@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P8 done 2026-10-10. Stable release **v0.1.0** frozen (git tag). Waiting on Eric's inputs (below) before further work; experiments go on top of v0.1.0.
+P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). Waiting on Eric's inputs (below) before further work; experiments go on top of v0.1.0.
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
