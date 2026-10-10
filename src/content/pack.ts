@@ -3,7 +3,7 @@ import { LENSES, saveSnippet, sources, type Lens, type Snippet, type Source } fr
 
 export const PACK_FORMAT = 'metaphysics-content';
 
-export type PackSnippet = Omit<Snippet, 'approved' | 'placeholder' | 'version'> & { version?: number };
+export type PackSnippet = Omit<Snippet, 'approved' | 'placeholder' | 'version' | 'themes'> & { version?: number; themes?: string[] };
 
 /** A content pack: sources, snippets and declared interpretation splits, loaded from a JSON file. */
 export interface ContentPack {
@@ -63,6 +63,8 @@ export function validatePack(raw: unknown, known: Set<string>): { pack: ContentP
     const n = words(s.text);
     if (n > WORD_LIMIT) throw new Error(`${where}: ${n} words; the limit is ${WORD_LIMIT} (layers are capped near ${WORD_CAP}).`);
     if (n > WORD_CAP) warnings.push(`${where}: ${n} words, over the ~${WORD_CAP}-word layer cap.`);
+    if (s.themes !== undefined && (!Array.isArray(s.themes) || !s.themes.every((t) => typeof t === 'string'))) throw new Error(`${where}: themes must be a list of words.`);
+    if (!s.key.endsWith('.move') && /\byou(r|rs|rself)?\b/i.test(s.text)) warnings.push(`${where}: addresses "you"; only the Your move layer may (layers 1-4 are neutral voice).`);
     if (/\bwill\b/i.test(s.text)) warnings.push(`${where}: uses "will"; readings should be conditional ("is read as").`);
   }
   for (const sp of p.splits ?? []) {
@@ -96,7 +98,8 @@ export function importPack(db: Db, raw: unknown, now = new Date()): PackReport {
       version: s.version ?? 1,
       authored_by: s.authored_by,
       placeholder: false,
-      approved: false
+      approved: false,
+      themes: (s.themes ?? []).map((t) => t.trim().toLowerCase()).filter(Boolean)
     });
   }
   for (const sp of pack.splits ?? []) {

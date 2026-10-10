@@ -19,7 +19,8 @@ import {
   type Reduction
 } from '../../engines/numerology/compute';
 import { Label } from '../components/Label';
-import { ReadingLayers } from '../components/ReadingLayers';
+import { ComposedReading } from '../components/ComposedReading';
+import { baziView, biorhythmView, hoursView, moonView, numerologyDailyView, numerologyMasterView, tzolkinView, vedicView } from '../../composer/views';
 import { useStore } from '../store';
 import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
@@ -205,10 +206,8 @@ function Numerology({ profile }: { profile: Profile }) {
         </div>
       </section>
 
-      <section>
-        <h2>Life Path {r.date.lifePathByComponent.value}</h2>
-        <ReadingLayers snippetKey={`numerology.lifePath.${r.date.lifePathByComponent.value}`} lens="general" />
-      </section>
+      <ComposedReading view={numerologyMasterView(rec)} kind="master" rec={rec} />
+      <ComposedReading view={numerologyDailyView(rec.id, cyc.personalDay, cyc.personalYear)} kind="daily" day={`${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}`} rec={{ id: rec.id, fingerprint: `${rec.fingerprint}:${t.year}-${t.month}-${t.day}` }} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>
   );
@@ -262,6 +261,7 @@ function Biorhythm({ profile }: { profile: Profile }) {
         </svg>
         <p class="note">Today on the left, four weeks ahead. Day {r.daysLived.toLocaleString()} of life, counted in calendar days.</p>
       </section>
+      <ComposedReading view={biorhythmView(rec)} kind="daily" day={`${t.year}-${t.month}-${t.day}`} rec={rec} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={[]} />
     </>
   );
@@ -323,6 +323,7 @@ function SkyInner({ eph }: { profile: Profile; eph: Ephemeris }) {
           <Label label="calculated">Calculated. Phase names use 45° bins centred on the exact phases.</Label>
         </section>
       )}
+      {moon && <ComposedReading view={moonView(moon)} kind="daily" day={`${t.year}-${t.month}-${t.day}`} rec={moon} />}
       <section>
         <h2>Planetary day and hours</h2>
         {hours.error && <p class="note">{hours.error}</p>}
@@ -350,6 +351,7 @@ function SkyInner({ eph }: { profile: Profile; eph: Ephemeris }) {
           </>
         )}
       </section>
+      {hours.rec && <ComposedReading view={hoursView(hours.rec, nowMs)} kind="daily" day={`${t.year}-${t.month}-${t.day}`} rec={hours.rec} />}
     </>
   );
 }
@@ -443,10 +445,7 @@ function BaziView({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
           ))}
         </section>
       )}
-      <section>
-        <h2>Day master</h2>
-        <ReadingLayers snippetKey={`bazi.dayMaster.${c.day.stem}`} lens="general" />
-      </section>
+      <ComposedReading view={baziView(rec)} kind="master" rec={rec} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>
   );
@@ -478,10 +477,7 @@ function TzolkinView({ profile }: { profile: Profile }) {
           </div>
         ))}
       </section>
-      <section>
-        <h2>Day sign</h2>
-        <ReadingLayers snippetKey={`tzolkin.daySign.${c.tzolkin.name.toLowerCase()}`} lens="general" />
-      </section>
+      <ComposedReading view={tzolkinView(rec)} kind="master" rec={rec} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>
   );
@@ -533,6 +529,7 @@ function VedicView({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
           })}
         </div>
       </section>
+      <ComposedReading view={vedicView(rec)} kind="master" rec={rec} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>
   );

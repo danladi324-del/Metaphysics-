@@ -11,6 +11,8 @@ import { computeReturn, computeTransits } from '../../engines/natal/transits';
 import { formatLongitude } from '../../engines/natal/zodiac';
 import { Label } from '../components/Label';
 import { ReadingLayers } from '../components/ReadingLayers';
+import { ComposedReading } from '../components/ComposedReading';
+import { natalView } from '../../composer/views';
 import { Wheel } from '../components/Wheel';
 import { shareFile } from '../share';
 import { useStore } from '../store';
@@ -212,6 +214,8 @@ function NatalView({ rec, profile, conv }: ViewProps & { profile: Profile }) {
             </>
           )}
         </section>
+
+        <ComposedReading view={natalView(rec, b.timeKnown)} kind="master" rec={rec} />
 
         <section style={{ borderTop: '1px solid var(--line)', paddingTop: '14px' }}>
           <h2>What changes under another convention</h2>

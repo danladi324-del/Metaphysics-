@@ -7,6 +7,7 @@ import { ProfileForm } from './screens/ProfileForm';
 import { Readings } from './screens/Readings';
 import { Draw } from './screens/Draw';
 import { FengShui } from './screens/FengShui';
+import { Journal } from './screens/Journal';
 import { StoreProvider, useStore } from './store';
 
 const ROUTES: Route[] = ['today', 'charts', 'draw', 'readings', 'journal', 'lab'];
@@ -50,6 +51,7 @@ function Router() {
   else if (loc.route === 'lab') screen = <Lab />;
   else if (loc.route === 'readings') screen = <Readings />;
   else if (loc.route === 'draw') screen = <Draw />;
+  else if (loc.route === 'journal') screen = <Journal />;
   else screen = <Placeholder route={loc.route} />;
 
   return (

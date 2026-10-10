@@ -1,0 +1,30 @@
+// P5 in a real browser: composed readings, journal entry with tags, outcome recorded, Lab outcome table. Same setup as e2e-p1.cjs.
+const { chromium, devices } = require(process.env.PW);
+(async () => {
+  const b = await chromium.launch(); const ctx = await b.newContext({ ...devices['iPhone 13'], timezoneId: 'America/Chicago' }); const page = await ctx.newPage();
+  const errors = []; page.on('pageerror', (e) => errors.push(e.message)); page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.goto('http://localhost:4173/Metaphysics-/');
+  await page.waitForSelector('text=New profile');
+  await page.fill('input >> nth=0', 'Eric'); await page.fill('input[type=date]', '1974-03-24'); await page.fill('input[type=time]', '11:15');
+  await page.fill('label:has-text("City") input', 'Bossier'); await page.click('button:has-text("Bossier City")');
+  await page.fill('input[aria-label="Name 1"]', 'Eric Garner');
+  await page.click('button:has-text("Save profile")'); await page.waitForSelector('text=Placements');
+  console.log('NATAL READING:', (await page.locator('section.card:has-text("Master reading")').innerText()).slice(0, 700).replace(/\n+/g, ' | '));
+  await page.click('nav a:has-text("Readings")'); await page.waitForSelector('text=Daily reading');
+  console.log('READING COUNT on numerology tab:', await page.locator('section.card:has-text("version")').count());
+  await page.click('nav a:has-text("Draw")'); await page.click('button:has-text("Tarot")'); await page.click('main button:has-text("Draw")');
+  await page.waitForSelector('text=Reading for this draw');
+  await page.click('button:has-text("Save to journal")');
+  await page.click('nav a:has-text("Journal")'); await page.waitForSelector('text=Tarot draw');
+  await page.fill('textarea >> nth=0', 'Slept badly, long day.'); await page.click('button[aria-pressed] >> text=2 >> nth=0');
+  await page.fill('label:has-text("Tags") input', 'sleep, work'); await page.click('button:has-text("Save entry")');
+  await page.click('button:has-text("Record what happened")'); await page.fill('label:has-text("What happened") textarea', 'Nothing notable.');
+  await page.click('button.chip:has-text("Can\'t tell")');
+  await page.waitForSelector('text=Outcome: Can');
+  await page.screenshot({ path: (process.env.OUT || '.') + '/p5-journal.png', fullPage: true });
+  await page.click('nav a:has-text("Lab")'); await page.waitForSelector('text=Outcomes by engine');
+  console.log('OUTCOMES:', (await page.locator('section:has(h2:has-text("Outcomes by engine"))').innerText()).replace(/\n+/g, ' | '));
+  console.log('widths', await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]));
+  console.log('errors', errors);
+  await b.close();
+})().catch((e) => { console.error('FAIL', e); process.exit(1); });

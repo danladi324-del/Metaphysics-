@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P4 done 2026-10-10. P5 next (composer, ledger, journal, outcomes).
+P5 done 2026-10-10. P6 next (daily synthesis, Today, convergence with baseline).
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -43,6 +43,12 @@ P4 done 2026-10-10. P5 next (composer, ledger, journal, outcomes).
 - UNVERIFIED: no E-Bazi or reference-app screenshots yet; the Flying Star fixture is a recalled published chart; webkitCompassHeading behavior on Eric's phone; WMM declination not checked against NOAA's online calculator.
 - Not done: BaZi luck pillars and Eight Mansions single Kua (need sex); Ti Gua replacement charts; Vedic divisional charts and antardashas.
 
+### P5 Composer, ledger, journal, outcomes — TEST
+- Works: five-layer composer with trace ids on every item; stored, versioned master readings (natal, numerology, BaZi, Tzolk'in, Vedic); daily readings (numerology personal day, biorhythm, moon, planetary day); per-draw readings (tarot, I Ching); status line agreement / disagreement / single source / insufficient; Obsidian note per reading; Journal tab with mood, energy, user tags, tag filter and 90-day tag table; outcomes recorded against saved draws; outcome table per engine in Lab; schema 3 with a real column migration.
+- Acceptance: with today's content every reading reports "Insufficient information" (no approved text) instead of a reading; tests show agreement only for two approved sources with a shared declared theme, disagreement whenever a split is declared (even with shared themes), and single-source otherwise.
+- Tested (130 unit tests total): status rules including unapproved and theme-less cases; trace ids; facts within the cap; house splits flow into layer 4; markdown; master versioning (reuse, content change, record change); migration of a pre-themes database; tag parsing; tag patterns; outcome rate withheld below five.
+- Browser (`scripts/e2e-p5.cjs`): natal master reading shows "Insufficient information" with traced facts; numerology shows master and daily; tarot draw → journal → outcome → Lab table; no console errors; no horizontal scroll.
+
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
 
@@ -75,6 +81,7 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Biorhythm, moon, planetary hours, I Ching | TEST | I Ching text not loaded |
 | Tarot | TEST | text placeholders until sources are loaded |
 | Content layer | TEST | approval gate, packs, templates |
+| Composer, journal, outcomes | TEST | P5 |
 | BaZi, Tzolk'in, Vedic | TEST | own BaZi, lunar-javascript as test oracle (D-016) |
 | Feng Shui | TEST | Flying Star fixture from memory; needs reference screenshot |
 | Qi Men | RESEARCH | blocked on school choice (D-005) |

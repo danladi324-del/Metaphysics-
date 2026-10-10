@@ -110,3 +110,17 @@ Loading source texts and approving paraphrases are Eric's (brief §8), so P3 shi
 
 ## D-017 Feng Shui declination: geomagnetism 0.2.0
 **Prior art: exists.** geomagnetism (Apache-2.0, last publish 2024-12) ships WMM-2015/2020/2025 coefficients and runs offline. WMM-2025 is valid to 2029; the app will need a model update after that.
+
+## D-018 Composer and the four statuses
+- The composer selects stored snippets; it writes no free text. Facts are filled templates with ids (`fact:natal.sun`) traced together with the record id (`fact:natal.sun@<record id>`). Every item in every layer has a trace id.
+- Layers: Facts (calculated, capped near 60 words), Traditional (one per source per key), Original synthesis, Where it splits (calculation rows for the record plus declared interpretation splits for the keys; "No split is recorded for these inputs." when empty), Your move (snippet `<key>.move`, else a placeholder).
+- Status is decided by rule, never from wording:
+  - **disagreement**: a split is declared for the keys;
+  - **insufficient**: no approved traditional text;
+  - **agreement**: two or more approved sources whose snippets share an author-declared theme;
+  - **single-source**: anything else (one source, or several with no shared declared theme — explicitly "not counted as agreement").
+- Themes are a new snippet field set by whoever writes the content pack. The app never assigns them.
+- Master readings are stored and versioned; a new version is written only when the record fingerprint or the hash of the snippets used changes. Daily readings are stored per day; draw and cast readings per record.
+
+## D-019 Outcomes are self-rated and labeled as such
+Outcome = Fit / Partly / Didn't fit / Can't tell, linked to the record that was checked. The Lab shows counts per engine and a "fit" share only once five outcomes are judged, with a note that unblinded self-rating of vague readings scores high by itself (Barnum effect). No outcome feeds back into any engine.

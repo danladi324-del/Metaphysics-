@@ -30,6 +30,8 @@ export interface Snippet {
   placeholder: boolean;
   /** Eric's approval (brief §8). A traditional snippet shows as Traditional only when approved. */
   approved: boolean;
+  /** Author-declared themes (e.g. "completion"). The app never assigns themes from wording. */
+  themes: string[];
 }
 
 /** The registry of known sources. Mirrors docs/SOURCES.md. None has text loaded yet. */
@@ -66,15 +68,16 @@ export function rowToSnippet(r: Row): Snippet {
     version: Number(r.version),
     authored_by: String(r.authored_by),
     placeholder: Number(r.placeholder) === 1,
-    approved: Number(r.approved) === 1
+    approved: Number(r.approved) === 1,
+    themes: JSON.parse(String(r.themes ?? '[]')) as string[]
   };
 }
 
 export function saveSnippet(db: Db, s: Snippet): void {
   db.run(
-    `INSERT OR REPLACE INTO snippet (id, key, tradition, text, source_id, source_locator, label, lens, reversal_mode, version, authored_by, placeholder, approved)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-    [s.id, s.key, s.tradition ?? null, s.text, s.source_id ?? null, s.source_locator ?? null, s.label, s.lens, s.reversal_mode ?? null, s.version, s.authored_by, s.placeholder ? 1 : 0, s.approved ? 1 : 0]
+    `INSERT OR REPLACE INTO snippet (id, key, tradition, text, source_id, source_locator, label, lens, reversal_mode, version, authored_by, placeholder, approved, themes)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [s.id, s.key, s.tradition ?? null, s.text, s.source_id ?? null, s.source_locator ?? null, s.label, s.lens, s.reversal_mode ?? null, s.version, s.authored_by, s.placeholder ? 1 : 0, s.approved ? 1 : 0, JSON.stringify(s.themes ?? [])]
   );
 }
 

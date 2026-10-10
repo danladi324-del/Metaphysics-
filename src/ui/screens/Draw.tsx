@@ -6,6 +6,8 @@ import { CARD_BY_ID, SPREADS, snippetKey } from '../../content/tarot';
 import { computeDraw, tarotDisagreements, type TarotResult } from '../../engines/tarot/compute';
 import { CardFace } from '../components/CardFace';
 import { ReadingLayers } from '../components/ReadingLayers';
+import { ComposedReading } from '../components/ComposedReading';
+import { ichingView, tarotView } from '../../composer/views';
 import { computeCast, type CastResult, type LineValue, type Method } from '../../engines/iching/compute';
 import { Label } from '../components/Label';
 import { useStore } from '../store';
@@ -155,6 +157,7 @@ function CastView({ rec }: { rec: CalcRecord<CastResult> }) {
         )}
         <p class="note">Planned source: Legge 1899 (public domain). Not loaded yet.</p>
       </section>
+      <ComposedReading view={ichingView(rec)} kind="event" rec={rec} day={rec.id} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>
   );
@@ -266,6 +269,7 @@ function Tarot() {
               </section>
             );
           })}
+          <ComposedReading view={tarotView(rec, tarot.mode)} kind="event" rec={rec} lens={lens} day={rec.id} />
           <section>
             <h2>Same cards, other lenses</h2>
             <div class="chips">

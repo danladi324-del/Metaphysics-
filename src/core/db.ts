@@ -2,7 +2,7 @@ import type { Database, SqlJsStatic } from 'sql.js';
 import type { CalcRecord } from './record';
 import type { Profile } from './profile';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -20,8 +20,13 @@ CREATE TABLE IF NOT EXISTS snippet (
   id TEXT PRIMARY KEY, key TEXT NOT NULL, tradition TEXT, text TEXT NOT NULL, source_id TEXT, source_locator TEXT,
   label TEXT NOT NULL CHECK (label IN ('traditional','synthesis')), lens TEXT NOT NULL DEFAULT 'general',
   reversal_mode TEXT, version INTEGER NOT NULL DEFAULT 1, authored_by TEXT NOT NULL, placeholder INTEGER NOT NULL DEFAULT 0,
-  approved INTEGER NOT NULL DEFAULT 0);
+  approved INTEGER NOT NULL DEFAULT 0, themes TEXT NOT NULL DEFAULT '[]');
 CREATE INDEX IF NOT EXISTS snippet_key ON snippet (key);
+CREATE TABLE IF NOT EXISTS reading (
+  id TEXT PRIMARY KEY, engine TEXT NOT NULL, kind TEXT NOT NULL CHECK (kind IN ('master','daily','event')), profile_id TEXT,
+  record_id TEXT NOT NULL, record_fingerprint TEXT NOT NULL, content_hash TEXT NOT NULL, lens TEXT NOT NULL,
+  day TEXT, composed_at TEXT NOT NULL, version INTEGER NOT NULL, status TEXT NOT NULL, layers TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS reading_lookup ON reading (engine, kind, profile_id, day);
 CREATE TABLE IF NOT EXISTS correspondence (
   id TEXT PRIMARY KEY, entity_a TEXT NOT NULL, relation TEXT NOT NULL, entity_b TEXT NOT NULL,
   tradition TEXT, source_id TEXT, label TEXT NOT NULL);
@@ -38,7 +43,7 @@ CREATE TABLE IF NOT EXISTS outcome (
 `;
 
 /** Tables included in export, in restore order. */
-export const TABLES = ['meta', 'profile', 'calc_record', 'source', 'snippet', 'correspondence', 'disagreement', 'journal_entry', 'outcome'] as const;
+export const TABLES = ['meta', 'profile', 'calc_record', 'source', 'snippet', 'correspondence', 'disagreement', 'reading', 'journal_entry', 'outcome'] as const;
 export type TableName = (typeof TABLES)[number];
 export type Row = Record<string, string | number | null>;
 
@@ -69,6 +74,7 @@ export class Db {
     const sql = image ? new SQL.Database(image) : new SQL.Database();
     sql.exec('PRAGMA foreign_keys = ON;');
     sql.exec(SCHEMA);
+    migrate(sql);
     const db = new Db(sql, persist);
     // Schema changes so far are additive (CREATE TABLE IF NOT EXISTS), so upgrading is just recording the version.
     if (db.getMeta('schema_version') !== String(SCHEMA_VERSION)) db.setMeta('schema_version', String(SCHEMA_VERSION));
@@ -211,6 +217,12 @@ export class Db {
       }
     });
   }
+}
+
+/** Column additions that CREATE TABLE IF NOT EXISTS cannot make on an existing database. Idempotent. */
+function migrate(sql: Database): void {
+  const cols = (t: string) => (sql.exec(`PRAGMA table_info(${t})`)[0]?.values ?? []).map((r) => String(r[1]));
+  if (!cols('snippet').includes('themes')) sql.exec("ALTER TABLE snippet ADD COLUMN themes TEXT NOT NULL DEFAULT '[]'");
 }
 
 function rowToRecord(r: Row): CalcRecord {

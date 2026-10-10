@@ -3,6 +3,7 @@ import { loadCities, searchCities, type City } from '../../core/cities';
 import { KEY_SETS } from '../../content/keys';
 import { approveSnippet, rowToSnippet, sources } from '../../content/model';
 import { importPack, templatePack } from '../../content/pack';
+import { FIT_LABEL, summarize } from '../../core/outcomes';
 import { backupStatus, exportJson, parseExport, restore } from '../../core/backup';
 import { LABEL_TEXT, type EvidenceLabel } from '../../core/labels';
 import { Label } from '../components/Label';
@@ -81,6 +82,8 @@ export function Lab() {
         ))}
         <p class="note">The app keeps both results. It does not pick one.</p>
       </section>
+
+      <OutcomeSection />
 
       <section>
         <h2>Labels</h2>
@@ -290,6 +293,39 @@ function ContentSection() {
           </button>
         </div>
       ))}
+    </section>
+  );
+}
+
+function OutcomeSection() {
+  const { db, version } = useStore();
+  void version;
+  const rows = summarize(db);
+  return (
+    <section>
+      <h2>Outcomes by engine</h2>
+      {rows.length === 0 && <p class="note">No outcomes recorded yet. Save a draw to the journal, then record what happened.</p>}
+      {rows.length > 0 && (
+        <div class="table" style={{ gridTemplateColumns: 'minmax(0,1.2fr) repeat(4, minmax(0,0.7fr))' }}>
+          <div class="h">Engine</div>
+          {(['fit', 'partly', 'no', 'unclear'] as const).map((f) => (
+            <div class="h">{FIT_LABEL[f]}</div>
+          ))}
+          {rows.map((r) => (
+            <>
+              <div>
+                {r.engine}
+                <div class="small muted">{r.fitShare === null ? 'too few to rate' : `${Math.round(r.fitShare * 100)}% fit`}</div>
+              </div>
+              <div>{r.counts.fit}</div>
+              <div>{r.counts.partly}</div>
+              <div>{r.counts.no}</div>
+              <div>{r.counts.unclear}</div>
+            </>
+          ))}
+        </div>
+      )}
+      <p class="note">Self-rated, unblinded. A high "fit" share is what vague readings produce by themselves (the Barnum effect), so this is a log, not a score.</p>
     </section>
   );
 }
