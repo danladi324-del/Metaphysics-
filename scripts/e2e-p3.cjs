@@ -1,0 +1,30 @@
+// P3 in a real browser: tarot draw, journal save, content pack import, approval flips the label. Same setup as e2e-p1.cjs.
+const { chromium, devices } = require(process.env.PW);
+(async () => {
+  const b = await chromium.launch(); const ctx = await b.newContext({ ...devices['iPhone 13'], timezoneId: 'America/Chicago' }); const page = await ctx.newPage();
+  const errors = []; page.on('pageerror', (e) => errors.push(e.message)); page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  page.on('dialog', (d) => d.accept());
+  await page.goto('http://localhost:4173/Metaphysics-/');
+  await page.waitForSelector('text=New profile');
+  await page.fill('input >> nth=0', 'Eric'); await page.fill('input[type=date]', '1974-03-24'); await page.fill('input[type=time]', '11:15');
+  await page.fill('label:has-text("City") input', 'Bossier'); await page.click('button:has-text("Bossier City")');
+  await page.click('button:has-text("Save profile")'); await page.waitForSelector('text=Placements');
+  await page.click('nav a:has-text("Draw")'); await page.click('button:has-text("Tarot")');
+  await page.selectOption('label:has-text("Spread") select', 'three');
+  await page.click('button:has-text("Draw")');
+  await page.waitForSelector('text=Same cards, other lenses');
+  await page.screenshot({ path: (process.env.OUT || '.') + '/p3-draw.png', fullPage: true });
+  await page.click('button:has-text("Save to journal")');
+  await page.click('nav a:has-text("Lab")'); await page.waitForSelector('text=Content');
+  await page.setInputFiles('label:has-text("Import a content pack") input', 'tests/fixtures/testpack.json');
+  await page.waitForSelector('text=Imported 2 snippets');
+  await page.click('nav a:has-text("Charts")'); await page.waitForSelector('text=Placements');
+  const before = await page.locator('h3:has-text("Sun in Aries") + div').innerText();
+  console.log('BEFORE APPROVAL:\n' + before);
+  await page.click('nav a:has-text("Lab")'); await page.click('button:has-text("Approve as a faithful paraphrase")');
+  await page.click('nav a:has-text("Charts")'); await page.waitForSelector('text=Placements');
+  console.log('AFTER APPROVAL:\n' + await page.locator('h3:has-text("Sun in Aries") + div').innerText());
+  console.log('widths', await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]));
+  console.log('errors', errors);
+  await b.close();
+})().catch((e) => { console.error('FAIL', e); process.exit(1); });
