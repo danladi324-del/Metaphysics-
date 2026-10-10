@@ -126,3 +126,32 @@ describe('numerology: boundaries', () => {
     expect(Object.keys(CHALDEAN).length).toBe(26);
   });
 });
+
+/*
+ Hand-worked: ERIC DANLADI GARNER (birth name, given 2026-10-10), 1974-03-24.
+ Pythagorean: ERIC 26 -> 8; DANLADI D4 A1 N5 L3 A1 D4 I9 = 27 -> 9; GARNER 36 -> 9.
+   Expression by part 8 + 9 + 9 = 26 -> 8; all letters 89 -> 17 -> 8.
+   Soul Urge: ERIC E5 I9 = 14 -> 5; DANLADI A1 A1 I9 = 11 (master, kept); GARNER 6. By part 5 + 11 + 6 = 22 (master). All vowels 31 -> 4.
+   Personality: ERIC 12 -> 3; DANLADI D4 N5 L3 D4 = 16 -> 7; GARNER 30 -> 3. By part 13 -> 4 (karmic 13 in the total). All 58 -> 13 -> 4 (karmic 13).
+ Chaldean: ERIC 11 (kept); DANLADI D4 A1 N5 L3 A1 D4 I1 = 19 -> 10 -> 1; GARNER 18 -> 9.
+   Expression by part 11 + 1 + 9 = 21 -> 3; all letters 48 -> 12 -> 3.
+ Maturity (Pythagorean) 3 + 8 = 11.
+*/
+describe('numerology: Eric Danladi Garner (birth name)', () => {
+  const r = numerology({ name: 'Eric Danladi Garner', year: 1974, month: 3, day: 24 });
+  it('Pythagorean', () => {
+    expect([r.pythagorean.expression.byNamePart.value, r.pythagorean.expression.allLetters.value]).toEqual([8, 8]);
+    expect([r.pythagorean.soulUrge.byNamePart.value, r.pythagorean.soulUrge.allLetters.value]).toEqual([22, 4]);
+    expect([r.pythagorean.personality.byNamePart.value, r.pythagorean.personality.allLetters.value]).toEqual([4, 4]);
+    expect(r.pythagorean.personality.byNamePart.karmicDebt).toBe(13);
+    expect(r.pythagorean.personality.allLetters.karmicDebt).toBe(13);
+  });
+  it('Chaldean', () => {
+    expect([r.chaldean.expression.byNamePart.value, r.chaldean.expression.allLetters.value]).toEqual([3, 3]);
+  });
+  it('maturity, karmic debt lists', () => {
+    expect(r.maturity.pythagorean.value).toBe(11);
+    expect(r.karmicDebt).toContainEqual({ where: 'Pythagorean Personality', number: 13 });
+    expect(r.karmicDebtInParts).toContainEqual({ where: 'Pythagorean Personality, name part DANLADI', number: 16 });
+  });
+});

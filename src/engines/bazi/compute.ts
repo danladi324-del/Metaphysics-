@@ -79,6 +79,19 @@ export interface BaziInputs {
   zone: string;
   lat: number;
   lon: number;
+  /** Optional. Only the luck-pillar direction depends on it. */
+  sex?: 'male' | 'female';
+}
+
+export interface LuckPillars {
+  /** Forward when a yang year stem meets male or a yin year stem meets female. */
+  direction: 'forward' | 'backward';
+  /** Days from birth to the next (forward) or previous (backward) month-boundary solar term. */
+  daysToTerm: number;
+  /** 3 days = 1 calendar year (about 1 day = 4 months), minute precision. */
+  startAge: { years: number; months: number };
+  startUtcMs: number;
+  pillars: { pillar: Pillar; fromUtcMs: number; fromAge: number }[];
 }
 
 export interface BaziChart {
@@ -95,6 +108,7 @@ export interface BaziChart {
 }
 
 export interface BaziResult {
+  luck: LuckPillars | null;
   chosen: BaziChart;
   conventions: BaziConventions;
   /** The same instant under every combination of the two conventions. */
@@ -139,10 +153,55 @@ function chart(eph: Ephemeris, inp: BaziInputs, conv: BaziConventions): BaziChar
   return { year: yearP, month: monthP, day: dayP, hour: hourP, timeUsed: w.toISOString().slice(0, 16), sunLongitude: Math.round(sun * 1e6) / 1e6, liChunUtcMs: liChun, elements };
 }
 
+/** Ten luck pillars (da yun) stepping from the month pillar. Solar terms are absolute instants, not Beijing wall time. */
+export function luckPillars(eph: Ephemeris, utcMs: number, c: BaziChart, sex: 'male' | 'female'): LuckPillars {
+  const yangYear = c.year.stem % 2 === 0;
+  const forward = (yangYear && sex === 'male') || (!yangYear && sex === 'female');
+  const sun = c.sunLongitude;
+  const k = Math.floor(norm360(sun - 315) / 30);
+  const target = norm360(315 + (forward ? k + 1 : k) * 30);
+  let term: number;
+  if (forward) term = solarTermInstant(eph, target, utcMs);
+  else {
+    // Previous boundary: search forward from ~40 days before.
+    term = solarTermInstant(eph, target, utcMs - 40 * 86_400_000);
+    if (term > utcMs) term = solarTermInstant(eph, target, utcMs - 400 * 86_400_000);
+  }
+  const days = Math.abs(term - utcMs) / 86_400_000;
+  // 3 days = 1 calendar year (365.2425 days), not "1 day = 120 days", which would assume 360-day years.
+  const ageYears = days / 3;
+  const startUtcMs = utcMs + Math.round(ageYears * 365.2425 * 86_400_000);
+  // Sexagenary index of the month pillar: the unique i in 0..59 with i%10 = stem, i%12 = branch.
+  let mi = 0;
+  while (mi % 10 !== c.month.stem || mi % 12 !== c.month.branch) mi++;
+  const pillars = Array.from({ length: 10 }, (_, n) => {
+    const i = (((mi + (forward ? n + 1 : -(n + 1))) % 60) + 60) % 60;
+    return { pillar: fromIndex(i), fromUtcMs: startUtcMs + Math.round(n * 10 * 365.2425 * 86_400_000), fromAge: Math.round((ageYears + n * 10) * 100) / 100 };
+  });
+  return {
+    direction: forward ? 'forward' : 'backward',
+    daysToTerm: Math.round(days * 10000) / 10000,
+    startAge: { years: Math.floor(ageYears), months: Math.floor((ageYears - Math.floor(ageYears)) * 12) },
+    startUtcMs,
+    pillars
+  };
+}
+
 export function computeBazi(eph: Ephemeris, inp: BaziInputs, conv: BaziConventions = DEFAULT_BAZI, now = new Date()): CalcRecord<BaziResult> {
   const variants = (['early', 'midnight'] as const).flatMap((ziHour) => [false, true].map((trueSolarTime) => ({ conventions: { ziHour, trueSolarTime }, chart: chart(eph, inp, { ziHour, trueSolarTime }) })));
-  const limitations = ['Luck pillars are not computed: their direction depends on sex, which the profile does not record.'];
-  return makeRecord(BAZI, { ...inp }, { ...conv, monthBoundary: 'solar terms (jie), Li Chun = 315°', ephemeris: 'swiss-moshier' }, { chosen: chart(eph, inp, conv), conventions: conv, variants }, limitations, now);
+  const chosen = chart(eph, inp, conv);
+  const luck = inp.sex ? luckPillars(eph, inp.utcMs, chosen, inp.sex) : null;
+  const limitations = luck
+    ? ['Luck-pillar start uses absolute solar-term instants; apps that read the birth clock as Beijing time can differ by months for births outside China.']
+    : ['Luck pillars are not computed: their direction depends on sex, which this profile does not record.'];
+  return makeRecord(
+    BAZI,
+    { ...inp },
+    { ...conv, monthBoundary: 'solar terms (jie), Li Chun = 315°', ephemeris: 'swiss-moshier', luckStart: '3 days = 1 year, minute precision' },
+    { luck, chosen, conventions: conv, variants },
+    limitations,
+    now
+  );
 }
 
 const convLabel = (c: BaziConventions) => `${c.trueSolarTime ? 'true solar time' : 'clock time'}, ${c.ziHour === 'early' ? 'day changes 23:00' : 'day changes 00:00'}`;

@@ -92,7 +92,7 @@ export function Charts() {
             </select>
           </label>
         </div>
-        <p class="note">Provisional defaults are waiting for your choice. Placidus and whole sign are always both computed.</p>
+        <p class="note">Your defaults: whole sign houses, tropical zodiac. Placidus is always computed alongside so the ledger can show where the two differ. Node and Lilith variants are still provisional.</p>
       </section>
 
       {error && <p class="note">Ephemeris failed to load: {error}</p>}

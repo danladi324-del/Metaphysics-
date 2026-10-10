@@ -100,3 +100,42 @@ describe('random instants vs lunar-javascript (clock time)', () => {
     expect(lateZi).toBeGreaterThanOrEqual(0);
   });
 });
+
+import { luckPillars } from '../src/engines/bazi/compute';
+
+describe('luck pillars', () => {
+  it("Eric (male, yang Jia year): forward from 丁卯, starting 戊辰 at about 3 years 10 months", () => {
+    const rec = computeBazi(eph, { ...ERIC, sex: 'male' });
+    const l = rec.raw_result.luck!;
+    expect(l.direction).toBe('forward');
+    expect(l.pillars.slice(0, 4).map((p) => gz(p.pillar))).toEqual(['戊辰', '己巳', '庚午', '辛未']);
+    expect(l.daysToTerm).toBeGreaterThan(11.4);
+    expect(l.daysToTerm).toBeLessThan(11.6);
+    expect(l.startAge).toEqual({ years: 3, months: 9 });
+  });
+  it('no sex, no luck pillars, and the limitation says why', () => {
+    const rec = computeBazi(eph, ERIC);
+    expect(rec.raw_result.luck).toBeNull();
+    expect(rec.limitations[0]).toMatch(/sex/);
+  });
+  it('vs lunar-javascript for Shanghai births (where its Beijing-time reading is correct): direction, pillars, start within 3 days (calendar-component vs continuous addition)', () => {
+    let n = 0;
+    for (const ms of instants(60, 23)) {
+      for (const [sex, g] of [['male', 1], ['female', 0]] as const) {
+        const ours = computeBazi(eph, { utcMs: ms, zone: 'Asia/Shanghai', lat: 31.2, lon: 121.5, sex }).raw_result;
+        const edge = Math.abs(((ours.chosen.sunLongitude - 315) % 30 + 30) % 30);
+        if (edge < 0.01 || edge > 29.99) continue;
+        const y = Solar.fromYmdHms(...wall(ms, 8)).getLunar().getEightChar().getYun(g, 2);
+        expect(ours.luck!.direction === 'forward', new Date(ms).toISOString()).toBe(y.isForward());
+        const theirs = y.getDaYun().slice(1, 5).map((d: { getGanZhi(): string }) => d.getGanZhi());
+        expect(ours.luck!.pillars.slice(0, 4).map((p) => gz(p.pillar))).toEqual(theirs);
+        const s = y.getStartSolar();
+        const theirStart = Date.UTC(s.getYear(), s.getMonth() - 1, s.getDay(), s.getHour(), s.getMinute()) - 8 * 3_600_000;
+        expect(Math.abs(ours.luck!.startUtcMs - theirStart) / 86_400_000, new Date(ms).toISOString()).toBeLessThan(3);
+        n++;
+      }
+    }
+    expect(n).toBeGreaterThan(100);
+    expect(typeof luckPillars).toBe('function');
+  });
+});

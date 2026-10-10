@@ -140,3 +140,21 @@ Three parts only (brief §4.9). (a) Pointers: Saturn, Pluto, Chiron, Lilith, the
 
 ## D-023 Qi Men blocked
 Not started. The brief requires the school choice (Chai Bu vs Zhi Run) first, and the old app's output as a fixture. Candidate libraries are listed in D-005.
+
+## D-024 Eric's choices, 2026-10-10
+- **Birth name for numerology:** Eric Danladi Garner (middle name Danladi). Profiles store names on the phone, so the existing profile needs the name edited there (Lab → Profiles → Edit; kind "Birth").
+- **Sex:** male. New optional profile field, used only by BaZi luck-pillar direction and the Eight Mansions Kua formula.
+- **House system:** "whole house system" read as **Whole Sign** (the assumption; Equal houses is the other system sometimes described that way). Default is now whole sign; Placidus is still computed alongside (rule 5).
+- **Zodiac:** tropical. Sidereal stays selectable.
+These are no longer marked provisional. Node type, Lilith type and master-number handling remain provisional.
+
+## D-025 Tarot reversal mode (delegated to Claude): "as the source reads each card"
+Options were blocked, opposite, internal, delayed. Chosen: none of them as the default, but the cited source's own reversed meaning per card (`mode: 'source'`, snippets keyed `tarot.<card>.reversed` with no mode tag).
+Why it coheres: rule 2 lets a sentence be Traditional only when it paraphrases a cited passage. Waite 1911 (the registered tarot source) prints a reversed meaning for each card, so source-per-card reversals can reach the Traditional label. A blanket rule ("every reversal means blocked") is not a passage in any loaded source; applied across cards it is the app's own transformation, i.e. synthesis. The four generic modes stay available as comparison lenses and display as synthesis unless a cited passage for that mode is loaded.
+Reverse if: Eric loads a source whose author defines reversals by one generic rule and wants that author as the default.
+
+## D-026 BaZi luck pillars
+- Direction: forward for yang year stem + male or yin year stem + female; otherwise backward.
+- Start: days from birth to the next (forward) or previous (backward) month-boundary solar term, 3 days = 1 calendar year, minute precision, added as continuous time.
+- Solar terms are absolute instants. lunar-javascript reads the birth clock as Beijing time, which is right for births in China and wrong elsewhere: for Eric (Chicago) it gives a 4-year start; the absolute-instant result is 11.49 days → 3.83 years (3 years 9 months). Tested against lunar-javascript on 120 Shanghai births: direction and pillars identical, start dates within 3 days (it adds calendar components, this adds continuous time).
+- A bug found while testing: the first version converted days with "1 day = 120 days", which silently assumes 360-day years and drifted ~5 weeks over 7 years. Fixed.

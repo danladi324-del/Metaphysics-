@@ -21,7 +21,7 @@ import { computeNumerology, DEFAULT_NUMEROLOGY, NUMEROLOGY, personalCycles } fro
 import { TAROT, type TarotResult } from '../../engines/tarot/compute';
 import { Dot, Label } from '../components/Label';
 import { Warnings } from '../components/Warnings';
-import { useStore } from '../store';
+import { snippetMode, useStore } from '../store';
 import { useEphemeris, useNatal } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
@@ -82,7 +82,7 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
   if (bio) add(BIORHYTHM.input_dependencies, biorhythmView(bio));
   if (moon) add(MOON.input_dependencies, moonView(moon));
   if (hours) add(HOURS.input_dependencies, hoursView(hours, nowMs));
-  if (tarot) add(TAROT.input_dependencies, tarotView(tarot, settings.tarot.mode));
+  if (tarot) add(TAROT.input_dependencies, tarotView(tarot, snippetMode(settings.tarot.mode)));
   if (cast) add(ICHING.input_dependencies, ichingView(cast));
   const conv = convergence(
     daily.map((d): EngineThemes => ({ engine: d.engine, deps: d.deps, themes: d.reading.approvedThemes })),
