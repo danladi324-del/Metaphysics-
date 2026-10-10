@@ -22,3 +22,6 @@ Every `snippet` and `correspondence` row cites a `source_id` from this registry.
 
 Paraphrases may be labeled Traditional only after Eric approves them (brief §8).
 | `geonames` | GeoNames cities15000 (2017 snapshot via npm cities15000-json) | CC-BY | offline city list, coordinates, zone names |
+| `qimen-wasm` | @spensercai/qimen-wasm 0.2.1 | MIT | test-only oracle for the Chai Bu Qi Men chart |
+| `qimen-dunjia` | qimen-dunjia 3.1.0 (arc119226) | MIT | test-only oracle for the elapsed-time yuan variant |
+| `lunar-javascript` | lunar-javascript 1.7.7 (6tail) | MIT | test-only oracle for BaZi pillars and luck pillars |

@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). Waiting on Eric's inputs (below) before further work; experiments go on top of v0.1.0.
+P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). Eric's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -80,16 +80,21 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
 
+## Decisions applied 2026-10-10
+- Birth name Eric Danladi Garner; sex male; whole sign houses; tropical zodiac (D-024).
+- Delegated to Claude: tarot reversals read as each card's source gives them (D-025); Qi Men school Chai Bu (D-027).
+- New: BaZi luck pillars (D-026): Eric forward from 丁卯, first pillar 戊辰 from age 3 years 9 months (11.49 days to Qing Ming; lunar-javascript-based apps will show 4 years because they read the birth clock as Beijing time). Single Kua 8 (West group).
+- Numerology with the full birth name (hand-checked): Life Path 3; Expression 8 (both methods); Soul Urge 22 by name part vs 4 all vowels (DANLADI's vowels make 11); Personality 4 with karmic debt 13 in the total, plus 16 inside DANLADI; Chaldean Expression 3; Maturity 11.
+- Qi Men (experimental): Eric's birth hour is Yang dun Ju 3, Spring Equinox upper yuan, leader 天冲 / 伤门.
+- **On the phone:** the existing profile still has the old name and no sex. Edit it once (Lab → Profiles → Edit): name "Eric Danladi Garner" (kind Birth), sex Male.
+
 ## Inputs received from Eric
 - Birth: 1974-03-24, 11:15, Bossier City, Louisiana (32.516 N, 93.732 W; America/Chicago; UTC−5 because of 1974 emergency DST — see DECISIONS D-006).
 - Name for numerology: "Eric Garner" (as given; full birth name not confirmed).
 
 ## Still owed by Eric (brief §8)
-- Confirm full birth name for numerology (middle name?).
 - 3–4 Astrodienst reference charts (one awkward case, e.g. a midnight birth), plus Planetaro, E-Bazi and Qi Men screenshots.
-- Default house system, zodiac, reversal mode; Qi Men school.
 - Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional.
-- Sex for the profile, if Eric wants BaZi luck pillars and a single Kua (both traditions use it). Optional.
 
 ## Design canvas: what it lacks
 The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet cover:
@@ -112,7 +117,7 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Composer, journal, outcomes | TEST | P5 |
 | BaZi, Tzolk'in, Vedic | TEST | own BaZi, lunar-javascript as test oracle (D-016) |
 | Feng Shui | TEST | Flying Star fixture from memory; needs reference screenshot |
-| Qi Men | BLOCKED | school choice (D-005, D-023) |
+| Qi Men | TEST (experimental) | Chai Bu, checked vs qimen-wasm and qimen-dunjia; old-app fixture owed; Zhi Run not built (D-027) |
 | Shadow | TEST | D-021 |
 | Geomancy | TEST | D-022 |
 | Rest of long tail | IDEA | one at a time |

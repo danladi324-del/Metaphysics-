@@ -17,6 +17,10 @@ export const KEY_SETS: Record<string, () => string[]> = {
       ...(b === 'southnode' ? [] : Array.from({ length: 12 }, (_, i) => `shadow.${b}.house.${i + 1}`))
     ]),
   geomancy: () => FIGURES.map((f) => `geomancy.figure.${f.name.toLowerCase().replace(/[^a-z0-9]+/g, '')}`),
+  qimen: () => [
+    ...['tianpeng', 'tianrui', 'tianchong', 'tianfu', 'tianqin', 'tianxin', 'tianzhu', 'tianren', 'tianying'].map((x) => `qimen.star.${x}`),
+    ...['xiu', 'si', 'shang', 'du', 'kai', 'jing', 'sheng', 'jingscene'].map((x) => `qimen.door.${x}`)
+  ],
   numerology: () => [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33].map((n) => `numerology.lifePath.${n}`),
   iching: () =>
     Array.from({ length: 64 }, (_, i) => i + 1).flatMap((n) => [`iching.hexagram.${n}`, ...[1, 2, 3, 4, 5, 6].map((l) => `iching.hexagram.${n}.line.${l}`)])

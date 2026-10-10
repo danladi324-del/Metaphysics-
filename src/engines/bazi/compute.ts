@@ -115,7 +115,8 @@ export interface BaziResult {
   variants: { conventions: BaziConventions; chart: BaziChart }[];
 }
 
-function chart(eph: Ephemeris, inp: BaziInputs, conv: BaziConventions): BaziChart {
+/** Four pillars at an instant. Shared with Qi Men so both engines use one solar-term and pillar input. */
+export function chart(eph: Ephemeris, inp: BaziInputs, conv: BaziConventions): BaziChart {
   assertInstant(inp.utcMs, 'birth time');
   assertLatLon(inp.lat, inp.lon);
   const jd = julianDayUT(inp.utcMs);

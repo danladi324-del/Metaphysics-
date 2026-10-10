@@ -21,13 +21,14 @@ import {
 import { Label } from '../components/Label';
 import { ComposedReading } from '../components/ComposedReading';
 import { Shadow } from './Shadow';
+import { Qimen } from './Qimen';
 import { baziView, biorhythmView, hoursView, moonView, numerologyDailyView, numerologyMasterView, tzolkinView, vedicView } from '../../composer/views';
 import { useStore } from '../store';
 import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
 
-type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'shadow';
+type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'qimen' | 'shadow';
 
 export function Readings() {
   const { profile } = useStore();
@@ -48,6 +49,7 @@ export function Readings() {
             ['bazi', 'BaZi'],
             ['tzolkin', "Tzolk'in"],
             ['vedic', 'Vedic'],
+            ['qimen', 'Qi Men'],
             ['shadow', 'Shadow']
           ] as [Engine, string][]
         ).map(([k, v]) => (
@@ -62,6 +64,7 @@ export function Readings() {
       {engine === 'bazi' && <WithEph render={(eph) => <BaziView profile={profile} eph={eph} />} />}
       {engine === 'tzolkin' && <TzolkinView profile={profile} />}
       {engine === 'shadow' && <Shadow profile={profile} />}
+      {engine === 'qimen' && <WithEph render={(eph) => <Qimen profile={profile} eph={eph} />} />}
       {engine === 'vedic' && <WithEph render={(eph) => <VedicView profile={profile} eph={eph} />} />}
       <a class="btn" href="#/lab/fengshui" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         Feng Shui compass
