@@ -73,7 +73,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 ### Not verified (honest list)
 - Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on Eric's iOS version, and install-to-Home-Screen.
 - GitHub Pages deploy: needs the branch merged to `main` and Pages source set to GitHub Actions (INSTALL.md).
-- No external reference fixtures (Astrodienst, Planetaro, E-Bazi, Qi Men app). Current checks are against independent code and hand arithmetic.
+- External fixtures: 7 from Eric's apps (D-028). Still no awkward-case (midnight/DST) external fixture.
 - Flying Star fixture is from memory of a published chart.
 - No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information".
 
@@ -86,6 +86,7 @@ Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 2
 - New: BaZi luck pillars (D-026): Eric forward from 丁卯, first pillar 戊辰 from age 3 years 9 months (11.49 days to Qing Ming; lunar-javascript-based apps will show 4 years because they read the birth clock as Beijing time). Single Kua 8 (West group).
 - Numerology with the full birth name (hand-checked): Life Path 3; Expression 8 (both methods); Soul Urge 22 by name part vs 4 all vowels (DANLADI's vowels make 11); Personality 4 with karmic debt 13 in the total, plus 16 inside DANLADI; Chaldean Expression 3; Maturity 11.
 - Qi Men (experimental): Eric's birth hour is Yang dun Ju 3, Spring Equinox upper yuan, leader 天冲 / 伤门.
+- Reference screenshots received and turned into fixtures (D-028): 7 fixtures, all passing; one bug found and fixed (sidereal whole-sign cusps). Defaults now match Eric's own software: true node, interpolated Lilith, BaZi true solar time.
 - **On the phone:** the existing profile still has the old name and no sex. Edit it once (Lab → Profiles → Edit): name "Eric Danladi Garner" (kind Birth), sex Male.
 
 ## Inputs received from Eric
@@ -93,7 +94,7 @@ Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 2
 - Name for numerology: "Eric Garner" (as given; full birth name not confirmed).
 
 ## Still owed by Eric (brief §8)
-- 3–4 Astrodienst reference charts (one awkward case, e.g. a midnight birth), plus Planetaro, E-Bazi and Qi Men screenshots.
+- Optional: one awkward-case chart (a midnight or DST-change birth) from Astrodienst, to exercise the boundary code against an outside source.
 - Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional.
 
 ## Design canvas: what it lacks
@@ -109,7 +110,7 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Engine | State | Notes |
 |---|---|---|
 | Foundation | TEST | P1 |
-| Natal chart, transits, returns | TEST | awaiting Astrodienst fixtures |
+| Natal chart, transits, returns | VALIDATE | matches Astrodienst natal, sidereal, relocation, draconic (D-028) |
 | Numerology | TEST | letter tables not yet checked against source scans |
 | Biorhythm, moon, planetary hours, I Ching | TEST | I Ching text not loaded |
 | Tarot | TEST | text placeholders until sources are loaded |

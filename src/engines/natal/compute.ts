@@ -29,16 +29,23 @@ export const COMPETING_HOUSES: HouseSystem[] = ['placidus', 'wholeSign'];
 
 export const BODY_ORDER = [
   'sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto',
-  'chiron', 'meanNode', 'trueNode', 'meanLilith', 'osculatingLilith'
+  'chiron', 'meanNode', 'trueNode', 'meanLilith', 'osculatingLilith', 'interpolatedLilith'
 ] as const;
 export type BodyId = (typeof BODY_ORDER)[number];
 
 export const BODY_LABEL: Record<BodyId | 'southNode' | 'asc' | 'mc', string> = {
   sun: 'Sun', moon: 'Moon', mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn',
   uranus: 'Uranus', neptune: 'Neptune', pluto: 'Pluto', chiron: 'Chiron', meanNode: 'North Node (mean)',
-  trueNode: 'North Node (true)', meanLilith: 'Lilith (mean)', osculatingLilith: 'Lilith (osculating)',
+  trueNode: 'North Node (true)', meanLilith: 'Lilith (mean)', osculatingLilith: 'Lilith (osculating)', interpolatedLilith: 'Lilith (interpolated)',
   southNode: 'South Node', asc: 'Ascendant', mc: 'Midheaven'
 };
+
+/** Node and Lilith come in variants; only the chosen one is drawn and aspected, all are stored. */
+export const NODE_IDS = ['meanNode', 'trueNode'] as const;
+export const LILITH_IDS = ['meanLilith', 'osculatingLilith', 'interpolatedLilith'] as const;
+export const isVariantPoint = (id: string) => (NODE_IDS as readonly string[]).includes(id) || (LILITH_IDS as readonly string[]).includes(id);
+export const nodeBody = (c: { nodeType: 'mean' | 'true' }): BodyId => (c.nodeType === 'mean' ? 'meanNode' : 'trueNode');
+export const lilithBody = (c: { lilithType: 'mean' | 'osculating' | 'interpolated' }): BodyId => `${c.lilithType}Lilith` as BodyId;
 
 export interface NatalInputs {
   utcMs: number;
@@ -140,7 +147,13 @@ export function natalPositions(
       limitations.push(`${HOUSE_SYSTEM_LABEL[sys]} is undefined above ${quadrantLimit.toFixed(2)}° latitude; Swiss Ephemeris substituted Porphyry cusps.`);
     }
     const shift = ayanamsa ?? 0;
-    houses[sys] = { system: sys, cusps: h.cusps.slice(1, 13).map((c) => r7(norm360(c - shift))), fallback };
+    // Whole sign cusps sit at 0° of each sign counted from the ascendant's sign in the zodiac in use;
+    // subtracting the ayanamsa from tropical whole-sign cusps would leave them mid-sign (caught by the Astrodienst sidereal fixture).
+    const cusps =
+      sys === 'wholeSign'
+        ? Array.from({ length: 12 }, (_, i) => norm360(Math.floor(norm360(h.ascendant - shift) / 30) * 30 + i * 30))
+        : h.cusps.slice(1, 13).map((c) => r7(norm360(c - shift)));
+    houses[sys] = { system: sys, cusps, fallback };
     if (sys === conv.houseSystem || sys === systems[0]) {
       angles = {
         asc: r7(norm360(h.ascendant - shift)),
@@ -151,7 +164,7 @@ export function natalPositions(
       };
     }
   }
-  if (sidereal) limitations.push('Sidereal house cusps are tropical cusps minus the ayanamsa.');
+  if (sidereal) limitations.push('Sidereal quadrant cusps are tropical cusps minus the ayanamsa; whole sign cusps start at 0° of the sidereal rising sign.');
   if (inputs.timeKnown === false) {
     limitations.push('Birth time unknown: computed for local noon. Houses, angles and house splits are not meaningful; the Moon may be off by up to about 7°.');
   }
@@ -173,10 +186,10 @@ export function natalPositions(
     };
   });
 
-  const node = conv.nodeType === 'mean' ? 'meanNode' : 'trueNode';
-  const lilith = conv.lilithType === 'mean' ? 'meanLilith' : 'osculatingLilith';
+  const node = nodeBody(conv);
+  const lilith = lilithBody(conv);
   const aspectPoints: Point[] = bodies
-    .filter((b) => !['meanNode', 'trueNode', 'meanLilith', 'osculatingLilith'].includes(b.id) || b.id === node || b.id === lilith)
+    .filter((b) => !isVariantPoint(b.id) || b.id === node || b.id === lilith)
     .map((b) => ({ id: b.id, longitude: b.longitude, speed: b.speed }));
   aspectPoints.push({ id: 'asc', longitude: angles.asc, speed: 0 }, { id: 'mc', longitude: angles.mc, speed: 0 });
   const aspects = findAspects(aspectPoints, orbs, (a, b) => (a.id === 'asc' && b.id === 'mc') || (a.id === 'mc' && b.id === 'asc'));
@@ -226,7 +239,9 @@ export function natalDisagreements(rec: CalcRecord<NatalResult>, profileId: stri
   const find = (id: BodyId) => res.bodies.find((b) => b.id === id);
   const pairs: [BodyId, BodyId, string][] = [
     ['meanNode', 'trueNode', 'convention: lunar node (mean vs true)'],
-    ['meanLilith', 'osculatingLilith', 'convention: Lilith (mean vs osculating apogee)']
+    ['meanLilith', 'osculatingLilith', 'convention: Lilith (mean vs osculating apogee)'],
+    ['interpolatedLilith', 'meanLilith', 'convention: Lilith (interpolated vs mean apogee)'],
+    ['interpolatedLilith', 'osculatingLilith', 'convention: Lilith (interpolated vs osculating apogee)']
   ];
   for (const [a, b, cause] of pairs) {
     const pa = find(a);

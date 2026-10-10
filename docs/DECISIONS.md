@@ -168,3 +168,15 @@ Reverse if: Eric loads a source whose author defines reversals by one generic ru
 **Conventions (match qimen-wasm):** hour chart, rotating plate; centre lodged in Kun; Tian Qin travels with Tian Rui; deities 值符 螣蛇 太阴 六合 白虎 玄武 九地 九天 for both duns (some schools say 勾陈/朱雀 in yang dun; positions are identical); day changes at 23:00; pillars from clock time in the zone.
 **Verification:** vs qimen-wasm on 300 random hours (1950–2049, UTC+8): dun, term, yuan, Ju, leader star/door and palaces, and every palace's earth stem, heaven stems, stars, door and deity identical (sample includes 133 yin-dun hours, 22 centre-palace leaders, 29 Jia hours; a deliberate deity swap makes the test fail). Elapsed-time variant vs qimen-dunjia on 300 random whole hours: Ju and dun identical.
 **Still owed:** the old app's output as a manual fixture (brief §4.8). Status: experimental.
+
+## D-028 Reference fixtures from Eric's apps, and the defaults they settle (2026-10-10)
+Eric supplied screenshots from Astrodienst (natal Placidus, sidereal Fagan/Bradley whole signs, relocation to Abilene, draconic), his BaZi app, a planetary-hours app and Qi Men Dun Jia Pro (kymon.net). They are transcribed in `tests/reference-fixtures.test.ts` and listed in `src/core/fixtures.ts` (shown in Lab). Results:
+- Astrodienst natal: 11 bodies within 2″ (most within 1″); interpolated Lilith exact; true node 11″ and osculating Lilith 77″ off (Moshier vs Swiss data files); Ascendant, MC and four cusps to the printed minute. Sidereal: Sun, Moon, Ascendant, MC within 1″, confirming the nutation-inclusive ayanamsa (D-016 era fix). Relocation: Ascendant and MC to the second. Draconic: consistent within 15″.
+- BaZi app: shows the birth time as 09:53, which is the app's true-solar-time result to the minute, with pillars 己巳 甲子 丁卯 甲寅.
+- Planetary hours: Saturn day; Mars/Sun/Venus hours to the minute; sunrise ~1 minute apart.
+- Kymon Qi Men: Yin dun Ju 9 with every palace's stems, door and deity identical, and annual stars identical. The competing elapsed-time yuan rule would give Ju 6, so Kymon follows the fu-head Chai Bu the app shows (supports D-027).
+**Bug found by a fixture:** in sidereal mode, whole-sign cusps were tropical cusps minus the ayanamsa, leaving them mid-sign. Whole-sign cusps now start at 0° of the sidereal rising sign. (House assignment was already correct; the wheel's cusp lines were not.)
+**Defaults aligned with Eric's own software** (all alternatives still computed and logged):
+- Lunar node: **true** (Astrodienst shows True Node).
+- Lilith: **interpolated**, newly added (Astrodienst's "Lilith (i)"); mean and osculating stay available.
+- BaZi time: **true solar time on** (his BaZi app is fed 09:53, not 11:15).

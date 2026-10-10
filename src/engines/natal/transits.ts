@@ -3,7 +3,7 @@ import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/r
 import { julianDayUT, utcMsFromJulianDay } from '../../core/time';
 import { aspectBetween, type Aspect, type AspectType } from './aspects';
 import { BODY, FLAG, type Ephemeris } from './ephemeris';
-import { BODY_ORDER, type BodyId, type NatalResult } from './compute';
+import { BODY_ORDER, isVariantPoint, type BodyId, type NatalResult } from './compute';
 import { norm360 } from './zodiac';
 
 export const TRANSITS: EngineDescriptor = {
@@ -50,7 +50,7 @@ export function computeTransits(
   if (conv.zodiac === 'sidereal') limitations.push('Transits are computed tropically; natal sidereal comparison not yet supported.');
   const node = conv.nodeType === 'mean' ? 'meanNode' : 'trueNode';
   const natalPoints = natal.raw_result.bodies
-    .filter((b) => !['meanNode', 'trueNode', 'meanLilith', 'osculatingLilith'].includes(b.id) || b.id === node)
+    .filter((b) => !isVariantPoint(b.id) || b.id === node)
     .map((b) => ({ id: b.id as string, longitude: b.longitude, speed: 0 }));
   natalPoints.push({ id: 'asc', longitude: natal.raw_result.angles.asc, speed: 0 }, { id: 'mc', longitude: natal.raw_result.angles.mc, speed: 0 });
   const aspects: TransitResult['aspects'] = [];

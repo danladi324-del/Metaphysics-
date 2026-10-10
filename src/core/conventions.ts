@@ -4,7 +4,7 @@ export type HouseSystem = 'placidus' | 'wholeSign' | 'koch' | 'equal' | 'campanu
 export type Zodiac = 'tropical' | 'sidereal';
 export type Ayanamsa = 'lahiri' | 'raman' | 'krishnamurti' | 'faganBradley';
 export type NodeType = 'mean' | 'true';
-export type LilithType = 'mean' | 'osculating';
+export type LilithType = 'mean' | 'osculating' | 'interpolated';
 
 export interface AstroConventions {
   houseSystem: HouseSystem;
@@ -18,12 +18,12 @@ export const DEFAULT_ASTRO: AstroConventions = {
   houseSystem: 'wholeSign',
   zodiac: 'tropical',
   ayanamsa: 'lahiri',
-  nodeType: 'mean',
-  lilithType: 'mean'
+  nodeType: 'true',
+  lilithType: 'interpolated'
 };
 
 /** Which defaults are still provisional (shown with a note in the UI). */
-export const PROVISIONAL: ReadonlySet<string> = new Set(['nodeType', 'lilithType', 'masterNumbers']);
+export const PROVISIONAL: ReadonlySet<string> = new Set(['masterNumbers']);
 
 export const HOUSE_SYSTEM_LABEL: Record<HouseSystem, string> = {
   placidus: 'Placidus',

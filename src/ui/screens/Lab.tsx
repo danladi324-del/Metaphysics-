@@ -8,6 +8,7 @@ import { backupStatus, exportJson, parseExport, restore } from '../../core/backu
 import { LABEL_TEXT, type EvidenceLabel } from '../../core/labels';
 import { Label } from '../components/Label';
 import { Warnings } from '../components/Warnings';
+import { FIXTURES } from '../../core/fixtures';
 import { shareFile } from '../share';
 import { APP_VERSION, deviceZone, useStore } from '../store';
 
@@ -98,8 +99,16 @@ export function Lab() {
       <section>
         <h2>Reference fixtures</h2>
         <p class="note">
-          0 external reference charts loaded. Astrodienst screenshots are still owed. Current checks are against independent code: astronomy-engine for planets (agreement under 18″) and a textbook implementation for Ascendant, MC and Placidus cusps (under 36″).
+          Screenshots from your own apps, transcribed into tests that run on every push (CI). A failing fixture fails the build. Independent-code checks (astronomy-engine, lunar-javascript, qimen-wasm) run alongside.
         </p>
+        {FIXTURES.map((f) => (
+          <div class="card" style={{ padding: '10px', gap: '4px' }}>
+            <Label label="calculated">{f.source}</Label>
+            <p class="note small">
+              {f.what}. Tolerance: {f.tolerance}.
+            </p>
+          </div>
+        ))}
       </section>
 
       <section>

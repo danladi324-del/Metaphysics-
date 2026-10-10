@@ -3,7 +3,7 @@ import { SIGNS, norm360 } from '../../engines/natal/zodiac';
 
 const ABBR: Record<string, string> = {
   sun: 'Su', moon: 'Mo', mercury: 'Me', venus: 'Ve', mars: 'Ma', jupiter: 'Ju', saturn: 'Sa', uranus: 'Ur', neptune: 'Ne',
-  pluto: 'Pl', chiron: 'Ch', meanNode: 'No', trueNode: 'No', meanLilith: 'Li', osculatingLilith: 'Li'
+  pluto: 'Pl', chiron: 'Ch', meanNode: 'No', trueNode: 'No', meanLilith: 'Li', osculatingLilith: 'Li', interpolatedLilith: 'Li'
 };
 
 /** Spread label angles so markers do not overlap; keeps order, minimum gap in degrees. */
