@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P2 done 2026-10-10. P3 next (content layer + tarot).
+P3 done 2026-10-10 (machinery; no source text loaded, by design). P4 next.
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -27,6 +27,13 @@ P2 done 2026-10-10. P3 next (content layer + tarot).
 - Eric (calculated): Life Path 3 (both methods); Expression 8 Pythagorean / 2 Chaldean (Chaldean all-letters 29/11); Soul Urge 11 by name part vs 2 all vowels (Pythagorean), 3 Chaldean; Personality 6 / 8; Birthday 6; Maturity 11; karmic debt none in totals, 14 inside ERIC's vowels only; pinnacles 9-9-9-6, challenges 3-3-0-0, first break at 33; personal year 2026 = 1.
 - Assumed: letter tables as commonly reproduced match Balliett and Cheiro; not yet checked against scans (needs the texts). Interpretation is entirely placeholder.
 - UNVERIFIED: whether Eric's preferred name for numerology is "Eric Garner" or a fuller birth name.
+
+### P3 Content layer + tarot — TEST
+- Works: source registry; snippet store with approval gate; content-pack import with validation; key templates per engine; one Traditional layer per source plus a Synthesis layer for natal (sign and house per body), numerology Life Path, I Ching (hexagram, changing lines, relating), and tarot (per card, lens, reversal mode); 78-card deck, three spreads, replayable shuffle, Waite/Marseille numbering; original card faces; draws save to the journal.
+- Acceptance: every displayed reading block shows its snippet id; traditional blocks show their source id and locator; placeholders are visibly placeholders and have ids.
+- Tested (93 unit tests total): placeholder ids; unapproved → hypothesis label, approved → Traditional; lens fallback and reversal-mode isolation; one layer per source; pack refusals (no source, no locator, too long), warnings (cap, "will"), template skip, imported approval flags ignored; declared splits only; schema-1 export restores and re-stamps version; deck integrity; numbering swap; replay; reversals off; first-card chi-square over 78,000 seeded shuffles; rejection-sampling edge.
+- Browser (`scripts/e2e-p3.cjs`): three-card draw, save to journal, import test pack, label flips from "Unapproved paraphrase" to "Traditional. Source: testsrc, p. 1" after approval; no console errors; no page-level horizontal scroll.
+- Not done: no source text loaded (Waite, Legge, Balliett, Cheiro are registered only). Correspondence table exists but is empty: every correspondence needs a source and none is loaded. Library screen not built.
 
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
@@ -57,7 +64,8 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Natal chart, transits, returns | TEST | awaiting Astrodienst fixtures |
 | Numerology | TEST | letter tables not yet checked against source scans |
 | Biorhythm, moon, planetary hours, I Ching | TEST | I Ching text not loaded |
-| Tarot | IDEA | |
+| Tarot | TEST | text placeholders until sources are loaded |
+| Content layer | TEST | approval gate, packs, templates |
 | BaZi, Tzolk'in, Vedic | RESEARCH | D-004 |
 | Feng Shui | IDEA | |
 | Qi Men | RESEARCH | blocked on school choice (D-005) |

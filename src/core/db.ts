@@ -2,7 +2,7 @@ import type { Database, SqlJsStatic } from 'sql.js';
 import type { CalcRecord } from './record';
 import type { Profile } from './profile';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS calc_record (
   input_dependencies TEXT NOT NULL, limitations TEXT NOT NULL, evidence_label TEXT NOT NULL CHECK (evidence_label = 'calculated'),
   fingerprint TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS calc_record_fp ON calc_record (fingerprint);
+CREATE TABLE IF NOT EXISTS source (
+  id TEXT PRIMARY KEY, title TEXT NOT NULL, author TEXT, year INTEGER, license TEXT NOT NULL,
+  url TEXT, status TEXT NOT NULL CHECK (status IN ('registered','loaded')), notes TEXT);
 CREATE TABLE IF NOT EXISTS snippet (
   id TEXT PRIMARY KEY, key TEXT NOT NULL, tradition TEXT, text TEXT NOT NULL, source_id TEXT, source_locator TEXT,
   label TEXT NOT NULL CHECK (label IN ('traditional','synthesis')), lens TEXT NOT NULL DEFAULT 'general',
@@ -35,7 +38,7 @@ CREATE TABLE IF NOT EXISTS outcome (
 `;
 
 /** Tables included in export, in restore order. */
-export const TABLES = ['meta', 'profile', 'calc_record', 'snippet', 'correspondence', 'disagreement', 'journal_entry', 'outcome'] as const;
+export const TABLES = ['meta', 'profile', 'calc_record', 'source', 'snippet', 'correspondence', 'disagreement', 'journal_entry', 'outcome'] as const;
 export type TableName = (typeof TABLES)[number];
 export type Row = Record<string, string | number | null>;
 
@@ -67,7 +70,8 @@ export class Db {
     sql.exec('PRAGMA foreign_keys = ON;');
     sql.exec(SCHEMA);
     const db = new Db(sql, persist);
-    if (db.getMeta('schema_version') === null) db.setMeta('schema_version', String(SCHEMA_VERSION));
+    // Schema changes so far are additive (CREATE TABLE IF NOT EXISTS), so upgrading is just recording the version.
+    if (db.getMeta('schema_version') !== String(SCHEMA_VERSION)) db.setMeta('schema_version', String(SCHEMA_VERSION));
     return db;
   }
 

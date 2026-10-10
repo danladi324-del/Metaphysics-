@@ -1,0 +1,3 @@
+{"format":"metaphysics-content","version":1,"sources":[{"id":"testsrc","title":"Test Source","license":"own","status":"loaded"}],
+ "snippets":[{"id":"x1","key":"natal.sun.sign.aries","text":"TEST: a paraphrase awaiting approval.","label":"traditional","lens":"general","source_id":"testsrc","source_locator":"p. 1","authored_by":"test"},
+ {"id":"x2","key":"natal.sun.sign.aries","text":"TEST: synthesis text.","label":"synthesis","lens":"general","authored_by":"test"}]}

@@ -15,6 +15,7 @@ import {
   type Reduction
 } from '../../engines/numerology/compute';
 import { Label } from '../components/Label';
+import { ReadingLayers } from '../components/ReadingLayers';
 import { useStore } from '../store';
 import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
@@ -191,7 +192,10 @@ function Numerology({ profile }: { profile: Profile }) {
         </div>
       </section>
 
-      <ReadingPlaceholder title={`Life Path ${r.date.lifePathByComponent.value}`} />
+      <section>
+        <h2>Life Path {r.date.lifePathByComponent.value}</h2>
+        <ReadingLayers snippetKey={`numerology.lifePath.${r.date.lifePathByComponent.value}`} lens="general" />
+      </section>
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>
   );
@@ -351,22 +355,6 @@ function MoonGlyph({ elongation }: { elongation: number }) {
       <circle cx="32" cy="32" r={r} fill="#1B2A36" stroke="#2C4050" />
       <path d={d} fill="#E9E5D9" />
     </svg>
-  );
-}
-
-export function ReadingPlaceholder({ title }: { title: string }) {
-  return (
-    <section>
-      <h2>{title}</h2>
-      <div>
-        <Label label="traditional">Traditional. Source: [no source loaded]</Label>
-        <p class="serif">[Paraphrase of a published reading goes here.]</p>
-      </div>
-      <div>
-        <Label label="synthesis">Original synthesis, written for this app</Label>
-        <p class="serif synth">[Placeholder. No synthesis text exists yet.]</p>
-      </div>
-    </section>
   );
 }
 

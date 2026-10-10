@@ -10,6 +10,7 @@ import { natalMarkdown } from '../../engines/natal/markdown';
 import { computeReturn, computeTransits } from '../../engines/natal/transits';
 import { formatLongitude } from '../../engines/natal/zodiac';
 import { Label } from '../components/Label';
+import { ReadingLayers } from '../components/ReadingLayers';
 import { Wheel } from '../components/Wheel';
 import { shareFile } from '../share';
 import { useStore } from '../store';
@@ -115,6 +116,8 @@ function NatalView({ rec, profile, conv }: ViewProps & { profile: Profile }) {
     const cusps = r.houses[conv.houseSystem]?.cusps ?? null;
     const splits = natalDisagreements(rec, profile.id);
     const [showAll, setShowAll] = useState(false);
+    const [focus, setFocus] = useState<string>('sun');
+    const focused = r.bodies.find((x) => x.id === focus);
     const aspects = showAll ? r.aspects : r.aspects.slice(0, 12);
     return (
       <>
@@ -183,15 +186,31 @@ function NatalView({ rec, profile, conv }: ViewProps & { profile: Profile }) {
 
         <section>
           <h2>Reading</h2>
-          <div>
-            <Label label="traditional">Traditional. Source: [no source loaded]</Label>
-            <p class="serif">[Paraphrase of a published reading goes here.]</p>
+          <div class="scroll-x" role="group" aria-label="Body to read">
+            {r.bodies
+              .filter((x) => shown.includes(x.id))
+              .map((x) => (
+                <button class="chip" style={{ flex: 'none' }} aria-pressed={focus === x.id} onClick={() => setFocus(x.id)}>
+                  {label(x.id)}
+                </button>
+              ))}
           </div>
-          <div>
-            <Label label="synthesis">Original synthesis, written for this app</Label>
-            <p class="serif synth">[Placeholder. No synthesis text exists yet.]</p>
-          </div>
-          <p class="note">Interpretation snippets arrive in phase 3. Until then these are visible placeholders, not readings.</p>
+          {focused && (
+            <>
+              <h3>
+                {label(focused.id)} in {focused.sign}
+              </h3>
+              <ReadingLayers snippetKey={`natal.${focused.id}.sign.${focused.sign.toLowerCase()}`} lens="general" />
+              {b.timeKnown && focused.houses[conv.houseSystem] !== undefined && (
+                <>
+                  <h3>
+                    {label(focused.id)} in house {focused.houses[conv.houseSystem]} ({HOUSE_SYSTEM_LABEL[conv.houseSystem]})
+                  </h3>
+                  <ReadingLayers snippetKey={`natal.${focused.id}.house.${focused.houses[conv.houseSystem]}`} lens="general" />
+                </>
+              )}
+            </>
+          )}
         </section>
 
         <section style={{ borderTop: '1px solid var(--line)', paddingTop: '14px' }}>

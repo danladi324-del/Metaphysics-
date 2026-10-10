@@ -74,6 +74,8 @@ function safeParse(v: unknown): unknown {
 /** Replace the database contents with an export. All-or-nothing. */
 export function restore(db: Db, file: ExportFile): void {
   db.replaceAll(file.tables);
+  // An older export carries its own schema_version row; the tables are already at the current schema.
+  db.setMeta('schema_version', String(SCHEMA_VERSION));
 }
 
 export interface BackupStatus {

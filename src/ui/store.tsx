@@ -6,6 +6,7 @@ import { DEFAULT_ASTRO, type AstroConventions } from '../core/conventions';
 import { Db } from '../core/db';
 import type { Profile } from '../core/profile';
 import { loadImage, requestPersistence, saveImage } from '../core/storage';
+import { seedSources } from '../content/model';
 
 export const APP_VERSION = '0.1.0';
 
@@ -17,10 +18,20 @@ export interface Here {
   zone: string;
 }
 
+export interface TarotSettings {
+  reversals: boolean;
+  /** Eric's choice (brief §8); null until made. */
+  mode: 'blocked' | 'opposite' | 'internal' | 'delayed' | null;
+  numbering: 'waite' | 'marseille';
+}
+
+export const DEFAULT_TAROT_SETTINGS: TarotSettings = { reversals: true, mode: null, numbering: 'waite' };
+
 export interface Settings {
   astro: AstroConventions;
   activeProfileId: string | null;
   here: Here | null;
+  tarot: TarotSettings;
 }
 
 export const deviceZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -49,11 +60,11 @@ export function useStore(): Store {
 
 function readSettings(db: Db): Settings {
   const raw = db.getMeta('settings');
-  const base: Settings = { astro: DEFAULT_ASTRO, activeProfileId: null, here: null };
+  const base: Settings = { astro: DEFAULT_ASTRO, activeProfileId: null, here: null, tarot: DEFAULT_TAROT_SETTINGS };
   if (!raw) return base;
   try {
     const s = JSON.parse(raw) as Partial<Settings>;
-    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null };
+    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null, tarot: { ...DEFAULT_TAROT_SETTINGS, ...s.tarot } };
   } catch {
     return base;
   }
@@ -75,7 +86,9 @@ export function StoreProvider({ children }: { children: ComponentChildren }) {
       } catch {
         image = null;
       }
-      setDb(Db.open(SQL, image, saveImage));
+      const db = Db.open(SQL, image, saveImage);
+      seedSources(db);
+      setDb(db);
       setPersisted(await requestPersistence());
     })().catch((e: Error) => setError(e.message));
   }, []);

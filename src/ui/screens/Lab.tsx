@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'preact/hooks';
 import { loadCities, searchCities, type City } from '../../core/cities';
+import { KEY_SETS } from '../../content/keys';
+import { approveSnippet, rowToSnippet, sources } from '../../content/model';
+import { importPack, templatePack } from '../../content/pack';
 import { backupStatus, exportJson, parseExport, restore } from '../../core/backup';
 import { LABEL_TEXT, type EvidenceLabel } from '../../core/labels';
 import { Label } from '../components/Label';
@@ -129,6 +132,8 @@ export function Lab() {
         )}
       </section>
 
+      <ContentSection />
+
       <HereSetting />
 
       <section>
@@ -211,6 +216,76 @@ function HereSetting() {
           Use the default
         </button>
       )}
+    </section>
+  );
+}
+
+function ContentSection() {
+  const { db, bump, version } = useStore();
+  void version;
+  const [msg, setMsg] = useState<string | null>(null);
+  const srcs = sources(db);
+  const pending = db.all("SELECT * FROM snippet WHERE label = 'traditional' AND approved = 0 AND placeholder = 0 ORDER BY key").map(rowToSnippet);
+  const approved = Number(db.all("SELECT COUNT(*) AS n FROM snippet WHERE label = 'traditional' AND approved = 1")[0]?.n ?? 0);
+  const synth = Number(db.all("SELECT COUNT(*) AS n FROM snippet WHERE label = 'synthesis'")[0]?.n ?? 0);
+
+  async function onPack(file: File) {
+    try {
+      const r = importPack(db, JSON.parse(await file.text()));
+      setMsg(`Imported ${r.snippets} snippets, ${r.sources} sources, ${r.splits} declared splits.${r.warnings.length ? ' Warnings: ' + r.warnings.join(' ') : ''}`);
+      bump();
+    } catch (e) {
+      setMsg(`Pack refused: ${(e as Error).message} Nothing was imported.`);
+    }
+  }
+
+  return (
+    <section>
+      <h2>Content</h2>
+      <p class="note">
+        {approved} approved traditional paraphrases, {pending.length} awaiting approval, {synth} synthesis snippets. Everything else shows as a placeholder.
+      </p>
+      <div class="table" style={{ gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)' }}>
+        {srcs.map((s) => (
+          <>
+            <div>
+              {s.title}
+              <span class="muted small"> · {s.author}, {s.year}</span>
+            </div>
+            <div class="small">{s.status === 'loaded' ? 'text loaded' : 'not loaded'}</div>
+          </>
+        ))}
+      </div>
+      <label class="btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Import a content pack
+        <input type="file" accept="application/json,.json" class="visually-hidden" onChange={(e) => {
+          const f = e.currentTarget.files?.[0];
+          if (f) void onPack(f);
+          e.currentTarget.value = '';
+        }} />
+      </label>
+      <div class="chips">
+        {Object.keys(KEY_SETS).map((k) => (
+          <button class="chip" onClick={() => shareFile(`content-template-${k}.json`, 'application/json', JSON.stringify(templatePack(KEY_SETS[k]!()), null, 1))}>
+            Template: {k}
+          </button>
+        ))}
+      </div>
+      <p class="note small">Templates list every key an engine reads. Fill in text, source and locator, then import. Traditional entries arrive unapproved.</p>
+      {msg && <p class="note" role="status">{msg}</p>}
+      {pending.length > 0 && <h3>Awaiting your approval</h3>}
+      {pending.slice(0, 30).map((sn) => (
+        <div class="card">
+          <div class="small muted">
+            {sn.key} · {sn.lens}
+            {sn.reversal_mode ? ` · ${sn.reversal_mode}` : ''} · {sn.source_id}, {sn.source_locator}
+          </div>
+          <p class="serif">{sn.text}</p>
+          <button class="btn" onClick={() => { approveSnippet(db, sn.id, true); bump(); }}>
+            Approve as a faithful paraphrase
+          </button>
+        </div>
+      ))}
     </section>
   );
 }

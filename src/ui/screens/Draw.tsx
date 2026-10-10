@@ -1,5 +1,11 @@
 import { useState } from 'preact/hooks';
+import { newEntryId, saveEntry } from '../../core/journal';
 import type { CalcRecord } from '../../core/record';
+import { LENSES, type Lens } from '../../content/model';
+import { CARD_BY_ID, SPREADS, snippetKey } from '../../content/tarot';
+import { computeDraw, tarotDisagreements, type TarotResult } from '../../engines/tarot/compute';
+import { CardFace } from '../components/CardFace';
+import { ReadingLayers } from '../components/ReadingLayers';
 import { computeCast, type CastResult, type LineValue, type Method } from '../../engines/iching/compute';
 import { Label } from '../components/Label';
 import { useStore } from '../store';
@@ -37,7 +43,7 @@ export function Draw() {
         </button>
       </div>
 
-      {tool === 'tarot' && <p class="note">Tarot arrives in phase 3 with the content layer.</p>}
+      {tool === 'tarot' && <Tarot />}
 
       {tool === 'iching' && (
         <>
@@ -133,11 +139,152 @@ function CastView({ rec }: { rec: CalcRecord<CastResult> }) {
         {rec.inputs.question ? <p class="note">Question: {String(rec.inputs.question)}</p> : null}
       </section>
       <section>
-        <h2>Reading</h2>
-        <Label label="traditional">Traditional. Source: Legge 1899 (public domain) — not loaded yet</Label>
-        <p class="serif">[Paraphrase of Legge's text for hexagram {r.primary.number} goes here once the source is loaded and the paraphrase approved.]</p>
+        <h2>Reading: {r.primary.number} {r.primary.name}</h2>
+        <ReadingLayers snippetKey={`iching.hexagram.${r.primary.number}`} lens="general" />
+        {r.changing.map((n) => (
+          <>
+            <h3>Line {n}</h3>
+            <ReadingLayers snippetKey={`iching.hexagram.${r.primary.number}.line.${n}`} lens="general" />
+          </>
+        ))}
+        {r.relating && (
+          <>
+            <h3>Relating: {r.relating.number} {r.relating.name}</h3>
+            <ReadingLayers snippetKey={`iching.hexagram.${r.relating.number}`} lens="general" />
+          </>
+        )}
+        <p class="note">Planned source: Legge 1899 (public domain). Not loaded yet.</p>
       </section>
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
+    </>
+  );
+}
+
+const MODES = ['blocked', 'opposite', 'internal', 'delayed'] as const;
+
+function Tarot() {
+  const { db, profile, bump, settings, updateSettings } = useStore();
+  const tarot = settings.tarot;
+  const [lens, setLens] = useState<Lens>('general');
+  const [spread, setSpread] = useState('one');
+  const [question, setQuestion] = useState('');
+  const [rec, setRec] = useState<CalcRecord<TarotResult> | null>(null);
+  const [saved, setSaved] = useState(false);
+  const setTarot = (patch: Partial<typeof tarot>) => updateSettings({ tarot: { ...tarot, ...patch } });
+
+  function draw() {
+    const r = computeDraw(spread, question.trim(), { reversals: tarot.reversals, majorNumbering: tarot.numbering });
+    db.saveRecord(r, profile?.id ?? null);
+    for (const d of tarotDisagreements(r, profile?.id ?? null)) db.saveDisagreement(d);
+    setRec(r);
+    setSaved(false);
+    bump();
+  }
+
+  function saveToJournal() {
+    if (!rec) return;
+    const names = rec.raw_result.cards.map((c) => `${c.position}: ${CARD_BY_ID.get(c.cardId)!.name}${c.reversed ? ' (reversed)' : ''}`);
+    saveEntry(db, {
+      id: newEntryId(),
+      created_at: new Date().toISOString(),
+      text: `Tarot draw, ${lens} lens. ${names.join('; ')}.${question.trim() ? ` Question: ${question.trim()}` : ''}`,
+      mood: null,
+      energy: null,
+      tags: [],
+      links: [{ kind: 'record', id: rec.id, label: 'Tarot draw' }]
+    });
+    setSaved(true);
+    bump();
+  }
+
+  return (
+    <>
+      <section>
+        <div class="scroll-x" role="group" aria-label="Lens">
+          {LENSES.map((l) => (
+            <button class="chip" style={{ flex: 'none' }} aria-pressed={lens === l} onClick={() => setLens(l)}>
+              {l[0]!.toUpperCase() + l.slice(1)}
+            </button>
+          ))}
+        </div>
+        <div class="grid2">
+          <label class="field">
+            Spread
+            <select value={spread} onChange={(e) => setSpread(e.currentTarget.value)}>
+              {SPREADS.map((s) => (
+                <option value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </label>
+          <label class="field">
+            Reversals
+            <select value={tarot.reversals ? tarot.mode ?? 'unset' : 'off'} onChange={(e) => {
+              const v = e.currentTarget.value;
+              setTarot(v === 'off' ? { reversals: false } : { reversals: true, mode: v === 'unset' ? null : (v as (typeof MODES)[number]) });
+            }}>
+              <option value="off">Off (all upright)</option>
+              <option value="unset">On, no mode chosen</option>
+              {MODES.map((m) => (
+                <option value={m}>On, read as {m}</option>
+              ))}
+            </select>
+          </label>
+          <label class="field">
+            Major numbering
+            <select value={tarot.numbering} onChange={(e) => setTarot({ numbering: e.currentTarget.value as 'waite' | 'marseille' })}>
+              <option value="waite">Waite (Strength VIII)</option>
+              <option value="marseille">Marseille (Justice VIII)</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          Question (optional)
+          <input value={question} onInput={(e) => setQuestion(e.currentTarget.value)} />
+        </label>
+        <p class="note">Reversal mode is your call and is still unset. Traditions read reversals as blocked, opposite, internal or delayed; pick one to compare.</p>
+        <button class="btn primary" onClick={draw}>
+          {rec ? 'Draw again' : 'Draw'}
+        </button>
+      </section>
+
+      {rec && (
+        <>
+          {rec.raw_result.cards.map((c) => {
+            const card = CARD_BY_ID.get(c.cardId)!;
+            return (
+              <section>
+                {rec.raw_result.cards.length > 1 && <h2>{c.position}</h2>}
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <CardFace cardId={c.cardId} reversed={c.reversed} numbering={tarot.numbering} />
+                </div>
+                <p class="note small" style={{ textAlign: 'center' }}>Original generative line art.</p>
+                <h3>
+                  {card.name}
+                  {c.reversed ? ', reversed' : ''} · {lens}
+                </h3>
+                <ReadingLayers snippetKey={snippetKey(card, c.reversed)} lens={lens} reversalMode={c.reversed ? tarot.mode : null} />
+              </section>
+            );
+          })}
+          <section>
+            <h2>Same cards, other lenses</h2>
+            <div class="chips">
+              {LENSES.filter((l) => l !== lens).map((l) => (
+                <button class="chip" onClick={() => setLens(l)}>
+                  {l[0]!.toUpperCase() + l.slice(1)}
+                </button>
+              ))}
+            </div>
+          </section>
+          <section style={{ borderTop: '1px solid var(--line)', paddingTop: '14px' }}>
+            <button class="btn" onClick={saveToJournal} disabled={saved}>
+              {saved ? 'Saved to journal' : 'Save to journal'}
+            </button>
+            <p class="note">Saved draws can be checked against what happened later.</p>
+          </section>
+          <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
+        </>
+      )}
     </>
   );
 }

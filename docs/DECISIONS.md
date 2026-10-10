@@ -88,3 +88,19 @@ download.geonames.org is blocked from the build environment. The npm package `ci
 
 ## D-013 Stored record reuse and drift
 A chart is recomputed on open; if a stored record with the same fingerprint exists and its result matches, the stored one is shown (stable `computed_at`). If it does not match, that is a rule-9 failure: a disagreement row is written with cause "determinism failure" and the fresh result is shown.
+
+## D-014 Content: machinery now, text only on Eric's say-so
+Loading source texts and approving paraphrases are Eric's (brief §8), so P3 ships no interpretive text. What exists:
+- `source` table seeded with the four registered sources (none loaded).
+- Content packs (JSON) imported from Lab. Validation refuses a traditional snippet without a registered source and a locator, refuses over 90 words, warns over 60 and on "will". Unfilled template entries are skipped.
+- **Every imported traditional snippet arrives unapproved**, whatever the file says. Until Eric approves it in Lab it displays under the synthesis label with the caption "Unapproved paraphrase of <source>: a hypothesis until approved" (rule 2).
+- Interpretation disagreements are written only when a pack declares a split between two snippets. The app does not infer that two texts disagree.
+- When nothing is stored, the UI shows a placeholder that still has a snippet id (`placeholder:<layer>:<key>:<lens>`), so every displayed block traces to an id.
+- Templates (Lab → Template: tarot / natal / numerology / iching) list every key an engine reads.
+
+## D-015 Tarot
+- Deck identity ids do not depend on numbering (`major.strength`), so Waite (Strength VIII, Justice XI) vs Marseille numbering is a convention with a ledger row when either card is drawn.
+- Shuffle: Fisher-Yates with rejection sampling over `crypto.getRandomValues`; the whole 78-card order and orientation bits are stored, so any draw replays.
+- Reversals: orientation is drawn when reversals are on; the reading mode (blocked, opposite, internal, delayed) stays unset until Eric picks. Snippets tied to another mode are never shown.
+- Card faces are original generative line art (suit marks, numbered polygons). No Rider-Waite-Smith imagery.
+- Celtic Cross position names paraphrased from Waite 1911 Part III; locator not verified against the text.
