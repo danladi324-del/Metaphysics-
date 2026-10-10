@@ -7,13 +7,14 @@ import { computeDraw, tarotDisagreements, type TarotResult } from '../../engines
 import { CardFace } from '../components/CardFace';
 import { ReadingLayers } from '../components/ReadingLayers';
 import { ComposedReading } from '../components/ComposedReading';
-import { ichingView, tarotView } from '../../composer/views';
+import { geomancyView, ichingView, tarotView } from '../../composer/views';
+import { computeGeomancy, type Figure, type GeomancyResult } from '../../engines/geomancy/compute';
 import { computeCast, type CastResult, type LineValue, type Method } from '../../engines/iching/compute';
 import { Label } from '../components/Label';
 import { useStore } from '../store';
 import { Provenance } from './Readings';
 
-type Tool = 'iching' | 'tarot';
+type Tool = 'iching' | 'tarot' | 'geomancy';
 
 export function Draw() {
   const { db, profile, bump } = useStore();
@@ -43,9 +44,13 @@ export function Draw() {
         <button class="chip" style={{ flex: 'none' }} aria-pressed={tool === 'tarot'} onClick={() => setTool('tarot')}>
           Tarot
         </button>
+        <button class="chip" style={{ flex: 'none' }} aria-pressed={tool === 'geomancy'} onClick={() => setTool('geomancy')}>
+          Geomancy
+        </button>
       </div>
 
       {tool === 'tarot' && <Tarot />}
+      {tool === 'geomancy' && <Geomancy />}
 
       {tool === 'iching' && (
         <>
@@ -286,6 +291,78 @@ function Tarot() {
             </button>
             <p class="note">Saved draws can be checked against what happened later.</p>
           </section>
+          <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
+        </>
+      )}
+    </>
+  );
+}
+
+function FigureGlyph({ rows, label }: { rows: Figure; label: string }) {
+  return (
+    <svg width="44" height="64" viewBox="0 0 44 64" role="img" aria-label={label}>
+      {rows.map((r, i) =>
+        r === 1 ? <circle cx="22" cy={10 + i * 15} r="4" fill="#E9E5D9" /> : (
+          <>
+            <circle cx="13" cy={10 + i * 15} r="4" fill="#E9E5D9" />
+            <circle cx="31" cy={10 + i * 15} r="4" fill="#E9E5D9" />
+          </>
+        )
+      )}
+    </svg>
+  );
+}
+
+function Geomancy() {
+  const { db, profile, bump } = useStore();
+  const [question, setQuestion] = useState('');
+  const [rec, setRec] = useState<CalcRecord<GeomancyResult> | null>(null);
+  function cast() {
+    const r = computeGeomancy(question.trim());
+    db.saveRecord(r, profile?.id ?? null);
+    setRec(r);
+    bump();
+  }
+  const rows: string[][] = [
+    ['Mother 4', 'Mother 3', 'Mother 2', 'Mother 1'],
+    ['Daughter 4', 'Daughter 3', 'Daughter 2', 'Daughter 1'],
+    ['Niece 4', 'Niece 3', 'Niece 2', 'Niece 1'],
+    ['Left Witness', 'Right Witness'],
+    ['Judge', 'Reconciler']
+  ];
+  return (
+    <>
+      <section>
+        <label class="field">
+          Question (optional)
+          <input value={question} onInput={(e) => setQuestion(e.currentTarget.value)} />
+        </label>
+        <p class="note">Sixteen random points generate the four Mothers; every other figure follows by geomantic addition.</p>
+        <button class="btn primary" onClick={cast}>
+          {rec ? 'Cast again' : 'Cast'}
+        </button>
+      </section>
+      {rec && (
+        <>
+          <section>
+            <h2>Shield chart</h2>
+            {rows.map((row) => (
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${row.length}, 1fr)`, gap: '6px' }}>
+                {row.map((p) => {
+                  const f = rec.raw_result.figures.find((x) => x.position === p)!;
+                  return (
+                    <div class="card" style={{ padding: '6px', gap: '2px', alignItems: 'center', borderColor: p === 'Judge' ? 'var(--calc)' : undefined }}>
+                      <FigureGlyph rows={f.rows} label={`${p}: ${f.name}`} />
+                      <div class="small" style={{ textAlign: 'center' }}>{f.name}</div>
+                      <div class="small muted" style={{ textAlign: 'center' }}>{p}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+            <Label label="calculated">Calculated from a random cast. Mothers read right to left, as traditionally laid out.</Label>
+          </section>
+          <ComposedReading view={geomancyView(rec)} kind="event" rec={rec} day={rec.id} />
           <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
         </>
       )}

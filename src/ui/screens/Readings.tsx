@@ -20,13 +20,14 @@ import {
 } from '../../engines/numerology/compute';
 import { Label } from '../components/Label';
 import { ComposedReading } from '../components/ComposedReading';
+import { Shadow } from './Shadow';
 import { baziView, biorhythmView, hoursView, moonView, numerologyDailyView, numerologyMasterView, tzolkinView, vedicView } from '../../composer/views';
 import { useStore } from '../store';
 import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
 
-type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic';
+type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'shadow';
 
 export function Readings() {
   const { profile } = useStore();
@@ -46,7 +47,8 @@ export function Readings() {
             ['sky', 'Moon and hours'],
             ['bazi', 'BaZi'],
             ['tzolkin', "Tzolk'in"],
-            ['vedic', 'Vedic']
+            ['vedic', 'Vedic'],
+            ['shadow', 'Shadow']
           ] as [Engine, string][]
         ).map(([k, v]) => (
           <button class="chip" role="tab" aria-selected={engine === k} aria-pressed={engine === k} style={{ flex: 'none' }} onClick={() => setEngine(k)}>
@@ -59,6 +61,7 @@ export function Readings() {
       {engine === 'sky' && <Sky profile={profile} />}
       {engine === 'bazi' && <WithEph render={(eph) => <BaziView profile={profile} eph={eph} />} />}
       {engine === 'tzolkin' && <TzolkinView profile={profile} />}
+      {engine === 'shadow' && <Shadow profile={profile} />}
       {engine === 'vedic' && <WithEph render={(eph) => <VedicView profile={profile} eph={eph} />} />}
       <a class="btn" href="#/lab/fengshui" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         Feng Shui compass

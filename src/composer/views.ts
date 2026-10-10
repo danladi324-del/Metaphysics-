@@ -14,6 +14,7 @@ import type { NumerologyResult } from '../engines/numerology/compute';
 import type { TarotResult } from '../engines/tarot/compute';
 import type { TzolkinResult } from '../engines/tzolkin/compute';
 import type { VedicResult } from '../engines/vedic/compute';
+import type { GeomancyResult } from '../engines/geomancy/compute';
 import type { EngineView } from './compose';
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -175,5 +176,24 @@ export function tarotView(rec: CalcRecord<TarotResult>, reversalMode: string | n
     recordIds: [rec.id],
     facts: cards.map((c, i) => ({ id: `fact:tarot.card.${i}`, text: `${c.position}: ${c.card.name}${c.reversed ? ', reversed' : ''}.` })),
     keys: cards.map((c) => ({ key: snippetKey(c.card, c.reversed), title: `${c.position}: ${c.card.name}`, reversalMode: c.reversed ? reversalMode : null }))
+  };
+}
+
+export function geomancyView(rec: CalcRecord<GeomancyResult>): EngineView {
+  const r = rec.raw_result;
+  const f = (p: string) => r.figures.find((x) => x.position === p)!.name;
+  return {
+    engine: 'geomancy',
+    title: `Geomancy: Judge ${r.judge}`,
+    recordIds: [rec.id],
+    facts: [
+      { id: 'fact:geomancy.court', text: `Judge ${r.judge}; right witness ${f('Right Witness')}, left witness ${f('Left Witness')}; reconciler ${f('Reconciler')}.` },
+      { id: 'fact:geomancy.mothers', text: `Mothers: ${[1, 2, 3, 4].map((n) => f(`Mother ${n}`)).join(', ')}.` }
+    ],
+    keys: [
+      { key: `geomancy.figure.${slug(r.judge)}`, title: `Judge: ${r.judge}` },
+      { key: `geomancy.figure.${slug(f('Right Witness'))}`, title: `Right witness: ${f('Right Witness')}` },
+      { key: `geomancy.figure.${slug(f('Left Witness'))}`, title: `Left witness: ${f('Left Witness')}` }
+    ]
   };
 }

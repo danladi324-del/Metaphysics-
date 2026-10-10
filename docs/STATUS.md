@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P6 done 2026-10-10. P7 next (Shadow, then long tail one module at a time; Qi Men blocked on school choice).
+P7 partly done 2026-10-10: Shadow and geomancy built; Qi Men BLOCKED on school choice; rest of the long tail not started. P8 next.
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -55,6 +55,12 @@ P6 done 2026-10-10. P7 next (Shadow, then long tail one module at a time; Qi Men
 - Tested (143 unit tests total): grouping (birth, sky, random; transitive merge); simulation vs three exact results; determinism; computed / none / blocked paths; wording never rounds to zero and says "near certain" at the top.
 - Browser (`scripts/e2e-p6.cjs`): default Today shows "Cannot be assessed" with the two-source table; after a themed test pack is approved, it shows "completion: 2 engines, 2 independent sources, chance near certain (p = 1.000), consistent with chance" — correct, since 2 + 2 themes from a 3-theme vocabulary must overlap. The loaded move appears in the compass with its trace id.
 
+### P7 Long tail and Qi Men — partial
+- Works: Shadow tab (pointers with house-system split, interpretive snippet slots, question prompts that write to the journal, pattern log of user tags); geomancy (shield chart from 16 random bits, replayable, composed reading for judge and witnesses).
+- Tested (153 unit tests total): Eric's pointers (Mars in the 12th under Placidus only); time-unknown pointers; prompts never assert; 16 unique figures; exactly 4 self-inverse figures and the named inversion pairs; addition identities; judge even and uniform over all 65,536 mother sets; replay.
+- Browser (`scripts/e2e-p7.cjs`): Shadow → prompt → journal → pattern log shows "#work · 1"; geomancy shield chart renders (hand-checked one cast end to end); no errors; no horizontal scroll.
+- BLOCKED: Qi Men (school choice). NOT STARTED: the rest of the long tail.
+
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
 
@@ -90,5 +96,7 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Composer, journal, outcomes | TEST | P5 |
 | BaZi, Tzolk'in, Vedic | TEST | own BaZi, lunar-javascript as test oracle (D-016) |
 | Feng Shui | TEST | Flying Star fixture from memory; needs reference screenshot |
-| Qi Men | RESEARCH | blocked on school choice (D-005) |
-| Shadow, long tail | IDEA | |
+| Qi Men | BLOCKED | school choice (D-005, D-023) |
+| Shadow | TEST | D-021 |
+| Geomancy | TEST | D-022 |
+| Rest of long tail | IDEA | one at a time |
