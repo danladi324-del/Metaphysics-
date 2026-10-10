@@ -34,7 +34,7 @@ Sources: [PowerSync: SQLite persistence on the web](https://powersync.com/blog/s
 | @fusionstrings/swisseph-wasm | declares MIT | – | – | **Avoid:** wraps the Swiss Ephemeris C library, which is AGPL or commercial. The MIT label looks wrong. |
 
 **Decision:** @swisseph/browser with Moshier for planets and `seas_18.se1` (223 KB, covers 1800–2399 CE, from github.com/aloistr/swisseph) bundled locally for Chiron, so the app stays offline. astronomy-engine (independent code base, MIT) is a test-only cross-check for Sun through Pluto.
-**Verified in Node, 2026-10-10:** the package is built for web only (Emscripten `ENVIRONMENT_IS_NODE` stripped); tests inject the wasm via `instantiateWasm`. With Eric's data the engine returned Sun 3°39′ Aries, Asc 18°26′ Gemini, Chiron 19°21′ Aries.
+**Verified in Node, 2026-10-10:** the package is built for web only (Emscripten `ENVIRONMENT_IS_NODE` stripped); tests inject the wasm via `instantiateWasm`. With Eric's data the engine returned Sun 3°38′ Aries (3.645°), Asc 18°26′ Gemini, Chiron 19°21′ Aries.
 **License:** AGPL is acceptable for personal use (brief §4.2). **Must be revisited before the app is shared with anyone** (see D-010).
 Sources: [@swisseph/browser README](https://cdn.jsdelivr.net/npm/@swisseph/browser@1.1.1/README.md), [swisseph-wasm README](https://cdn.jsdelivr.net/npm/swisseph-wasm@0.0.5/README.md), [fusionstrings swisseph-wasm](https://jsr.io/@fusionstrings/swisseph-wasm), [swisseph-js/swisseph](https://github.com/swisseph-js/swisseph).
 
@@ -79,3 +79,12 @@ Eric gave "Eric Garner". Classical practice (Balliett) uses the full birth-certi
 
 ## D-010 Sharing changes licensing
 The app is personal. AGPL (Swiss Ephemeris) and GeoNames CC-BY attribution are fine at that scope. Sharing the app with anyone triggers a review of D-003 and of every content source.
+
+## D-011 UI library: Preact
+Brief fixes TypeScript + Vite but no framework. Preact 11 (MIT, ~4 KB) gives components and hooks without React's weight. Hash routing (`#/charts`) because GitHub Pages cannot rewrite paths.
+
+## D-012 City list: GeoNames via npm
+download.geonames.org is blocked from the build environment. The npm package `cities15000-json` 1.0.0 is a JSON port of GeoNames `cities15000` (2017 snapshot, CC-BY). `scripts/build-cities.mjs` trims it to `public/data/cities.tsv` (23,527 places, 1.27 MB, 540 KB gzipped). Coordinates and zone names from 2017 are adequate; the offset itself comes from tzdb at entry. Towns under 15,000 people need manual coordinates. Reverse if: Eric needs smaller places often — then regenerate from `cities5000` or `cities1000`.
+
+## D-013 Stored record reuse and drift
+A chart is recomputed on open; if a stored record with the same fingerprint exists and its result matches, the stored one is shown (stable `computed_at`). If it does not match, that is a rule-9 failure: a disagreement row is written with cause "determinism failure" and the fresh result is shown.

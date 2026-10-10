@@ -1,0 +1,173 @@
+import { useState } from 'preact/hooks';
+import { backupStatus, exportJson, parseExport, restore } from '../../core/backup';
+import { LABEL_TEXT, type EvidenceLabel } from '../../core/labels';
+import { Label } from '../components/Label';
+import { shareFile } from '../share';
+import { APP_VERSION, useStore } from '../store';
+
+export function Lab() {
+  const { db, profile, profiles, persisted, updateSettings, bump, version } = useStore();
+  const [kind, setKind] = useState<'calculation' | 'interpretation'>('calculation');
+  const [msg, setMsg] = useState<string | null>(null);
+  void version;
+  const rows = db.disagreements('kind = ? AND (profile_id = ? OR profile_id IS NULL)', [kind, profile?.id ?? '']);
+  const status = backupStatus(db, persisted);
+  const counts = db.counts();
+
+  async function doExport() {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const json = exportJson(db, APP_VERSION);
+    const how = await shareFile(`metaphysics-backup-${stamp}.json`, 'application/json', json);
+    setMsg(how === 'cancelled' ? 'Export cancelled. Nothing was saved.' : `Export ${how === 'shared' ? 'handed to the share sheet' : 'downloaded'}.`);
+    bump();
+  }
+
+  async function doImport(file: File) {
+    try {
+      const parsed = parseExport(await file.text());
+      if (!confirm(`Replace everything on this device with the backup from ${parsed.exported_at.slice(0, 10)}? (${parsed.counts.profile ?? 0} profiles, ${parsed.counts.calc_record ?? 0} records)`)) return;
+      restore(db, parsed);
+      await db.flush();
+      setMsg('Restored. Every table was replaced with the backup contents.');
+      bump();
+    } catch (e) {
+      setMsg(`Restore refused: ${(e as Error).message} Nothing was changed.`);
+    }
+  }
+
+  async function doWipe() {
+    if (!confirm('Delete every profile, record and journal entry on this device? Export first if you want to keep them.')) return;
+    db.wipe();
+    await db.flush();
+    setMsg('All data on this device was deleted.');
+    bump();
+  }
+
+  return (
+    <main>
+      <header>
+        <h1>Lab</h1>
+        <div class="sub">Where results differ, and why. Backups and settings.</div>
+      </header>
+
+      <section>
+        <h2>Ledger</h2>
+        <div class="seg" role="tablist" aria-label="Disagreement type">
+          <button role="tab" aria-selected={kind === 'calculation'} onClick={() => setKind('calculation')}>
+            Calculation
+          </button>
+          <button role="tab" aria-selected={kind === 'interpretation'} onClick={() => setKind('interpretation')}>
+            Interpretation
+          </button>
+        </div>
+        {rows.length === 0 && (
+          <p class="note">{kind === 'calculation' ? 'No calculation disagreements stored yet. Open Charts to compute.' : 'Interpretation splits arrive with the content layer (phase 3).'}</p>
+        )}
+        {dedupe(rows).map((d) => (
+          <div class="card">
+            <Label label="disagreement">{d.subject}</Label>
+            <div class="grid2">
+              <div class="small">{d.result_a}</div>
+              <div class="small">{d.result_b}</div>
+            </div>
+            <p class="note small">
+              Cause: {d.cause}. Engine: {d.engine ?? '–'}.
+            </p>
+          </div>
+        ))}
+        <p class="note">The app keeps both results. It does not pick one.</p>
+      </section>
+
+      <section>
+        <h2>Labels</h2>
+        {(Object.keys(LABEL_TEXT) as EvidenceLabel[]).map((l) => (
+          <Label label={l}>{LABEL_TEXT[l]}</Label>
+        ))}
+      </section>
+
+      <section>
+        <h2>Reference fixtures</h2>
+        <p class="note">
+          0 external reference charts loaded. Astrodienst screenshots are still owed. Current checks are against independent code: astronomy-engine for planets (agreement under 18″) and a textbook implementation for Ascendant, MC and Placidus cusps (under 36″).
+        </p>
+      </section>
+
+      <section>
+        <h2>Backup</h2>
+        <div class="card">
+          <Label label={status.daysSinceExport === null || status.daysSinceExport > 7 ? 'disagreement' : 'calculated'}>
+            {status.lastExport ? `Last export: ${status.daysSinceExport === 0 ? 'today' : `${status.daysSinceExport} days ago`}` : 'Never exported'}
+          </Label>
+          <Label label={persisted ? 'calculated' : 'disagreement'}>
+            {persisted === null ? 'Persistent storage: not supported by this browser' : persisted ? 'Persistent storage granted' : 'Persistent storage not granted: Safari may evict data'}
+          </Label>
+          <p class="note small">
+            On this device: {counts.profile} profiles, {counts.calc_record} records, {counts.disagreement} disagreements, {counts.journal_entry} journal entries. The JSON export is the real backup.
+          </p>
+        </div>
+        <button class="btn primary" onClick={doExport}>
+          Export all records
+        </button>
+        <label class="btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          Restore from a backup file
+          <input
+            type="file"
+            accept="application/json,.json"
+            class="visually-hidden"
+            onChange={(e) => {
+              const f = e.currentTarget.files?.[0];
+              if (f) void doImport(f);
+              e.currentTarget.value = '';
+            }}
+          />
+        </label>
+        {msg && (
+          <p class="note" role="status">
+            {msg}
+          </p>
+        )}
+      </section>
+
+      <section>
+        <h2>Profiles</h2>
+        {profiles.map((p) => (
+          <div class="row" style={{ justifyContent: 'space-between' }}>
+            <button class="chip" aria-pressed={p.id === profile?.id} onClick={() => updateSettings({ activeProfileId: p.id })}>
+              {p.displayName}
+            </button>
+            <a class="chip" style={{ display: 'inline-flex', alignItems: 'center' }} href={`#/lab/profile/${p.id}`}>
+              Edit
+            </a>
+          </div>
+        ))}
+        <a class="btn" href="#/lab/profile/new" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          Add a profile
+        </a>
+      </section>
+
+      <section>
+        <h2>Danger</h2>
+        <button class="btn danger" onClick={doWipe}>
+          Delete all data on this device
+        </button>
+      </section>
+
+      <section>
+        <p class="note small">
+          Metaphysics {APP_VERSION}. Swiss Ephemeris (Astrodienst, AGPL-3.0) via @swisseph/browser. City data: GeoNames (geonames.org), CC-BY. Fonts: Familjen Grotesk and Newsreader, SIL OFL 1.1.
+        </p>
+      </section>
+    </main>
+  );
+}
+
+/** One row per subject + cause; repeated computes of the same chart would otherwise list the same split many times. */
+function dedupe<T extends { subject: string; result_a: string; result_b: string; cause: string }>(rows: T[]): T[] {
+  const seen = new Set<string>();
+  return rows.filter((r) => {
+    const k = `${r.subject}|${r.result_a}|${r.result_b}|${r.cause}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
