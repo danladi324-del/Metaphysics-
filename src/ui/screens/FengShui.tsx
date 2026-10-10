@@ -61,7 +61,7 @@ function FengShuiInner({ eph }: { eph: Ephemeris }) {
   const [north, setNorth] = useState<'magnetic' | 'true'>(fs.north);
   const bearing = manual.trim() === '' ? null : Number(manual);
   const builtYear = Number(built);
-  const ok = bearing !== null && Number.isFinite(bearing) && bearing >= 0 && bearing < 360 && Number.isInteger(builtYear) && builtYear > 1800 && builtYear < 2200 && here;
+  const ok = bearing !== null && Number.isFinite(bearing) && bearing >= 0 && bearing < 360 && Number.isInteger(builtYear) && builtYear >= 1864 && builtYear <= 2400 && here;
   const now = Date.now();
   const rec = useMemo(() => {
     if (!ok || !here) return null;

@@ -6,6 +6,7 @@ import { julianDayUT } from '../../core/time';
 import { DEFAULT_ORBS, findAspects, type Aspect, type AspectType, type Point } from './aspects';
 import { BODY, FLAG, SIDEREAL_MODE, type Ephemeris } from './ephemeris';
 import { formatLongitude, houseOf, norm360, signOf, wholeSignHouse } from './zodiac';
+import { assertInstant, assertLatLon } from '../../core/validate';
 
 export const NATAL: EngineDescriptor = {
   engine: 'natal',
@@ -95,6 +96,8 @@ export function natalPositions(
   conv: AstroConventions,
   orbs: Record<AspectType, number> = DEFAULT_ORBS
 ): { result: NatalResult; limitations: string[] } {
+  assertInstant(inputs.utcMs, 'birth time');
+  assertLatLon(inputs.lat, inputs.lon);
   const limitations: string[] = [];
   const jd = julianDayUT(inputs.utcMs);
   const sidereal = conv.zodiac === 'sidereal';

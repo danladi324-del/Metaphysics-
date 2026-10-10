@@ -20,6 +20,7 @@ import type { Ephemeris } from '../../engines/natal/ephemeris';
 import { computeNumerology, DEFAULT_NUMEROLOGY, NUMEROLOGY, personalCycles } from '../../engines/numerology/compute';
 import { TAROT, type TarotResult } from '../../engines/tarot/compute';
 import { Dot, Label } from '../components/Label';
+import { Warnings } from '../components/Warnings';
 import { useStore } from '../store';
 import { useEphemeris, useNatal } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
@@ -107,6 +108,8 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
           <span class="chip" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', padding: 0 }}>{profile.displayName[0]}</span>
         </a>
       </header>
+
+      <Warnings />
 
       <section>
         <h2>Sky now</h2>

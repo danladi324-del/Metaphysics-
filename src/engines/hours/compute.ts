@@ -1,5 +1,6 @@
 import * as Astronomy from 'astronomy-engine';
 import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/record';
+import { assertInstant, assertLatLon } from '../../core/validate';
 
 export const HOURS: EngineDescriptor = {
   engine: 'planetaryHours',
@@ -45,6 +46,8 @@ function riseSet(obs: Astronomy.Observer, dir: 1 | -1, fromMs: number, limitDays
  * `localWeekday(ms)` gives the civil weekday at the location (0 = Sunday) for the midnight convention and to name the sunrise day.
  */
 export function planetaryHours(utcMs: number, lat: number, lon: number, localWeekday: (ms: number) => number): HoursResult {
+  assertInstant(utcMs);
+  assertLatLon(lat, lon);
   const obs = new Astronomy.Observer(lat, lon, 0);
   // Most recent sunrise at or before the instant.
   const sunrise = riseSet(obs, 1, utcMs - 1.5 * 86_400_000, 2);

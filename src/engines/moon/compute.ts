@@ -2,6 +2,7 @@ import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/r
 import { julianDayUT, utcMsFromJulianDay } from '../../core/time';
 import { BODY, FLAG, type Ephemeris } from '../natal/ephemeris';
 import { norm360, signOf } from '../natal/zodiac';
+import { assertInstant } from '../../core/validate';
 
 export const MOON: EngineDescriptor = {
   engine: 'moon',
@@ -48,6 +49,7 @@ export function nextElongation(eph: Ephemeris, jd0: number, target: number): num
 }
 
 export function moon(eph: Ephemeris, utcMs: number): MoonResult {
+  assertInstant(utcMs);
   const jd = julianDayUT(utcMs);
   const { e, moon: lon } = elongationAt(eph, jd);
   const names = [['New moon', 0], ['First quarter', 90], ['Full moon', 180], ['Last quarter', 270]] as const;

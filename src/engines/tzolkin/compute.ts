@@ -1,6 +1,7 @@
 import type { Disagreement } from '../../core/db';
 import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/record';
 import { dayIndex } from '../bazi/compute';
+import { assertYMD } from '../../core/validate';
 
 export const TZOLKIN: EngineDescriptor = {
   engine: 'tzolkin',
@@ -31,6 +32,8 @@ export function jdn(y: number, m: number, d: number): number {
 }
 
 export function mayaDate(y: number, m: number, d: number, correlation: number): MayaDate {
+  assertYMD({ year: y, month: m, day: d });
+  if (!Number.isInteger(correlation)) throw new Error('correlation must be a whole number');
   const days = jdn(y, m, d) - correlation;
   const mod = (a: number, n: number) => ((a % n) + n) % n;
   const lc: [number, number, number, number, number] = [

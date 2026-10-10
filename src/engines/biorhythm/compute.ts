@@ -1,5 +1,6 @@
 import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/record';
 import { daysBetween } from '../../core/time';
+import { assertYMD } from '../../core/validate';
 
 export const BIORHYTHM: EngineDescriptor = {
   engine: 'biorhythm',
@@ -21,6 +22,8 @@ export interface BiorhythmResult {
 type YMD = { year: number; month: number; day: number };
 
 export function biorhythm(birth: YMD, date: YMD): BiorhythmResult {
+  assertYMD(birth);
+  assertYMD(date);
   const n = daysBetween(birth, date);
   const values = {} as Record<Cycle, number>;
   const critical: Cycle[] = [];

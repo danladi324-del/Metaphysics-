@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P7 partly done 2026-10-10: Shadow and geomancy built; Qi Men BLOCKED on school choice; rest of the long tail not started. P8 next.
+P8 done 2026-10-10. Stable release **v0.1.0** frozen (git tag). Waiting on Eric's inputs (below) before further work; experiments go on top of v0.1.0.
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -60,6 +60,22 @@ P7 partly done 2026-10-10: Shadow and geomancy built; Qi Men BLOCKED on school c
 - Tested (153 unit tests total): Eric's pointers (Mars in the 12th under Placidus only); time-unknown pointers; prompts never assert; 16 unique figures; exactly 4 self-inverse figures and the named inversion pairs; addition identities; judge even and uniform over all 65,536 mother sets; replay.
 - Browser (`scripts/e2e-p7.cjs`): Shadow → prompt → journal → pattern log shows "#work · 1"; geomancy shield chart renders (hand-checked one cast end to end); no errors; no horizontal scroll.
 - BLOCKED: Qi Men (school choice). NOT STARTED: the rest of the long tail.
+
+### P8 Validate and release — RELEASE (v0.1.0)
+- Restore test: unit round trip (profile → chart → export → wipe → restore → identical recompute) and browser round trip with reload, both passing.
+- Privacy review: the only network requests are same-origin (`ephe/seas_18.se1`, `data/cities.tsv`, app files). The bundle's one external URL (the library's unused jsDelivr ephemeris loader) is never called. A Content-Security-Policy now blocks connections, scripts, fonts and images from any other origin; `no-referrer`. No analytics, no accounts. Exports contain birth data and say so. The policy allows `wasm-unsafe-eval`/`unsafe-eval` so WebAssembly starts on older Safari; this does not open network access.
+- Malformed input: every engine guards its inputs (instant range ±3000 years, lat/lon, real dates, bearing, building year); a fuzz test feeds 121 junk combinations to seven engines and requires either a valid record or a clean error, never NaN.
+- Stale-data warnings (tested): backup never/over 7 days; profile offset that this device's tzdb no longer agrees with (the D-006 check, which had not been implemented until now); persistent storage refused; WMM-2025 expiry. App-update banner added (service worker was in prompt mode with no prompt).
+- Offline: after one online load, profile creation, city search and a full natal chart work with the network off (`scripts/e2e-offline.cjs`).
+- Install docs: `docs/INSTALL.md`.
+- All browser checks (p1, p3–p7, offline) pass on the CSP build with no console errors and no horizontal scroll at 390 px. 162 unit tests pass; CI green through P5 at time of writing.
+
+### Not verified (honest list)
+- Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on Eric's iOS version, and install-to-Home-Screen.
+- GitHub Pages deploy: needs the branch merged to `main` and Pages source set to GitHub Actions (INSTALL.md).
+- No external reference fixtures (Astrodienst, Planetaro, E-Bazi, Qi Men app). Current checks are against independent code and hand arithmetic.
+- Flying Star fixture is from memory of a published chart.
+- No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information".
 
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.

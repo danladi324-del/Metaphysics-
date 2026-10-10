@@ -1,5 +1,6 @@
 import type { Disagreement } from '../../core/db';
 import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/record';
+import { assertYMD } from '../../core/validate';
 
 export const NUMEROLOGY: EngineDescriptor = {
   engine: 'numerology',
@@ -209,6 +210,7 @@ export interface NumerologyInputs {
 }
 
 export function numerology(inputs: NumerologyInputs, conv: NumerologyConventions = DEFAULT_NUMEROLOGY): NumerologyResult {
+  assertYMD(inputs);
   const words = normalizeName(inputs.name);
   if (!words.length) throw new Error('Name has no letters A-Z.');
   const keep = conv.masterNumbers === 'keep';

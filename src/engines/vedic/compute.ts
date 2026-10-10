@@ -3,6 +3,7 @@ import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/r
 import { julianDayUT } from '../../core/time';
 import { BODY, FLAG, SIDEREAL_MODE, type Ephemeris } from '../natal/ephemeris';
 import { norm360, signOf } from '../natal/zodiac';
+import { assertInstant, assertLatLon } from '../../core/validate';
 
 export const VEDIC: EngineDescriptor = {
   engine: 'vedic',
@@ -52,6 +53,8 @@ export function nakshatraOf(lon: number) {
 }
 
 export function vedic(eph: Ephemeris, inp: { utcMs: number; lat: number; lon: number; timeKnown?: boolean }, conv: VedicConventions = DEFAULT_VEDIC): VedicResult {
+  assertInstant(inp.utcMs, 'birth time');
+  assertLatLon(inp.lat, inp.lon);
   const jd = julianDayUT(inp.utcMs);
   eph.setSidereal(SIDEREAL_MODE[conv.ayanamsa]);
   const ay = eph.ayanamsa(jd);

@@ -7,6 +7,7 @@ import { FIT_LABEL, summarize } from '../../core/outcomes';
 import { backupStatus, exportJson, parseExport, restore } from '../../core/backup';
 import { LABEL_TEXT, type EvidenceLabel } from '../../core/labels';
 import { Label } from '../components/Label';
+import { Warnings } from '../components/Warnings';
 import { shareFile } from '../share';
 import { APP_VERSION, deviceZone, useStore } from '../store';
 
@@ -54,6 +55,8 @@ export function Lab() {
         <h1>Lab</h1>
         <div class="sub">Where results differ, and why. Backups and settings.</div>
       </header>
+
+      <Warnings />
 
       <section>
         <h2>Ledger</h2>

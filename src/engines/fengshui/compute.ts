@@ -1,6 +1,7 @@
 import geomagnetism from 'geomagnetism';
 import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/record';
 import { norm360 } from '../natal/zodiac';
+import { assertBearing, assertLatLon, InputError } from '../../core/validate';
 
 export const FENGSHUI: EngineDescriptor = {
   engine: 'fengshui',
@@ -186,6 +187,9 @@ export interface FengShuiInputs {
 }
 
 export function computeFengShui(inp: FengShuiInputs, now = new Date()): CalcRecord<FengShuiResult> {
+  assertBearing(inp.bearing);
+  assertLatLon(inp.lat, inp.lon);
+  if (!Number.isInteger(inp.builtYear) || inp.builtYear < 1864 || inp.builtYear > 2400) throw new InputError('building year must be between 1864 and 2400');
   const decl = declination(inp.lat, inp.lon, new Date(inp.dateMs));
   const r2 = (x: number) => Math.round(x * 100) / 100;
   const trueBearing = inp.north === 'true' ? norm360(inp.bearing) : norm360(inp.bearing + decl.degrees);

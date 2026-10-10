@@ -4,6 +4,7 @@ import { makeRecord, type CalcRecord, type EngineDescriptor } from '../../core/r
 import { julianDayUT, utcMsFromJulianDay, zoneOffsetSeconds } from '../../core/time';
 import { BODY, FLAG, type Ephemeris } from '../natal/ephemeris';
 import { norm360 } from '../natal/zodiac';
+import { assertInstant, assertLatLon } from '../../core/validate';
 
 export const BAZI: EngineDescriptor = {
   engine: 'bazi',
@@ -101,6 +102,8 @@ export interface BaziResult {
 }
 
 function chart(eph: Ephemeris, inp: BaziInputs, conv: BaziConventions): BaziChart {
+  assertInstant(inp.utcMs, 'birth time');
+  assertLatLon(inp.lat, inp.lon);
   const jd = julianDayUT(inp.utcMs);
   const sun = norm360(eph.position(jd, BODY.sun, FLAG.moshier).longitude);
   // Year: changes at Li Chun (315°). Find the Li Chun on or before the instant.
