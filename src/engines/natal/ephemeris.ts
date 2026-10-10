@@ -62,8 +62,9 @@ export class Ephemeris {
     this.swe.setSiderealMode(mode, 0, 0);
   }
 
+  /** Ayanamsa including nutation, so tropical apparent longitude − this = sidereal longitude (as SEFLG_SIDEREAL gives). */
   ayanamsa(jd: number): number {
-    return this.swe.getAyanamsa(jd);
+    return this.swe.getAyanamsaExUt(jd, FLAG.moshier);
   }
 }
 

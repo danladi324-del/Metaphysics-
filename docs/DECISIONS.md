@@ -104,3 +104,9 @@ Loading source texts and approving paraphrases are Eric's (brief §8), so P3 shi
 - Reversals: orientation is drawn when reversals are on; the reading mode (blocked, opposite, internal, delayed) stays unset until Eric picks. Snippets tied to another mode are never shown.
 - Card faces are original generative line art (suit marks, numbered polygons). No Rider-Waite-Smith imagery.
 - Celtic Cross position names paraphrased from Waite 1911 Part III; locator not verified against the text.
+
+## D-016 BaZi: own implementation, lunar-javascript as test oracle
+**Prior art: exists** (lunar-javascript 1.7.7, tyme4ts 1.5.3, both MIT, same author). Built in-app instead of adopting because (a) its solar terms are tabulated in UTC+8 wall time, while births elsewhere need absolute instants, (b) true solar time must be applied before the day/hour pillars, and (c) both Zi-hour rules and every combination must be computed for the ledger. The code is ~150 lines on Swiss Ephemeris solar longitudes. lunar-javascript is a devDependency used only in tests, where it agrees on every case tested.
+
+## D-017 Feng Shui declination: geomagnetism 0.2.0
+**Prior art: exists.** geomagnetism (Apache-2.0, last publish 2024-12) ships WMM-2015/2020/2025 coefficients and runs offline. WMM-2025 is valid to 2029; the app will need a model update after that.

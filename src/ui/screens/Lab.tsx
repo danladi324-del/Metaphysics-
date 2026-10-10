@@ -132,6 +132,10 @@ export function Lab() {
         )}
       </section>
 
+      <a class="btn" href="#/lab/fengshui" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Feng Shui compass
+      </a>
+
       <ContentSection />
 
       <HereSetting />

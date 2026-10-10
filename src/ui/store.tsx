@@ -7,6 +7,7 @@ import { Db } from '../core/db';
 import type { Profile } from '../core/profile';
 import { loadImage, requestPersistence, saveImage } from '../core/storage';
 import { seedSources } from '../content/model';
+import type { BaziConventions } from '../engines/bazi/compute';
 
 export const APP_VERSION = '0.1.0';
 
@@ -32,6 +33,8 @@ export interface Settings {
   activeProfileId: string | null;
   here: Here | null;
   tarot: TarotSettings;
+  bazi?: BaziConventions;
+  fengshui?: { builtYear: number | null; lastBearing: number | null; north: 'magnetic' | 'true' };
 }
 
 export const deviceZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -64,7 +67,7 @@ function readSettings(db: Db): Settings {
   if (!raw) return base;
   try {
     const s = JSON.parse(raw) as Partial<Settings>;
-    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null, tarot: { ...DEFAULT_TAROT_SETTINGS, ...s.tarot } };
+    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null, tarot: { ...DEFAULT_TAROT_SETTINGS, ...s.tarot }, ...(s.bazi ? { bazi: s.bazi } : {}), ...(s.fengshui ? { fengshui: s.fengshui } : {}) };
   } catch {
     return base;
   }

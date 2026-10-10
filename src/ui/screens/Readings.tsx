@@ -4,6 +4,10 @@ import { localDateIn, resolveLocal } from '../../core/time';
 import { computeBiorhythm, CYCLES, type Cycle } from '../../engines/biorhythm/compute';
 import { computeHours } from '../../engines/hours/compute';
 import { computeMoon } from '../../engines/moon/compute';
+import { baziDisagreements, BRANCHES_ZH, computeBazi, DEFAULT_BAZI, pillarName, STEMS_ZH } from '../../engines/bazi/compute';
+import { computeTzolkin, tzolkinDisagreements } from '../../engines/tzolkin/compute';
+import { computeVedic, DEFAULT_VEDIC } from '../../engines/vedic/compute';
+import type { ComponentChildren } from 'preact';
 import type { Ephemeris } from '../../engines/natal/ephemeris';
 import { formatLongitude } from '../../engines/natal/zodiac';
 import {
@@ -21,7 +25,7 @@ import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
 
-type Engine = 'numerology' | 'biorhythm' | 'sky';
+type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic';
 
 export function Readings() {
   const { profile } = useStore();
@@ -38,7 +42,10 @@ export function Readings() {
           [
             ['numerology', 'Numerology'],
             ['biorhythm', 'Biorhythm'],
-            ['sky', 'Moon and hours']
+            ['sky', 'Moon and hours'],
+            ['bazi', 'BaZi'],
+            ['tzolkin', "Tzolk'in"],
+            ['vedic', 'Vedic']
           ] as [Engine, string][]
         ).map(([k, v]) => (
           <button class="chip" role="tab" aria-selected={engine === k} aria-pressed={engine === k} style={{ flex: 'none' }} onClick={() => setEngine(k)}>
@@ -49,6 +56,12 @@ export function Readings() {
       {engine === 'numerology' && <Numerology profile={profile} />}
       {engine === 'biorhythm' && <Biorhythm profile={profile} />}
       {engine === 'sky' && <Sky profile={profile} />}
+      {engine === 'bazi' && <WithEph render={(eph) => <BaziView profile={profile} eph={eph} />} />}
+      {engine === 'tzolkin' && <TzolkinView profile={profile} />}
+      {engine === 'vedic' && <WithEph render={(eph) => <VedicView profile={profile} eph={eph} />} />}
+      <a class="btn" href="#/lab/fengshui" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Feng Shui compass
+      </a>
     </main>
   );
 }
@@ -368,5 +381,159 @@ export function Provenance({ engine, at, fp, limitations }: { engine: string; at
         <p class="note small">Limitation: {x}</p>
       ))}
     </section>
+  );
+}
+
+function WithEph({ render }: { render: (eph: Ephemeris) => ComponentChildren }) {
+  const { eph, error } = useEphemeris();
+  if (error) return <p class="note">Ephemeris failed: {error}</p>;
+  if (!eph) return <p class="note">Loading the ephemeris…</p>;
+  return <>{render(eph)}</>;
+}
+
+function BaziView({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
+  const { settings, updateSettings } = useStore();
+  const conv = settings.bazi ?? DEFAULT_BAZI;
+  const inp = { utcMs: profile.birth.utcMs, zone: profile.birth.zone, lat: profile.place.lat, lon: profile.place.lon };
+  const { rec } = useStoredRecord([profile.id, profile.updated_at, conv.ziHour, conv.trueSolarTime], () => computeBazi(eph, inp, conv), baziDisagreements);
+  if (!rec) return null;
+  const c = rec.raw_result.chosen;
+  const cols = [['Hour', c.hour], ['Day', c.day], ['Month', c.month], ['Year', c.year]] as const;
+  const splits = baziDisagreements(rec, null);
+  return (
+    <>
+      <section>
+        <div class="grid2">
+          <label class="field">
+            Time used
+            <select value={conv.trueSolarTime ? 'solar' : 'clock'} onChange={(e) => updateSettings({ bazi: { ...conv, trueSolarTime: e.currentTarget.value === 'solar' } })}>
+              <option value="clock">Clock time</option>
+              <option value="solar">True solar time</option>
+            </select>
+          </label>
+          <label class="field">
+            Zi hour rule
+            <select value={conv.ziHour} onChange={(e) => updateSettings({ bazi: { ...conv, ziHour: e.currentTarget.value as 'early' | 'midnight' } })}>
+              <option value="early">Day changes at 23:00</option>
+              <option value="midnight">Day changes at 00:00</option>
+            </select>
+          </label>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', textAlign: 'center' }}>
+          {cols.map(([k, p]) => (
+            <div class="card" style={{ padding: '10px 4px', gap: '4px' }}>
+              <div class="small muted">{k}</div>
+              <div style={{ fontSize: '28px' }} lang="zh">{STEMS_ZH[p.stem]}</div>
+              <div style={{ fontSize: '28px' }} lang="zh">{BRANCHES_ZH[p.branch]}</div>
+              <div class="small">{pillarName(p).split(' ')[1]}</div>
+            </div>
+          ))}
+        </div>
+        <Label label="calculated">Calculated. Year from Li Chun (315°), month from solar terms, day and hour from {conv.trueSolarTime ? 'true solar time' : 'clock time'} ({c.timeUsed.replace('T', ' ')}).</Label>
+        <p class="note">Elements in the eight characters: {Object.entries(c.elements).map(([k, v]) => `${k} ${v}`).join(', ')}. Day master: {pillarName(c.day).split(' ')[1]!.split('-')[0]}.</p>
+      </section>
+      {splits.length > 0 && (
+        <section>
+          <h2>Where conventions split</h2>
+          {splits.map((d) => (
+            <div>
+              <Label label="disagreement">{d.subject}</Label>
+              <p class="note">{d.result_a} · {d.result_b}</p>
+            </div>
+          ))}
+        </section>
+      )}
+      <section>
+        <h2>Day master</h2>
+        <ReadingLayers snippetKey={`bazi.dayMaster.${c.day.stem}`} lens="general" />
+      </section>
+      <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
+    </>
+  );
+}
+
+function TzolkinView({ profile }: { profile: Profile }) {
+  const b = profile.birth.local;
+  const { rec } = useStoredRecord([b.year, b.month, b.day], () => computeTzolkin({ year: b.year, month: b.month, day: b.day }), tzolkinDisagreements);
+  if (!rec) return null;
+  const c = rec.raw_result.chosen;
+  return (
+    <>
+      <section>
+        <div class="card" style={{ alignItems: 'center' }}>
+          <div style={{ fontSize: '28px', fontWeight: 500 }}>
+            {c.tzolkin.number} {c.tzolkin.name}
+          </div>
+          <div class="note">
+            Haab {c.haab.day} {c.haab.month} · Long Count {c.longCount.join('.')}
+          </div>
+        </div>
+        <Label label="calculated">Calculated with the GMT correlation (584283), civil birth date.</Label>
+        {rec.raw_result.alternatives.map((a) => (
+          <div>
+            <Label label="disagreement">Correlation {a.correlation}</Label>
+            <p class="note">
+              {a.tzolkin.number} {a.tzolkin.name}, Haab {a.haab.day} {a.haab.month}
+            </p>
+          </div>
+        ))}
+      </section>
+      <section>
+        <h2>Day sign</h2>
+        <ReadingLayers snippetKey={`tzolkin.daySign.${c.tzolkin.name.toLowerCase()}`} lens="general" />
+      </section>
+      <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
+    </>
+  );
+}
+
+function VedicView({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
+  const inp = { utcMs: profile.birth.utcMs, lat: profile.place.lat, lon: profile.place.lon, timeKnown: profile.birth.timeKnown };
+  const { rec } = useStoredRecord([profile.id, profile.updated_at], () => computeVedic(eph, inp, DEFAULT_VEDIC));
+  if (!rec) return null;
+  const r = rec.raw_result;
+  const now = Date.now();
+  const fmt = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+  return (
+    <>
+      <section>
+        <p class="note">Sidereal, Lahiri ayanamsa {r.ayanamsa.toFixed(4)}°. {r.ascendant ? `Ascendant ${formatLongitude(r.ascendant.longitude)}.` : 'No ascendant (time unknown).'}</p>
+        <div class="table" style={{ gridTemplateColumns: 'minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.4fr)' }}>
+          <div class="h">Graha</div>
+          <div class="h">Position</div>
+          <div class="h">Nakshatra</div>
+          {r.grahas.map((g) => (
+            <>
+              <div class="muted">{g.id}</div>
+              <div>{formatLongitude(g.longitude)}</div>
+              <div>
+                {g.nakshatra} {g.pada}
+              </div>
+            </>
+          ))}
+        </div>
+        <Label label="calculated">Calculated. Mean node; dasha years of 365.25 days.</Label>
+      </section>
+      <section>
+        <h2>Vimshottari dasha</h2>
+        <p class="note">
+          Moon in {r.moonNakshatra.name} (lord {r.moonNakshatra.lord}), {Math.round(r.moonNakshatra.fractionTraversed * 100)}% traversed at birth.
+        </p>
+        <div class="table" style={{ gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)' }}>
+          {r.dashas.map((d) => {
+            const cur = now >= d.startMs && now < d.endMs;
+            const st = cur ? { color: 'var(--calc)' } : undefined;
+            return (
+              <>
+                <div style={st}>{d.lord}{cur ? ' (now)' : ''}</div>
+                <div style={st}>{fmt(d.startMs)}</div>
+                <div style={st}>{fmt(d.endMs)}</div>
+              </>
+            );
+          })}
+        </div>
+      </section>
+      <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
+    </>
   );
 }

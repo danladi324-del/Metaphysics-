@@ -6,6 +6,7 @@ import { Placeholder } from './screens/Placeholder';
 import { ProfileForm } from './screens/ProfileForm';
 import { Readings } from './screens/Readings';
 import { Draw } from './screens/Draw';
+import { FengShui } from './screens/FengShui';
 import { StoreProvider, useStore } from './store';
 
 const ROUTES: Route[] = ['today', 'charts', 'draw', 'readings', 'journal', 'lab'];
@@ -41,6 +42,8 @@ function Router() {
     const id = loc.rest[1];
     const existing = profiles.find((p) => p.id === id) ?? null;
     screen = <ProfileForm key={id} existing={existing} onDone={() => (location.hash = '#/charts')} />;
+  } else if (loc.route === 'lab' && loc.rest[0] === 'fengshui') {
+    screen = <FengShui />;
   } else if (profiles.length === 0 && loc.route !== 'lab') {
     screen = <ProfileForm key="first" existing={null} onDone={() => (location.hash = '#/charts')} />;
   } else if (loc.route === 'charts') screen = <Charts />;
