@@ -124,3 +124,10 @@ Loading source texts and approving paraphrases are Eric's (brief §8), so P3 shi
 
 ## D-019 Outcomes are self-rated and labeled as such
 Outcome = Fit / Partly / Didn't fit / Can't tell, linked to the record that was checked. The Lab shows counts per engine and a "fit" share only once five outcomes are judged, with a note that unblinded self-rating of vague readings scores high by itself (Barnum effect). No outcome feeds back into any engine.
+
+## D-020 Convergence and its chance baseline
+Method follows the convergence-baseline skill: full table, real baseline, p-value, verdict, or BLOCKED.
+- **Sources.** Engines are merged into one source when they share an input, transitively: anything using birth data is one source, anything using an ephemeris or solar terms is "the sky", the current place is its own input, and each random draw is its own source. The query date and per-draw randomness are not shared inputs. This is conservative: a single engine that reads both birth data and the sky (transits) merges those groups.
+- **What counts.** Only author-declared themes on **approved traditional** snippets. Synthesis text, including anything written by an AI, never counts (rule 2).
+- **Baseline.** Seeded Monte Carlo, 20,000 simulated days: each independent source draws as many distinct themes as it actually has, uniformly from the real vocabulary (distinct themes across all approved snippets). The chance rate is P(some theme reaches the observed number of independent sources), which is the p-value. Seed = the date, so a day's figure is reproducible. Checked against exact values (1/4, 0.52, 1 − 56/120).
+- **Display.** `Convergence` is a union type whose computed variant requires `chanceRate`; the strip always shows the full source table. Verdict "unlikely by chance" only below 0.05. BLOCKED when fewer than two independent sources carry approved themes or the vocabulary has fewer than two themes. With no content loaded, today's strip is BLOCKED, which is correct.

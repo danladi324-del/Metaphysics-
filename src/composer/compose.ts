@@ -57,6 +57,8 @@ export interface Reading {
   status: Status;
   statusNote: string;
   sharedThemes: string[];
+  /** Union of author-declared themes on the approved traditional snippets used. Feeds the convergence strip. */
+  approvedThemes: string[];
   traceIds: string[];
   /** Hash of the snippet rows used: a master reading is regenerated only when this or the record changes. */
   contentHash: string;
@@ -176,6 +178,7 @@ export function compose(db: Db, view: EngineView, lens: Lens): Reading {
     status,
     statusNote,
     sharedThemes: shared,
+    approvedThemes: [...new Set([...approvedBySource.values()].flatMap((s) => [...s]))].sort(),
     traceIds: layers.flatMap((l) => l.items.map((i) => i.traceId)),
     contentHash: fingerprint(usedRows)
   };

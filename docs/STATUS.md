@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P5 done 2026-10-10. P6 next (daily synthesis, Today, convergence with baseline).
+P6 done 2026-10-10. P7 next (Shadow, then long tail one module at a time; Qi Men blocked on school choice).
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -48,6 +48,12 @@ P5 done 2026-10-10. P6 next (daily synthesis, Today, convergence with baseline).
 - Acceptance: with today's content every reading reports "Insufficient information" (no approved text) instead of a reading; tests show agreement only for two approved sources with a shared declared theme, disagreement whenever a split is declared (even with shared themes), and single-source otherwise.
 - Tested (130 unit tests total): status rules including unapproved and theme-less cases; trace ids; facts within the cap; house splits flow into layer 4; markdown; master versioning (reuse, content change, record change); migration of a pre-themes database; tag parsing; tag patterns; outcome rate withheld below five.
 - Browser (`scripts/e2e-p5.cjs`): natal master reading shows "Insufficient information" with traced facts; numerology shows master and daily; tarot draw → journal → outcome → Lab table; no console errors; no horizontal scroll.
+
+### P6 Daily synthesis and dashboard — TEST
+- Works: Today on live data for the current location: sky now (moon, planetary day and hour, closest applying transit to the natal chart), Daily Compass from loaded "Your move" snippets (empty with a stated reason otherwise), engine cards with input badges, convergence strip with independence grouping, full table, chance rate and verdict, daily synthesis (layers 1, 3, 5), quick draw, outcome check, system health.
+- Acceptance: a convergence cannot display without its chance rate — enforced by the type (a compile-time test proves it) and by a property test over 200 random days.
+- Tested (143 unit tests total): grouping (birth, sky, random; transitive merge); simulation vs three exact results; determinism; computed / none / blocked paths; wording never rounds to zero and says "near certain" at the top.
+- Browser (`scripts/e2e-p6.cjs`): default Today shows "Cannot be assessed" with the two-source table; after a themed test pack is approved, it shows "completion: 2 engines, 2 independent sources, chance near certain (p = 1.000), consistent with chance" — correct, since 2 + 2 themes from a 3-theme vocabulary must overlap. The loaded move appears in the compass with its trace id.
 
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
