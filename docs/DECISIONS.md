@@ -1,0 +1,81 @@
+# Decisions
+
+Each entry: the call, why, and what would reverse it. Entries marked **OWNER** are Eric's to make (brief §8); until he does, the value shown is provisional and labeled so in the UI.
+
+Prior-art findings use the four verdicts from rule 7: **exists / partially exists / adjacent / nothing found**. "Searched" lists what was actually checked on 2026-10-10. Nothing here was tested on an iPhone yet; anything about iOS Safari behavior is from documentation or third-party reports and is marked UNVERIFIED.
+
+---
+
+## D-001 Brief location
+`Claude.md` held the brief. Renamed to `BUILD_BRIEF.md`; `CLAUDE.md` now points at it and at `docs/STATUS.md`.
+
+## D-002 In-browser database: sql.js with IndexedDB snapshot
+**Prior art: exists.** Searched npm metadata and PowerSync's survey posts.
+
+| Option | License | Last publish | Notes |
+|---|---|---|---|
+| sql.js 1.14.2 | MIT | 2026-08 | In-memory SQLite; you persist the byte image yourself. Runs identically in Node, so tests exercise the real DB. 658 KB wasm. |
+| @sqlite.org/sqlite-wasm 3.53.4 | Apache-2.0 | 2026-10 | Official. OPFS VFS needs a dedicated worker; the `opfs-sahpool` VFS avoids COOP/COEP headers (GitHub Pages cannot set headers). |
+| wa-sqlite 1.0.0 (npm) | MIT | 2024-01 on npm | IDBBatchAtomicVFS recommended for broad support (PowerSync). npm release is stale; GitHub is newer. |
+
+**Decision:** sql.js, whole-DB snapshot written to IndexedDB after each write transaction (debounced). The dataset is personal and small (well under 10 MB), so rewriting the image is cheap, and identical behavior in Node and Safari matters more than incremental writes.
+**Reverse if:** DB grows past ~20 MB, or snapshot writes cause visible jank on the phone. Then move to sqlite-wasm `opfs-sahpool` in a worker.
+**iOS storage (UNVERIFIED on device):** WebKit's 7-day script-writable storage cap is reported not to apply to Home Screen web apps (Apple developer forum thread 710157, citing WebKit ITP docs). The app calls `navigator.storage.persist()` and shows the result; the JSON export remains the real backup regardless.
+Sources: [PowerSync: SQLite persistence on the web](https://powersync.com/blog/sqlite-persistence-on-the-web), [PowerSync 2024 update](https://conffab.com/elsewhere/the-current-state-of-sqlite-persistence-on-the-web-february-2024-update/), [Apple forum 710157](https://developer.apple.com/forums/thread/710157), [powersync-js PR 418 (OPFS on Safari)](https://github.com/powersync-ja/powersync-js/pull/418).
+
+## D-003 Ephemeris: Swiss Ephemeris WASM (@swisseph/browser), astronomy-engine as cross-check
+**Prior art: exists.**
+
+| Option | License | Houses | Chiron | Notes |
+|---|---|---|---|---|
+| @swisseph/browser 1.4.0 | AGPL-3.0 | yes (Placidus, Koch, Equal, Whole Sign, Campanus, Regiomontanus…) | yes, with `seas_18.se1` | Swiss Ephemeris 2.10.03. Moshier built in. Maintained (2026-09). |
+| astronomy-engine 2.1.19 | MIT | **no** | **no** | Verified: no house or Chiron code in the package. |
+| swisseph-wasm 0.1.0 | GPL-3.0+ | yes | unknown | 3 MB. |
+| @fusionstrings/swisseph-wasm | declares MIT | – | – | **Avoid:** wraps the Swiss Ephemeris C library, which is AGPL or commercial. The MIT label looks wrong. |
+
+**Decision:** @swisseph/browser with Moshier for planets and `seas_18.se1` (223 KB, covers 1800–2399 CE, from github.com/aloistr/swisseph) bundled locally for Chiron, so the app stays offline. astronomy-engine (independent code base, MIT) is a test-only cross-check for Sun through Pluto.
+**Verified in Node, 2026-10-10:** the package is built for web only (Emscripten `ENVIRONMENT_IS_NODE` stripped); tests inject the wasm via `instantiateWasm`. With Eric's data the engine returned Sun 3°39′ Aries, Asc 18°26′ Gemini, Chiron 19°21′ Aries.
+**License:** AGPL is acceptable for personal use (brief §4.2). **Must be revisited before the app is shared with anyone** (see D-010).
+Sources: [@swisseph/browser README](https://cdn.jsdelivr.net/npm/@swisseph/browser@1.1.1/README.md), [swisseph-wasm README](https://cdn.jsdelivr.net/npm/swisseph-wasm@0.0.5/README.md), [fusionstrings swisseph-wasm](https://jsr.io/@fusionstrings/swisseph-wasm), [swisseph-js/swisseph](https://github.com/swisseph-js/swisseph).
+
+## D-004 BaZi calendar: 6tail libraries (decide between two in P4)
+**Prior art: exists.** lunar-javascript 1.7.7 (MIT, 2025-11) and tyme4ts 1.5.3 (MIT, 2026-10, same author, TypeScript, actively published). Both provide solar terms and four pillars.
+**Decision deferred to P4:** check (a) whether the Zi-hour rule is exposed as a parameter (lunar-javascript's `EightChar.setSect` is reported to do this; verify), (b) whether solar-term instants agree with Swiss Ephemeris solar longitude (Li Chun = 315°) to the minute, (c) whether true-solar-time correction is supported or must be applied before the call. Whichever fails a check gets wrapped or replaced.
+Sources: [6tail/lunar-javascript](https://docsearch.algolia.com/mcp/docs/repo/6tail/lunar-javascript), [6tail/tyme4ts](https://docsearch.algolia.com/mcp/docs/repo/6tail/tyme4ts).
+
+## D-005 Qi Men Dun Jia: candidates exist, all young; school choice is OWNER
+**Prior art: exists (several), maturity unverified.** All candidates were first published in 2026.
+
+| Package | License | School(s) claimed | First published |
+|---|---|---|---|
+| qimen-dunjia 3.1.0 (arc119226) | MIT | Chai Bu and others | 2026-01 |
+| @yhjs/dunjia 1.0.1 | MIT | hour and mountain-direction Qi Men | 2026-02 |
+| @spensercai/qimen-wasm 0.2.1 (Rust) | MIT | hour-school Chai Bu, rotating | 2026-09 |
+| kinqimen 0.3.1 | GPL-3.0 | Chai Bu | 2026-04 |
+| mingyu-core 0.4.2 | AGPL-3.0 | multi-system | 2026-06 |
+
+Commercial reference: *Qi Men Dun Jia 1080Ju* (iOS, Chai Bu) and masterseanchan.com (Zhi Run default per its docs).
+**Decision:** none until Eric picks Chai Bu vs Zhi Run (P7). Then test the matching MIT candidates against the old app's screenshots as fixtures before adopting any.
+Sources: npm registry search 2026-10-10; [masterseanchan Qi Men](https://www.masterseanchan.com/qi-men-dun-jia-calculator/), [1080Ju on App Store](https://apps.apple.com/app/id869889798), [mingyu-core on jsDelivr](https://www.jsdelivr.com/package/npm/mingyu-core?tab=files).
+
+## D-006 Time zones: resolve once at entry, store the offset
+Historical offsets are the most common error source (brief §3). Eric's own birth is an example: on 1974-03-24 the US was on year-round emergency DST (from 1974-01-06), so 11:15 in Bossier City was **CDT, UTC−5**, not CST. A naive "March = standard time" rule would put the chart an hour off.
+**Decision:** the profile stores local wall time, IANA zone, the UTC offset resolved at entry, and where the offset came from (`Intl` tzdb in the runtime that resolved it). Engines compute from the stored UTC instant, not from a fresh lookup, so the same record recomputes identically on any device (rule 9). On load the app re-resolves and flags a mismatch instead of silently changing the chart.
+**Ambiguous/nonexistent local times** (fall-back hour, spring-forward gap) are detected and the user must pick.
+
+## D-007 Hosting and CI
+GitHub Pages deployed by GitHub Actions; tests run on every push. Vite base path `/Metaphysics-/`.
+
+## D-008 Provisional conventions pending OWNER choices
+Until Eric decides (brief §8), these defaults are used **and labeled provisional in the UI**. Competing conventions are computed anyway (rule 5), so the choice only sets which one is shown first.
+- House system: **Placidus** (provisional); Whole Sign always computed alongside.
+- Zodiac: **Tropical** (provisional); sidereal Lahiri computed alongside once Vedic lands.
+- Tarot reversal mode: none set; P3 will show all modes until chosen.
+- Qi Men school: none (P7 blocked on it).
+- Lunar node: mean and true both stored; mean shown first (provisional). Lilith: mean apogee shown first, osculating stored.
+
+## D-009 Numerology name
+Eric gave "Eric Garner". Classical practice (Balliett) uses the full birth-certificate name for Expression. Stored as `name_used = "Eric Garner"`, `name_kind = "as given"` until Eric confirms whether there is a middle name or a different birth name.
+
+## D-010 Sharing changes licensing
+The app is personal. AGPL (Swiss Ephemeris) and GeoNames CC-BY attribution are fine at that scope. Sharing the app with anyone triggers a review of D-003 and of every content source.
