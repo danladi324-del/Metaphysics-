@@ -5,7 +5,7 @@ import type { NatalResult } from '../../engines/natal/compute';
 import type { Ephemeris } from '../../engines/natal/ephemeris';
 import { HOUSE_SYSTEM_LABEL, PROVISIONAL, type AstroConventions, type HouseSystem } from '../../core/conventions';
 import { formatOffset } from '../../core/time';
-import { BODY_LABEL, natalDisagreements, type BodyId } from '../../engines/natal/compute';
+import { BODY_LABEL, isVariantPoint, lilithBody, natalDisagreements, nodeBody, type BodyId } from '../../engines/natal/compute';
 import { natalMarkdown } from '../../engines/natal/markdown';
 import { computeReturn, computeTransits } from '../../engines/natal/transits';
 import { formatLongitude } from '../../engines/natal/zodiac';
@@ -89,10 +89,11 @@ export function Charts() {
             <select value={conv.lilithType} onChange={(e) => setConv({ lilithType: e.currentTarget.value as AstroConventions['lilithType'] })}>
               <option value="mean">Mean</option>
               <option value="osculating">Osculating</option>
+              <option value="interpolated">Interpolated</option>
             </select>
           </label>
         </div>
-        <p class="note">Provisional defaults are waiting for your choice. Placidus and whole sign are always both computed.</p>
+        <p class="note">Your defaults: whole sign houses, tropical zodiac. Placidus is always computed alongside so the ledger can show where the two differ. True node and interpolated Lilith match your Astrodienst settings; the other variants are stored and logged where they differ.</p>
       </section>
 
       {error && <p class="note">Ephemeris failed to load: {error}</p>}
@@ -112,9 +113,9 @@ interface ViewProps {
 function NatalView({ rec, profile, conv }: ViewProps & { profile: Profile }) {
     const b = profile.birth;
     const r = rec.raw_result;
-    const node = conv.nodeType === 'mean' ? 'meanNode' : 'trueNode';
-    const lilith = conv.lilithType === 'mean' ? 'meanLilith' : 'osculatingLilith';
-    const shown = r.bodies.map((x) => x.id).filter((id) => !['meanNode', 'trueNode', 'meanLilith', 'osculatingLilith'].includes(id) || id === node || id === lilith);
+    const node = nodeBody(conv);
+    const lilith = lilithBody(conv);
+    const shown = r.bodies.map((x) => x.id).filter((id) => !isVariantPoint(id) || id === node || id === lilith);
     const cusps = r.houses[conv.houseSystem]?.cusps ?? null;
     const splits = natalDisagreements(rec, profile.id);
     const [showAll, setShowAll] = useState(false);
@@ -138,7 +139,7 @@ function NatalView({ rec, profile, conv }: ViewProps & { profile: Profile }) {
               .filter((x) => shown.includes(x.id))
               .map((x) => (
                 <>
-                  <div class="muted">{BODY_LABEL[x.id as BodyId].replace(/ \((mean|true|osculating)\)/, '')}</div>
+                  <div class="muted">{BODY_LABEL[x.id as BodyId].replace(/ \((mean|true|osculating|interpolated)\)/, '')}</div>
                   <div>
                     {formatLongitude(x.longitude)}
                     {x.retrograde ? ' ℞' : ''}
@@ -303,7 +304,7 @@ function ReturnsView({ rec, eph }: { rec: CalcRecord<NatalResult>; eph: Ephemeri
 }
 
 function label(id: string): string {
-  return (BODY_LABEL as Record<string, string>)[id]?.replace(/ \((mean|true|osculating)\)/, '') ?? id;
+  return (BODY_LABEL as Record<string, string>)[id]?.replace(/ \((mean|true|osculating|interpolated)\)/, '') ?? id;
 }
 
 export function NoProfile() {

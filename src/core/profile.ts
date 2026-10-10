@@ -33,6 +33,8 @@ export interface Profile {
   birth: Birth;
   place: Place;
   numerologyNames: NumerologyName[];
+  /** Optional. BaZi luck-pillar direction and the Eight Mansions Kua formula use it; nothing else does. */
+  sex?: 'male' | 'female';
   created_at: string;
   updated_at: string;
 }

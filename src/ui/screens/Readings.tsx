@@ -4,7 +4,7 @@ import { localDateIn, resolveLocal } from '../../core/time';
 import { computeBiorhythm, CYCLES, type Cycle } from '../../engines/biorhythm/compute';
 import { computeHours } from '../../engines/hours/compute';
 import { computeMoon } from '../../engines/moon/compute';
-import { baziDisagreements, BRANCHES_ZH, computeBazi, DEFAULT_BAZI, pillarName, STEMS_ZH } from '../../engines/bazi/compute';
+import { baziDisagreements, BRANCHES_ZH, computeBazi, DEFAULT_BAZI, pillarName, STEMS, STEMS_ZH } from '../../engines/bazi/compute';
 import { computeTzolkin, tzolkinDisagreements } from '../../engines/tzolkin/compute';
 import { computeVedic, DEFAULT_VEDIC } from '../../engines/vedic/compute';
 import type { ComponentChildren } from 'preact';
@@ -21,13 +21,14 @@ import {
 import { Label } from '../components/Label';
 import { ComposedReading } from '../components/ComposedReading';
 import { Shadow } from './Shadow';
+import { Qimen } from './Qimen';
 import { baziView, biorhythmView, hoursView, moonView, numerologyDailyView, numerologyMasterView, tzolkinView, vedicView } from '../../composer/views';
 import { useStore } from '../store';
 import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
 
-type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'shadow';
+type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'qimen' | 'shadow';
 
 export function Readings() {
   const { profile } = useStore();
@@ -48,6 +49,7 @@ export function Readings() {
             ['bazi', 'BaZi'],
             ['tzolkin', "Tzolk'in"],
             ['vedic', 'Vedic'],
+            ['qimen', 'Qi Men'],
             ['shadow', 'Shadow']
           ] as [Engine, string][]
         ).map(([k, v]) => (
@@ -62,6 +64,7 @@ export function Readings() {
       {engine === 'bazi' && <WithEph render={(eph) => <BaziView profile={profile} eph={eph} />} />}
       {engine === 'tzolkin' && <TzolkinView profile={profile} />}
       {engine === 'shadow' && <Shadow profile={profile} />}
+      {engine === 'qimen' && <WithEph render={(eph) => <Qimen profile={profile} eph={eph} />} />}
       {engine === 'vedic' && <WithEph render={(eph) => <VedicView profile={profile} eph={eph} />} />}
       <a class="btn" href="#/lab/fengshui" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         Feng Shui compass
@@ -399,8 +402,8 @@ function WithEph({ render }: { render: (eph: Ephemeris) => ComponentChildren }) 
 function BaziView({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
   const { settings, updateSettings } = useStore();
   const conv = settings.bazi ?? DEFAULT_BAZI;
-  const inp = { utcMs: profile.birth.utcMs, zone: profile.birth.zone, lat: profile.place.lat, lon: profile.place.lon };
-  const { rec } = useStoredRecord([profile.id, profile.updated_at, conv.ziHour, conv.trueSolarTime], () => computeBazi(eph, inp, conv), baziDisagreements);
+  const inp = { utcMs: profile.birth.utcMs, zone: profile.birth.zone, lat: profile.place.lat, lon: profile.place.lon, ...(profile.sex ? { sex: profile.sex } : {}) };
+  const { rec } = useStoredRecord([profile.id, profile.updated_at, profile.sex, conv.ziHour, conv.trueSolarTime], () => computeBazi(eph, inp, conv), baziDisagreements);
   if (!rec) return null;
   const c = rec.raw_result.chosen;
   const cols = [['Hour', c.hour], ['Day', c.day], ['Month', c.month], ['Year', c.year]] as const;
@@ -448,6 +451,35 @@ function BaziView({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
           ))}
         </section>
       )}
+      <section>
+        <h2>Luck pillars</h2>
+        {rec.raw_result.luck ? (
+          <>
+            <p class="note">
+              {rec.raw_result.luck.direction === 'forward' ? 'Forward' : 'Backward'} ({STEMS[c.year.stem]} year is {c.year.stem % 2 === 0 ? 'yang' : 'yin'}, {profile.sex}). First pillar from age {rec.raw_result.luck.startAge.years} years {rec.raw_result.luck.startAge.months} months ({rec.raw_result.luck.daysToTerm.toFixed(2)} days to the {rec.raw_result.luck.direction === 'forward' ? 'next' : 'previous'} month boundary, 3 days = 1 year).
+            </p>
+            <div class="table" style={{ gridTemplateColumns: 'minmax(0,0.8fr) minmax(0,1.2fr) minmax(0,1fr)' }}>
+              <div class="h">From age</div>
+              <div class="h">Pillar</div>
+              <div class="h">From</div>
+              {rec.raw_result.luck.pillars.map((p) => {
+                const cur = Date.now() >= p.fromUtcMs && Date.now() < p.fromUtcMs + 10 * 365.2425 * 86_400_000;
+                const st = cur ? { color: 'var(--calc)' } : undefined;
+                return (
+                  <>
+                    <div style={st}>{p.fromAge.toFixed(1)}{cur ? ' (now)' : ''}</div>
+                    <div style={st}>{pillarName(p.pillar)}</div>
+                    <div style={st}>{new Date(p.fromUtcMs).toISOString().slice(0, 10)}</div>
+                  </>
+                );
+              })}
+            </div>
+            <Label label="calculated">Calculated from absolute solar-term instants. Apps that read the birth clock as Beijing time may show a different start age.</Label>
+          </>
+        ) : (
+          <p class="note">Add sex to the profile to compute luck pillars; their direction depends on it.</p>
+        )}
+      </section>
       <ComposedReading view={baziView(rec)} kind="master" rec={rec} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
     </>

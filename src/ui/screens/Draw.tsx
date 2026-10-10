@@ -11,7 +11,7 @@ import { geomancyView, ichingView, tarotView } from '../../composer/views';
 import { computeGeomancy, type Figure, type GeomancyResult } from '../../engines/geomancy/compute';
 import { computeCast, type CastResult, type LineValue, type Method } from '../../engines/iching/compute';
 import { Label } from '../components/Label';
-import { useStore } from '../store';
+import { snippetMode, useStore } from '../store';
 import { Provenance } from './Readings';
 
 type Tool = 'iching' | 'tarot' | 'geomancy';
@@ -226,14 +226,14 @@ function Tarot() {
           </label>
           <label class="field">
             Reversals
-            <select value={tarot.reversals ? tarot.mode ?? 'unset' : 'off'} onChange={(e) => {
+            <select value={tarot.reversals ? tarot.mode : 'off'} onChange={(e) => {
               const v = e.currentTarget.value;
-              setTarot(v === 'off' ? { reversals: false } : { reversals: true, mode: v === 'unset' ? null : (v as (typeof MODES)[number]) });
+              setTarot(v === 'off' ? { reversals: false } : { reversals: true, mode: v as 'source' | (typeof MODES)[number] });
             }}>
               <option value="off">Off (all upright)</option>
-              <option value="unset">On, no mode chosen</option>
+              <option value="source">On, as the source reads each card</option>
               {MODES.map((m) => (
-                <option value={m}>On, read as {m}</option>
+                <option value={m}>On, compare: read as {m}</option>
               ))}
             </select>
           </label>
@@ -249,7 +249,9 @@ function Tarot() {
           Question (optional)
           <input value={question} onInput={(e) => setQuestion(e.currentTarget.value)} />
         </label>
-        <p class="note">Reversal mode is your call and is still unset. Traditions read reversals as blocked, opposite, internal or delayed; pick one to compare.</p>
+        <p class="note">
+          Reversed cards are read as each card's source reads them (Waite 1911 gives a reversed meaning per card). Blocked, opposite, internal and delayed are generic rules; they show as synthesis unless a cited passage for that mode is loaded. Use them to compare.
+        </p>
         <button class="btn primary" onClick={draw}>
           {rec ? 'Draw again' : 'Draw'}
         </button>
@@ -270,11 +272,11 @@ function Tarot() {
                   {card.name}
                   {c.reversed ? ', reversed' : ''} · {lens}
                 </h3>
-                <ReadingLayers snippetKey={snippetKey(card, c.reversed)} lens={lens} reversalMode={c.reversed ? tarot.mode : null} />
+                <ReadingLayers snippetKey={snippetKey(card, c.reversed)} lens={lens} reversalMode={c.reversed ? snippetMode(tarot.mode) : null} />
               </section>
             );
           })}
-          <ComposedReading view={tarotView(rec, tarot.mode)} kind="event" rec={rec} lens={lens} day={rec.id} />
+          <ComposedReading view={tarotView(rec, snippetMode(tarot.mode))} kind="event" rec={rec} lens={lens} day={rec.id} />
           <section>
             <h2>Same cards, other lenses</h2>
             <div class="chips">

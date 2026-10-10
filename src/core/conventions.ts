@@ -1,10 +1,10 @@
-/** Every convention is a parameter (rule 4). Defaults marked provisional await Eric (DECISIONS D-008). */
+/** Every convention is a parameter (rule 4). House system and zodiac decided by Eric 2026-10-10 (DECISIONS D-024); the rest marked provisional. */
 
 export type HouseSystem = 'placidus' | 'wholeSign' | 'koch' | 'equal' | 'campanus' | 'regiomontanus' | 'porphyry';
 export type Zodiac = 'tropical' | 'sidereal';
 export type Ayanamsa = 'lahiri' | 'raman' | 'krishnamurti' | 'faganBradley';
 export type NodeType = 'mean' | 'true';
-export type LilithType = 'mean' | 'osculating';
+export type LilithType = 'mean' | 'osculating' | 'interpolated';
 
 export interface AstroConventions {
   houseSystem: HouseSystem;
@@ -15,15 +15,15 @@ export interface AstroConventions {
 }
 
 export const DEFAULT_ASTRO: AstroConventions = {
-  houseSystem: 'placidus',
+  houseSystem: 'wholeSign',
   zodiac: 'tropical',
   ayanamsa: 'lahiri',
-  nodeType: 'mean',
-  lilithType: 'mean'
+  nodeType: 'true',
+  lilithType: 'interpolated'
 };
 
 /** Which defaults are still provisional (shown with a note in the UI). */
-export const PROVISIONAL: ReadonlySet<string> = new Set(['houseSystem', 'zodiac', 'nodeType', 'lilithType', 'masterNumbers', 'nameUsed']);
+export const PROVISIONAL: ReadonlySet<string> = new Set(['masterNumbers']);
 
 export const HOUSE_SYSTEM_LABEL: Record<HouseSystem, string> = {
   placidus: 'Placidus',

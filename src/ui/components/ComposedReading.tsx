@@ -23,7 +23,7 @@ export function ComposedReading({ view, kind, rec, day = null, lens = 'general' 
       <div>
         <h2>{r.title}</h2>
         <div class="small muted">
-          {kind === 'master' ? 'Master reading' : kind === 'daily' ? `Daily reading, ${day}` : 'Reading for this draw'} · version {stored.version} · composed {stored.composed_at.slice(0, 10)}
+          {kind === 'master' ? 'Master reading' : kind === 'daily' ? `Daily reading, ${day}` : 'Reading for this chart or draw'} · version {stored.version} · composed {stored.composed_at.slice(0, 10)}
         </div>
       </div>
       <div>

@@ -15,6 +15,7 @@ import type { TarotResult } from '../engines/tarot/compute';
 import type { TzolkinResult } from '../engines/tzolkin/compute';
 import type { VedicResult } from '../engines/vedic/compute';
 import type { GeomancyResult } from '../engines/geomancy/compute';
+import type { QimenResult } from '../engines/qimen/compute';
 import type { EngineView } from './compose';
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -194,6 +195,28 @@ export function geomancyView(rec: CalcRecord<GeomancyResult>): EngineView {
       { key: `geomancy.figure.${slug(r.judge)}`, title: `Judge: ${r.judge}` },
       { key: `geomancy.figure.${slug(f('Right Witness'))}`, title: `Right witness: ${f('Right Witness')}` },
       { key: `geomancy.figure.${slug(f('Left Witness'))}`, title: `Left witness: ${f('Left Witness')}` }
+    ]
+  };
+}
+
+const QM_PINYIN: Record<string, string> = {
+  天蓬: 'tianpeng', 天芮: 'tianrui', 天冲: 'tianchong', 天辅: 'tianfu', 天禽: 'tianqin', 天心: 'tianxin', 天柱: 'tianzhu', 天任: 'tianren', 天英: 'tianying',
+  休门: 'xiu', 死门: 'si', 伤门: 'shang', 杜门: 'du', 开门: 'kai', 惊门: 'jing', 生门: 'sheng', 景门: 'jingscene'
+};
+
+export function qimenView(rec: CalcRecord<QimenResult>): EngineView {
+  const c = rec.raw_result.chosen;
+  return {
+    engine: 'qimen',
+    title: `Qi Men: ${c.dun === 'yang' ? 'Yang' : 'Yin'} ${c.ju}, ${c.term}`,
+    recordIds: [rec.id],
+    facts: [
+      { id: 'fact:qimen.ju', text: `${c.dun === 'yang' ? 'Yang' : 'Yin'} dun Ju ${c.ju}, ${c.term} ${c.yuan} yuan (Chai Bu).` },
+      { id: 'fact:qimen.leaders', text: `Leader star ${c.leader.star} in palace ${c.leader.starPalace}; leader door ${c.leader.door} in palace ${c.leader.doorPalace}.` }
+    ],
+    keys: [
+      { key: `qimen.star.${QM_PINYIN[c.leader.star] ?? 'unknown'}`, title: `Leader star ${c.leader.star}` },
+      { key: `qimen.door.${QM_PINYIN[c.leader.door] ?? 'unknown'}`, title: `Leader door ${c.leader.door}` }
     ]
   };
 }

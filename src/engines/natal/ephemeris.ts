@@ -16,6 +16,7 @@ export const BODY = {
   trueNode: 11,
   meanLilith: 12,
   osculatingLilith: 13,
+  interpolatedLilith: 21,
   chiron: 15
 } as const;
 

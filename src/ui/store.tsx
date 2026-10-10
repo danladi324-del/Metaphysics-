@@ -21,12 +21,18 @@ export interface Here {
 
 export interface TarotSettings {
   reversals: boolean;
-  /** Eric's choice (brief §8); null until made. */
-  mode: 'blocked' | 'opposite' | 'internal' | 'delayed' | null;
+  /**
+   * Eric delegated the choice (2026-10-10, DECISIONS D-025): 'source' = each card's reversed meaning as its cited source gives it.
+   * The four generic modes stay available as comparison lenses; without a cited passage for the mode they display as synthesis.
+   */
+  mode: 'source' | 'blocked' | 'opposite' | 'internal' | 'delayed';
   numbering: 'waite' | 'marseille';
 }
 
-export const DEFAULT_TAROT_SETTINGS: TarotSettings = { reversals: true, mode: null, numbering: 'waite' };
+export const DEFAULT_TAROT_SETTINGS: TarotSettings = { reversals: true, mode: 'source', numbering: 'waite' };
+
+/** Snippet reversal_mode to select: per-card source text has no mode tag. */
+export const snippetMode = (m: TarotSettings['mode']): string | null => (m === 'source' ? null : m);
 
 export interface Settings {
   astro: AstroConventions;
@@ -67,7 +73,7 @@ function readSettings(db: Db): Settings {
   if (!raw) return base;
   try {
     const s = JSON.parse(raw) as Partial<Settings>;
-    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null, tarot: { ...DEFAULT_TAROT_SETTINGS, ...s.tarot }, ...(s.bazi ? { bazi: s.bazi } : {}), ...(s.fengshui ? { fengshui: s.fengshui } : {}) };
+    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null, tarot: { ...DEFAULT_TAROT_SETTINGS, ...s.tarot, mode: s.tarot?.mode ?? 'source' }, ...(s.bazi ? { bazi: s.bazi } : {}), ...(s.fengshui ? { fengshui: s.fengshui } : {}) };
   } catch {
     return base;
   }

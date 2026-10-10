@@ -1,7 +1,7 @@
 import type { HouseSystem } from '../../core/conventions';
 import { HOUSE_SYSTEM_LABEL } from '../../core/conventions';
 import type { CalcRecord } from '../../core/record';
-import { BODY_LABEL, type BodyId, type NatalResult } from '../natal/compute';
+import { BODY_LABEL, isVariantPoint, lilithBody, type BodyId, type NatalResult } from '../natal/compute';
 import { formatLongitude } from '../natal/zodiac';
 
 /**
@@ -20,18 +20,18 @@ export interface Pointer {
 
 const CORE: BodyId[] = ['saturn', 'pluto', 'chiron'];
 
-export function shadowPointers(rec: CalcRecord<NatalResult>, conv: { houseSystem: HouseSystem; nodeType: 'mean' | 'true'; lilithType: 'mean' | 'osculating' }, timeKnown: boolean): Pointer[] {
+export function shadowPointers(rec: CalcRecord<NatalResult>, conv: { houseSystem: HouseSystem; nodeType: 'mean' | 'true'; lilithType: 'mean' | 'osculating' | 'interpolated' }, timeKnown: boolean): Pointer[] {
   const r = rec.raw_result;
   const out: Pointer[] = [];
   const house = (id: string) => r.bodies.find((b) => b.id === id)?.houses[conv.houseSystem];
-  const lilith = conv.lilithType === 'mean' ? 'meanLilith' : 'osculatingLilith';
+  const lilith = lilithBody(conv);
   const node = conv.nodeType === 'mean' ? 'meanNode' : 'trueNode';
   for (const id of [...CORE, lilith as BodyId, node as BodyId]) {
     const b = r.bodies.find((x) => x.id === id);
     if (!b) continue;
-    const name = BODY_LABEL[id].replace(/ \((mean|true|osculating)\)/, '');
+    const name = BODY_LABEL[id].replace(/ \((mean|true|osculating|interpolated)\)/, '');
     const h = timeKnown ? house(id) : undefined;
-    const slug = id.replace(/^(mean|true|osculating)/, '').toLowerCase() || id;
+    const slug = id.replace(/^(mean|true|osculating|interpolated)/, '').toLowerCase() || id;
     out.push({
       id: slug,
       title: name,
@@ -47,7 +47,7 @@ export function shadowPointers(rec: CalcRecord<NatalResult>, conv: { houseSystem
   if (timeKnown) {
     const other: HouseSystem = conv.houseSystem === 'wholeSign' ? 'placidus' : 'wholeSign';
     for (const b of r.bodies) {
-      if (['meanNode', 'trueNode', 'meanLilith', 'osculatingLilith'].includes(b.id)) continue;
+      if (isVariantPoint(b.id)) continue;
       const here = b.houses[conv.houseSystem] === 12;
       const there = b.houses[other] === 12;
       if (!here && !there) continue;

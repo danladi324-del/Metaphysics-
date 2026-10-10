@@ -21,7 +21,8 @@ import { computeNumerology, DEFAULT_NUMEROLOGY, NUMEROLOGY, personalCycles } fro
 import { TAROT, type TarotResult } from '../../engines/tarot/compute';
 import { Dot, Label } from '../components/Label';
 import { Warnings } from '../components/Warnings';
-import { useStore } from '../store';
+import { FIXTURES } from '../../core/fixtures';
+import { snippetMode, useStore } from '../store';
 import { useEphemeris, useNatal } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
@@ -82,7 +83,7 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
   if (bio) add(BIORHYTHM.input_dependencies, biorhythmView(bio));
   if (moon) add(MOON.input_dependencies, moonView(moon));
   if (hours) add(HOURS.input_dependencies, hoursView(hours, nowMs));
-  if (tarot) add(TAROT.input_dependencies, tarotView(tarot, settings.tarot.mode));
+  if (tarot) add(TAROT.input_dependencies, tarotView(tarot, snippetMode(settings.tarot.mode)));
   if (cast) add(ICHING.input_dependencies, ichingView(cast));
   const conv = convergence(
     daily.map((d): EngineThemes => ({ engine: d.engine, deps: d.deps, themes: d.reading.approvedThemes })),
@@ -203,7 +204,7 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
       </section>
 
       <section style={{ borderTop: '1px solid var(--line)', paddingTop: '10px', gap: '4px' }}>
-        <Label label="disagreement">0 external reference charts loaded (Astrodienst screenshots owed)</Label>
+        <Label label="calculated">{FIXTURES.length} reference screenshots from your apps are checked in every test run</Label>
         <Label label={backup.daysSinceExport !== null && backup.daysSinceExport <= 7 ? 'calculated' : 'disagreement'}>
           {backup.lastExport ? `Last export: ${backup.daysSinceExport === 0 ? 'today' : `${backup.daysSinceExport} days ago`}` : 'Never exported'}
         </Label>

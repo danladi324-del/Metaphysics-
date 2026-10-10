@@ -6,21 +6,22 @@ Status column: **P** = provisional default awaiting Eric (DECISIONS D-008), **D*
 
 | Key | Values | Default | Status | Used by |
 |---|---|---|---|---|
-| `houseSystem` | placidus, wholeSign, koch, equal, campanus, regiomontanus, porphyry | placidus | P | natal, transits, returns |
-| `zodiac` | tropical, sidereal | tropical | P | natal, Vedic |
+| `houseSystem` | placidus, wholeSign, koch, equal, campanus, regiomontanus, porphyry | wholeSign | D (Eric, D-024) | natal, transits, returns |
+| `zodiac` | tropical, sidereal | tropical | D (Eric, D-024) | natal, Vedic |
 | `ayanamsa` | lahiri, raman, krishnamurti, faganBradley | lahiri | – | sidereal only |
 | `nodeType` | mean, true | mean | P | natal |
 | `lilithType` | mean, osculating | mean | P | natal |
 | `aspectOrbs` | table of degrees per aspect | see `src/engines/natal/aspects.ts` | D (documented, adjustable) | natal |
 | `numerologySystem` | pythagorean, chaldean | both computed | D | numerology |
 | `masterNumbers` | keep (11, 22, 33), reduce | keep | P | numerology |
-| `nameUsed` | stored string + kind (birth, current, as given) | "Eric Garner" (as given) | P | numerology |
+| `nameUsed` | stored string + kind (birth, current, as given) | "Eric Danladi Garner" (birth) | D (Eric, D-024) | numerology |
+| `sex` | male, female, unset | male (Eric) | D (Eric, D-024) | BaZi luck pillars, Kua |
 | `ziHour` | early (day changes 23:00), late (day changes 00:00) | – | – | BaZi |
 | `trueSolarTime` | on, off | – | – | BaZi |
 | `tzolkinCorrelation` | 584283 (GMT), 584285, … | – | – | Tzolk'in |
-| `qiMenSchool` | chaiBu, zhiRun | none | OWNER | Qi Men |
+| `qiMenSchool` | chaiBu, zhiRun | chaiBu | D (delegated, D-027) | Qi Men |
 | `northReference` | magnetic, true | – | – | Feng Shui |
-| `reversalMode` | none, opposite, blocked, internal, delayed | none | OWNER | tarot |
+| `reversalMode` | source, blocked, opposite, internal, delayed (or reversals off) | source | D (delegated, D-025) | tarot |
 
 ## Time
 Inputs are local wall time plus IANA zone. The UTC offset is resolved once at entry and stored (D-006). Julian Day is computed from the stored UTC instant (UT). Delta-T is handled inside Swiss Ephemeris.

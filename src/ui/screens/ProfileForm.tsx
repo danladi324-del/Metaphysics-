@@ -24,6 +24,7 @@ export function ProfileForm({ existing, onDone }: { existing: Profile | null; on
   const [lon, setLon] = useState(existing ? String(existing.place.lon) : '');
   const [names, setNames] = useState<NumerologyName[]>(existing?.numerologyNames ?? [{ name: '', kind: 'birth' }]);
   const [choice, setChoice] = useState<'a' | 'b' | null>(null);
+  const [sex, setSex] = useState<'male' | 'female' | ''>(existing?.sex ?? '');
   const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export function ProfileForm({ existing, onDone }: { existing: Profile | null; on
       },
       place: finalPlace,
       numerologyNames: names.filter((n) => n.name.trim()).map((n) => ({ ...n, name: n.name.trim() })),
+      ...(sex ? { sex } : {}),
       created_at: existing?.created_at ?? now,
       updated_at: now
     };
@@ -208,6 +210,15 @@ export function ProfileForm({ existing, onDone }: { existing: Profile | null; on
             )}
           </section>
         )}
+
+        <label class="field">
+          Sex (optional; used only by BaZi luck pillars and the Feng Shui Kua)
+          <select value={sex} onChange={(e) => setSex(e.currentTarget.value as 'male' | 'female' | '')}>
+            <option value="">Not given</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </label>
 
         <section>
           <h2>Names for numerology</h2>

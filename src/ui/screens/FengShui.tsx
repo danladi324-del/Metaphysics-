@@ -187,9 +187,11 @@ function FengShuiInner({ eph }: { eph: Ephemeris }) {
           <section>
             <h2>Eight Mansions</h2>
             <p class="note">
-              Kua depends on sex in this tradition and the profile does not record it, so both are shown. Birth solar year {r.kua.solarYear}.
+              {profile?.sex
+                ? `Kua uses the ${profile.sex} formula (from the profile). Birth solar year ${r.kua.solarYear}.`
+                : `Kua depends on sex in this tradition and the profile does not record it, so both are shown. Birth solar year ${r.kua.solarYear}.`}
             </p>
-            {(['male', 'female'] as const).map((sex) => {
+            {(profile?.sex ? [profile.sex] : (['male', 'female'] as const)).map((sex) => {
               const k = r.kua[sex];
               return (
                 <div class="card">

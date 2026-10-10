@@ -140,3 +140,43 @@ Three parts only (brief §4.9). (a) Pointers: Saturn, Pluto, Chiron, Lilith, the
 
 ## D-023 Qi Men blocked
 Not started. The brief requires the school choice (Chai Bu vs Zhi Run) first, and the old app's output as a fixture. Candidate libraries are listed in D-005.
+
+## D-024 Eric's choices, 2026-10-10
+- **Birth name for numerology:** Eric Danladi Garner (middle name Danladi). Profiles store names on the phone, so the existing profile needs the name edited there (Lab → Profiles → Edit; kind "Birth").
+- **Sex:** male. New optional profile field, used only by BaZi luck-pillar direction and the Eight Mansions Kua formula.
+- **House system:** "whole house system" read as **Whole Sign** (the assumption; Equal houses is the other system sometimes described that way). Default is now whole sign; Placidus is still computed alongside (rule 5).
+- **Zodiac:** tropical. Sidereal stays selectable.
+These are no longer marked provisional. Node type, Lilith type and master-number handling remain provisional.
+
+## D-025 Tarot reversal mode (delegated to Claude): "as the source reads each card"
+Options were blocked, opposite, internal, delayed. Chosen: none of them as the default, but the cited source's own reversed meaning per card (`mode: 'source'`, snippets keyed `tarot.<card>.reversed` with no mode tag).
+Why it coheres: rule 2 lets a sentence be Traditional only when it paraphrases a cited passage. Waite 1911 (the registered tarot source) prints a reversed meaning for each card, so source-per-card reversals can reach the Traditional label. A blanket rule ("every reversal means blocked") is not a passage in any loaded source; applied across cards it is the app's own transformation, i.e. synthesis. The four generic modes stay available as comparison lenses and display as synthesis unless a cited passage for that mode is loaded.
+Reverse if: Eric loads a source whose author defines reversals by one generic rule and wants that author as the default.
+
+## D-026 BaZi luck pillars
+- Direction: forward for yang year stem + male or yin year stem + female; otherwise backward.
+- Start: days from birth to the next (forward) or previous (backward) month-boundary solar term, 3 days = 1 calendar year, minute precision, added as continuous time.
+- Solar terms are absolute instants. lunar-javascript reads the birth clock as Beijing time, which is right for births in China and wrong elsewhere: for Eric (Chicago) it gives a 4-year start; the absolute-instant result is 11.49 days → 3.83 years (3 years 9 months). Tested against lunar-javascript on 120 Shanghai births: direction and pillars identical, start dates within 3 days (it adds calendar components, this adds continuous time).
+- A bug found while testing: the first version converted days with "1 day = 120 days", which silently assumes 360-day years and drifted ~5 weeks over 7 years. Fixed.
+
+## D-027 Qi Men school: Chai Bu (delegated to Claude)
+**Prior art: exists**, with a split inside "Chai Bu" itself:
+- `@spensercai/qimen-wasm` 0.2.1 (MIT, Rust/WASM): Chai Bu, yuan from the **day's fu head** (甲/己 day branch: 子午卯酉 upper, 寅申巳亥 middle, 辰戌丑未 lower), Ju switches the moment the term changes.
+- `qimen-dunjia` 3.1.0 (MIT, JS): its "拆補" takes the yuan from **time elapsed since the term** in 5-day blocks; its "符頭" option is Zhi Run with intercalation (超神/接氣/置閏). Its README cites 《遁甲演義》 and 《奇門寶鑒御定》 and reports that the methods give different charts on 97% of 2024's noon hours.
+**Choice:** Chai Bu with the fu-head yuan as the displayed chart; the elapsed-time yuan is computed alongside and logged when the Ju differs (e.g. 2024-01-15 10:00 +8: Ju 5 vs Ju 8). Zhi Run: not yet built.
+**Why it coheres:** it needs only the solar term at the instant and the day pillar, both already computed by the app from absolute instants (the engine reuses the BaZi pillar code, so Qi Men and BaZi share one input, rule 6); it has no intercalation rule, the part texts disagree on most; and it has an independent implementation to test against.
+**Conventions (match qimen-wasm):** hour chart, rotating plate; centre lodged in Kun; Tian Qin travels with Tian Rui; deities 值符 螣蛇 太阴 六合 白虎 玄武 九地 九天 for both duns (some schools say 勾陈/朱雀 in yang dun; positions are identical); day changes at 23:00; pillars from clock time in the zone.
+**Verification:** vs qimen-wasm on 300 random hours (1950–2049, UTC+8): dun, term, yuan, Ju, leader star/door and palaces, and every palace's earth stem, heaven stems, stars, door and deity identical (sample includes 133 yin-dun hours, 22 centre-palace leaders, 29 Jia hours; a deliberate deity swap makes the test fail). Elapsed-time variant vs qimen-dunjia on 300 random whole hours: Ju and dun identical.
+**Still owed:** the old app's output as a manual fixture (brief §4.8). Status: experimental.
+
+## D-028 Reference fixtures from Eric's apps, and the defaults they settle (2026-10-10)
+Eric supplied screenshots from Astrodienst (natal Placidus, sidereal Fagan/Bradley whole signs, relocation to Abilene, draconic), his BaZi app, a planetary-hours app and Qi Men Dun Jia Pro (kymon.net). They are transcribed in `tests/reference-fixtures.test.ts` and listed in `src/core/fixtures.ts` (shown in Lab). Results:
+- Astrodienst natal: 11 bodies within 2″ (most within 1″); interpolated Lilith exact; true node 11″ and osculating Lilith 77″ off (Moshier vs Swiss data files); Ascendant, MC and four cusps to the printed minute. Sidereal: Sun, Moon, Ascendant, MC within 1″, confirming the nutation-inclusive ayanamsa (D-016 era fix). Relocation: Ascendant and MC to the second. Draconic: consistent within 15″.
+- BaZi app: shows the birth time as 09:53, which is the app's true-solar-time result to the minute, with pillars 己巳 甲子 丁卯 甲寅.
+- Planetary hours: Saturn day; Mars/Sun/Venus hours to the minute; sunrise ~1 minute apart.
+- Kymon Qi Men: Yin dun Ju 9 with every palace's stems, door and deity identical, and annual stars identical. The competing elapsed-time yuan rule would give Ju 6, so Kymon follows the fu-head Chai Bu the app shows (supports D-027).
+**Bug found by a fixture:** in sidereal mode, whole-sign cusps were tropical cusps minus the ayanamsa, leaving them mid-sign. Whole-sign cusps now start at 0° of the sidereal rising sign. (House assignment was already correct; the wheel's cusp lines were not.)
+**Defaults aligned with Eric's own software** (all alternatives still computed and logged):
+- Lunar node: **true** (Astrodienst shows True Node).
+- Lilith: **interpolated**, newly added (Astrodienst's "Lilith (i)"); mean and osculating stay available.
+- BaZi time: **true solar time on** (his BaZi app is fed 09:53, not 11:15).
