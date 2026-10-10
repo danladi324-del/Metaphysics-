@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P1 done 2026-10-10 (pending external Astrodienst fixtures). P2 next.
+P2 done 2026-10-10. P3 next (content layer + tarot).
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -18,6 +18,15 @@ P1 done 2026-10-10 (pending external Astrodienst fixtures). P2 next.
 - Failed / fixed during the phase: wasm wrapper ignores the house-calc return code (polar fallback was silent) — now detected by latitude; wheel markers overlapped — spacing widened.
 - Assumed: Moshier ephemeris is accurate enough for natal work (agreement with astronomy-engine supports this); GeoNames 2017 snapshot is fine for coordinates and zone names.
 - UNVERIFIED: agreement with Astrodienst (no screenshots yet); iOS Safari behavior of IndexedDB persistence, share sheet and `navigator.storage.persist()`; sidereal mode (wired, untested against a reference).
+
+### P2 Fast engines — TEST
+- Works: numerology (Pythagorean and Chaldean side by side; Life Path, Expression, Soul Urge, Personality, Birthday, Maturity; both reduction methods with ledger rows; letter counts; missing numbers; karmic debt split into "in a total" vs "inside one part"; pinnacles, challenges; personal year/month/day); biorhythm with a 4-week chart and the not-validated warning; moon phase, sign, illumination and next four principal phases; planetary day and 24 unequal hours for the current location; I Ching casting (yarrow odds or three coins, replayable draws, primary and relating hexagram). Readings and Draw screens; "current location" setting.
+- Tested (74 unit tests total, all passing): numerology against hand-worked arithmetic for Eric Garner 1974-03-24 and boundary cases (master dates, reduce-masters convention, karmic 13 birthday, 19→10→1, leap day, accents, Y rule, empty name); King Wen table is a permutation of 1–64 and every pair is an inversion or (for 1/2, 27/28, 29/30, 61/62) a complement — an independent structural check; casting weights; moon principal phases vs astronomy-engine SearchMoonPhase over a year (< 1 min) and two known 2024 lunations (< 2 min); sunrise vs an independent NOAA formula (< 3 min); Chaldean-order week property; pre-sunrise day-ruler convention; polar-night error; biorhythm values for 19,193 days lived.
+- Browser check: numerology, biorhythm, moon/hours and I Ching screens render at 390 px with no console errors and no horizontal scroll.
+- Failed / fixed: one test expectation of mine was wrong (300° elongation is Waning crescent under 45° bins, not Last quarter). "Today" used the birth time zone instead of the user's; fixed with the current-location setting.
+- Eric (calculated): Life Path 3 (both methods); Expression 8 Pythagorean / 2 Chaldean (Chaldean all-letters 29/11); Soul Urge 11 by name part vs 2 all vowels (Pythagorean), 3 Chaldean; Personality 6 / 8; Birthday 6; Maturity 11; karmic debt none in totals, 14 inside ERIC's vowels only; pinnacles 9-9-9-6, challenges 3-3-0-0, first break at 33; personal year 2026 = 1.
+- Assumed: letter tables as commonly reproduced match Balliett and Cheiro; not yet checked against scans (needs the texts). Interpretation is entirely placeholder.
+- UNVERIFIED: whether Eric's preferred name for numerology is "Eric Garner" or a fuller birth name.
 
 ### Eric's chart (calculated, Placidus/tropical, mean node)
 Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
@@ -46,8 +55,8 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 |---|---|---|
 | Foundation | TEST | P1 |
 | Natal chart, transits, returns | TEST | awaiting Astrodienst fixtures |
-| Numerology | IDEA | |
-| Biorhythm, moon, planetary hours, I Ching | IDEA | |
+| Numerology | TEST | letter tables not yet checked against source scans |
+| Biorhythm, moon, planetary hours, I Ching | TEST | I Ching text not loaded |
 | Tarot | IDEA | |
 | BaZi, Tzolk'in, Vedic | RESEARCH | D-004 |
 | Feng Shui | IDEA | |

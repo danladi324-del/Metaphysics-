@@ -4,6 +4,8 @@ import { Charts } from './screens/Charts';
 import { Lab } from './screens/Lab';
 import { Placeholder } from './screens/Placeholder';
 import { ProfileForm } from './screens/ProfileForm';
+import { Readings } from './screens/Readings';
+import { Draw } from './screens/Draw';
 import { StoreProvider, useStore } from './store';
 
 const ROUTES: Route[] = ['today', 'charts', 'draw', 'readings', 'journal', 'lab'];
@@ -43,6 +45,8 @@ function Router() {
     screen = <ProfileForm key="first" existing={null} onDone={() => (location.hash = '#/charts')} />;
   } else if (loc.route === 'charts') screen = <Charts />;
   else if (loc.route === 'lab') screen = <Lab />;
+  else if (loc.route === 'readings') screen = <Readings />;
+  else if (loc.route === 'draw') screen = <Draw />;
   else screen = <Placeholder route={loc.route} />;
 
   return (

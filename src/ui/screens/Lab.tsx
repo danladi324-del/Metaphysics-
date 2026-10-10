@@ -1,9 +1,10 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
+import { loadCities, searchCities, type City } from '../../core/cities';
 import { backupStatus, exportJson, parseExport, restore } from '../../core/backup';
 import { LABEL_TEXT, type EvidenceLabel } from '../../core/labels';
 import { Label } from '../components/Label';
 import { shareFile } from '../share';
-import { APP_VERSION, useStore } from '../store';
+import { APP_VERSION, deviceZone, useStore } from '../store';
 
 export function Lab() {
   const { db, profile, profiles, persisted, updateSettings, bump, version } = useStore();
@@ -128,6 +129,8 @@ export function Lab() {
         )}
       </section>
 
+      <HereSetting />
+
       <section>
         <h2>Profiles</h2>
         {profiles.map((p) => (
@@ -170,4 +173,44 @@ function dedupe<T extends { subject: string; result_a: string; result_b: string;
     seen.add(k);
     return true;
   });
+}
+
+function HereSetting() {
+  const { here, settings, updateSettings } = useStore();
+  const [q, setQ] = useState('');
+  const [cities, setCities] = useState<City[] | null>(null);
+  useEffect(() => {
+    if (q.length >= 2 && !cities) loadCities(import.meta.env.BASE_URL).then(setCities, () => setCities([]));
+  }, [q]);
+  const matches = cities ? searchCities(cities, q) : [];
+  return (
+    <section>
+      <h2>Current location</h2>
+      <p class="note">
+        Used for "today", the sky and planetary hours: {here ? `${here.name}, ${here.zone}` : 'not set'}.
+        {!settings.here && ` Defaulting to the birth place and this device's zone (${deviceZone()}).`}
+      </p>
+      <label class="field">
+        Change city
+        <input value={q} onInput={(e) => setQ(e.currentTarget.value)} autocomplete="off" />
+      </label>
+      {matches.map((c) => (
+        <button
+          class="btn"
+          style={{ textAlign: 'left' }}
+          onClick={() => {
+            updateSettings({ here: { name: `${c.name}, ${c.admin} ${c.country}`, lat: c.lat, lon: c.lon, zone: c.zone } });
+            setQ('');
+          }}
+        >
+          {c.name}, {c.admin} {c.country} <span class="muted small">{c.zone}</span>
+        </button>
+      ))}
+      {settings.here && (
+        <button class="btn" onClick={() => updateSettings({ here: null })}>
+          Use the default
+        </button>
+      )}
+    </section>
+  );
 }

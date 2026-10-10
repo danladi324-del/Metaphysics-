@@ -9,10 +9,21 @@ import { loadImage, requestPersistence, saveImage } from '../core/storage';
 
 export const APP_VERSION = '0.1.0';
 
+/** Where the user is now: used for "today", planetary hours and the sky. Not the birth place. */
+export interface Here {
+  name: string;
+  lat: number;
+  lon: number;
+  zone: string;
+}
+
 export interface Settings {
   astro: AstroConventions;
   activeProfileId: string | null;
+  here: Here | null;
 }
+
+export const deviceZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
 interface Store {
   db: Db;
@@ -20,6 +31,8 @@ interface Store {
   updateSettings(patch: Partial<Settings>): void;
   profiles: Profile[];
   profile: Profile | null;
+  /** Current location: the setting, else the profile's birth place in the device's zone. */
+  here: Here | null;
   persisted: boolean | null;
   /** Bumped after any write so screens re-query. */
   version: number;
@@ -36,11 +49,11 @@ export function useStore(): Store {
 
 function readSettings(db: Db): Settings {
   const raw = db.getMeta('settings');
-  const base: Settings = { astro: DEFAULT_ASTRO, activeProfileId: null };
+  const base: Settings = { astro: DEFAULT_ASTRO, activeProfileId: null, here: null };
   if (!raw) return base;
   try {
     const s = JSON.parse(raw) as Partial<Settings>;
-    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null };
+    return { astro: { ...DEFAULT_ASTRO, ...s.astro }, activeProfileId: s.activeProfileId ?? null, here: s.here ?? null };
   } catch {
     return base;
   }
@@ -94,6 +107,7 @@ export function StoreProvider({ children }: { children: ComponentChildren }) {
     },
     profiles,
     profile,
+    here: settings.here ?? (profile ? { name: `${profile.place.name} (birth place)`, lat: profile.place.lat, lon: profile.place.lon, zone: deviceZone() } : null),
     persisted,
     version,
     bump
