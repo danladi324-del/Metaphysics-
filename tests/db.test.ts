@@ -22,10 +22,10 @@ function ericProfile(): Profile {
   if (r.kind !== 'exact') throw new Error('expected exact');
   return {
     id: 'p-eric',
-    displayName: 'Eric',
+    displayName: 'R1',
     birth: { local: { year: 1974, month: 3, day: 24, hour: 11, minute: 15 }, zone: 'America/Chicago', offsetSeconds: r.result.offsetSeconds, utcMs: r.result.utcMs, offsetSource: 'Intl tzdb', timeKnown: true },
-    place: { name: 'Bossier City', admin: 'LA', country: 'US', lat: 32.516, lon: -93.7321, source: 'geonames' },
-    numerologyNames: [{ name: 'Eric Garner', kind: 'as given' }],
+    place: { name: 'Reference place', admin: 'LA', country: 'US', lat: 32.516, lon: -93.7321, source: 'geonames' },
+    numerologyNames: [{ name: 'Eli Kane', kind: 'as given' }],
     created_at: '2026-10-10T00:00:00.000Z',
     updated_at: '2026-10-10T00:00:00.000Z'
   };
@@ -69,7 +69,7 @@ describe('P1 acceptance: profile -> chart -> export -> wipe -> restore -> identi
     db.saveProfile(ericProfile());
     await db.flush();
     const reopened = Db.open(SQL, last, null);
-    expect(reopened.profiles()[0]!.displayName).toBe('Eric');
+    expect(reopened.profiles()[0]!.displayName).toBe('R1');
   });
 });
 

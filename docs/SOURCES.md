@@ -20,7 +20,7 @@ Every `snippet` and `correspondence` row cites a `source_id` from this registry.
 | `balliett` | L. Dow Balliett, numerology works (1908–1917) | public domain (pre-1929 US); not loaded | Pythagorean letter table |
 | `cheiro` | Cheiro, *Cheiro's Book of Numbers* (1926) | US public domain since 2022 (published 1926; edition to confirm); not loaded | Chaldean letter table |
 
-Paraphrases may be labeled Traditional only after Eric approves them (brief §8).
+Paraphrases may be labeled Traditional only after the owner approves them (brief §8).
 | `geonames` | GeoNames cities15000 (2017 snapshot via npm cities15000-json) | CC-BY | offline city list, coordinates, zone names |
 | `qimen-wasm` | @spensercai/qimen-wasm 0.2.1 | MIT | test-only oracle for the Chai Bu Qi Men chart |
 | `qimen-dunjia` | qimen-dunjia 3.1.0 (arc119226) | MIT | test-only oracle for the elapsed-time yuan variant |

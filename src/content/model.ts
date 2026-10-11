@@ -28,7 +28,7 @@ export interface Snippet {
   version: number;
   authored_by: string;
   placeholder: boolean;
-  /** Eric's approval (brief §8). A traditional snippet shows as Traditional only when approved. */
+  /** The owner's approval (brief §8). A traditional snippet shows as Traditional only when approved. */
   approved: boolean;
   /** Author-declared themes (e.g. "completion"). The app never assigns themes from wording. */
   themes: string[];

@@ -69,7 +69,7 @@ const weekday = (ms: number) => {
   return new Date(Date.UTC(l.year, l.month - 1, l.day)).getUTCDay();
 };
 
-describe('planetary hours (Bossier City)', () => {
+describe('planetary hours (R1 place)', () => {
   const lat = 32.516;
   const lon = -93.7321;
 
@@ -113,7 +113,7 @@ describe('biorhythm', () => {
     expect(biorhythm(b, b).values).toEqual({ physical: 0, emotional: 0, intellectual: 0 });
     expect(biorhythm(b, { year: 2000, month: 1, day: 8 }).values.emotional).toBe(1); // 7/28 = quarter
   });
-  it("Eric on 2026-10-10: 19193 days lived", () => {
+  it("R1 on 2026-10-10: 19193 days lived", () => {
     const r = biorhythm({ year: 1974, month: 3, day: 24 }, { year: 2026, month: 10, day: 10 });
     expect(r.daysLived).toBe(19193);
     // 19193 mod 23 = 11, mod 28 = 13, mod 33 = 20

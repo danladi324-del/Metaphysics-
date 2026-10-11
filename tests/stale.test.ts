@@ -3,9 +3,9 @@ import type { Profile } from '../src/core/profile';
 import { staleWarnings, WMM_VALID_UNTIL } from '../src/core/stale';
 
 const eric: Profile = {
-  id: 'p', displayName: 'Eric',
+  id: 'p', displayName: 'R1',
   birth: { local: { year: 1974, month: 3, day: 24, hour: 11, minute: 15 }, zone: 'America/Chicago', offsetSeconds: -18000, utcMs: Date.UTC(1974, 2, 24, 16, 15), offsetSource: 'test', timeKnown: true },
-  place: { name: 'Bossier City', lat: 32.516, lon: -93.7321, source: 'geonames' }, numerologyNames: [], created_at: '', updated_at: ''
+  place: { name: 'Reference place', lat: 32.516, lon: -93.7321, source: 'geonames' }, numerologyNames: [], created_at: '', updated_at: ''
 };
 const ok = { lastExport: '2026-10-09', daysSinceExport: 1, persisted: true };
 

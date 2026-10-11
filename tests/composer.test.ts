@@ -23,7 +23,7 @@ const fresh = () => {
 };
 const KEY = 'tarot.major.tower.upright';
 const view: EngineView = { engine: 'tarot', title: 'Test', recordIds: ['rec1'], facts: [{ id: 'fact:t', text: 'The Tower, upright.' }], keys: [{ key: KEY, title: 'Tower' }] };
-const snip = (id: string, source: string, themes: string[]) => ({ id, key: KEY, text: `Text from ${source}.`, label: 'traditional', lens: 'general', source_id: source, source_locator: 'p. 1', authored_by: 'Eric', themes });
+const snip = (id: string, source: string, themes: string[]) => ({ id, key: KEY, text: `Text from ${source}.`, label: 'traditional', lens: 'general', source_id: source, source_locator: 'p. 1', authored_by: 'owner', themes });
 const pack = (snippets: object[], extra: object = {}) => ({ format: 'metaphysics-content', version: 1, snippets, ...extra });
 
 describe('composer status: never manufactures consensus', () => {

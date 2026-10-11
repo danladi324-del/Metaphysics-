@@ -2,20 +2,20 @@
 
 Every convention is a parameter (rule 4). Every calculation record stores the full convention set it ran under. Where two conventions give different results, a `disagreement` row is written (rule 5).
 
-Status column: **P** = provisional default awaiting Eric (DECISIONS D-008), **D** = decided, **–** = not built yet.
+Status column: **P** = provisional default awaiting the owner (DECISIONS D-008), **D** = decided, **–** = not built yet.
 
 | Key | Values | Default | Status | Used by |
 |---|---|---|---|---|
-| `houseSystem` | placidus, wholeSign, koch, equal, campanus, regiomontanus, porphyry | wholeSign | D (Eric, D-024) | natal, transits, returns |
-| `zodiac` | tropical, sidereal | tropical | D (Eric, D-024) | natal, Vedic |
+| `houseSystem` | placidus, wholeSign, koch, equal, campanus, regiomontanus, porphyry | wholeSign | D (owner, D-024) | natal, transits, returns |
+| `zodiac` | tropical, sidereal | tropical | D (owner, D-024) | natal, Vedic |
 | `ayanamsa` | lahiri, raman, krishnamurti, faganBradley | lahiri | – | sidereal only |
 | `nodeType` | mean, true | mean | P | natal |
 | `lilithType` | mean, osculating | mean | P | natal |
 | `aspectOrbs` | table of degrees per aspect | see `src/engines/natal/aspects.ts` | D (documented, adjustable) | natal |
 | `numerologySystem` | pythagorean, chaldean | both computed | D | numerology |
 | `masterNumbers` | keep (11, 22, 33), reduce | keep | P | numerology |
-| `nameUsed` | stored string + kind (birth, current, as given) | "Eric Danladi Garner" (birth) | D (Eric, D-024) | numerology |
-| `sex` | male, female, unset | male (Eric) | D (Eric, D-024) | BaZi luck pillars, Kua |
+| `nameUsed` | stored string + kind (birth, current, as given) | the full birth name (birth) | D (owner, D-024) | numerology |
+| `sex` | male, female, unset | set in the profile | D (owner, D-024) | BaZi luck pillars, Kua |
 | `ziHour` | early (day changes 23:00), late (day changes 00:00) | – | – | BaZi |
 | `trueSolarTime` | on, off | – | – | BaZi |
 | `tzolkinCorrelation` | 584283 (GMT), 584285, … | – | – | Tzolk'in |
@@ -27,7 +27,7 @@ Status column: **P** = provisional default awaiting Eric (DECISIONS D-008), **D*
 Inputs are local wall time plus IANA zone. The UTC offset is resolved once at entry and stored (D-006). Julian Day is computed from the stored UTC instant (UT). Delta-T is handled inside Swiss Ephemeris.
 
 ## Coordinates
-Latitude north positive, longitude east positive (so Bossier City is −93.73).
+Latitude north positive, longitude east positive (so places in the western hemisphere are negative).
 
 ## Numerology (P2)
 - Letter tables: Pythagorean A–I = 1–9 repeating; Chaldean per Cheiro (no letter = 9). Both always computed.

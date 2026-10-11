@@ -2,7 +2,7 @@
 
 ## One-time setup on GitHub (from Safari or the GitHub app)
 1. **Merge the work to `main`.** All phases were built on the branch `claude/intelligent-mendel-j3p880`. Open a pull request from it into `main` and merge it (or ask Claude Code to open the PR).
-2. **Turn on Pages.** Note: the repository is private; GitHub Pages for a private repository needs a paid GitHub plan (Pro/Team). Without one, either make the repository public (the app holds no personal data; your data stays on the phone, though the docs mention your birth details) or deploy the same `dist/` folder with Cloudflare Pages, which the brief also allows. Then: Repository → Settings → Pages → *Build and deployment* → Source: **GitHub Actions**.
+2. **Turn on Pages** (once). The repository is public, so Pages is free. Repository → Settings → Pages → *Build and deployment* → Source: **GitHub Actions**.
 3. **Check Actions are allowed.** Repository → Settings → Actions → General → allow actions. The `Deploy to Pages` workflow runs on every push to `main`; `CI` runs on every push.
 4. When `Deploy to Pages` finishes, the app is at `https://danladi324-del.github.io/Metaphysics-/`.
 

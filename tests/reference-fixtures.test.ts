@@ -1,6 +1,6 @@
 /**
- * External reference fixtures (Eric's screenshots, 2026-10-10). Values transcribed by hand from the images;
- * each block names its source. Birth: 1974-03-24 11:15 CDT (16:15 UT), Bossier City as Astrodienst gives it: 32n31, 93w44.
+ * External reference fixtures (the owner's screenshots, 2026-10-10), for reference chart R1. Values transcribed by hand from the images;
+ * each block names its source. R1: 1974-03-24 11:15 CDT (16:15 UT) at 32n31, 93w44 as Astrodienst gives it.
  */
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { AstroConventions } from '../src/core/conventions';
@@ -91,7 +91,7 @@ describe('Astrodienst draconic (fixture astro-draconic)', () => {
 
 const gz = (p: Pillar) => '甲乙丙丁戊己庚辛壬癸'[p.stem]! + '子丑寅卯辰巳午未申酉戌亥'[p.branch]!;
 
-describe("Eric's BaZi app (fixture bazi-app)", () => {
+describe("BaZi app (fixture bazi-app)", () => {
   it('true solar time 09:53 and pillars 己巳 甲子 丁卯 甲寅 (hour, day, month, year)', () => {
     const r = computeBazi(eph, { utcMs: UT, zone: 'America/Chicago', ...ASTRO_PLACE, sex: 'male' }, { ziHour: 'early', trueSolarTime: true }).raw_result.chosen;
     expect(r.timeUsed.slice(11)).toBe('09:53');
