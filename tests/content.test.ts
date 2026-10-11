@@ -2,7 +2,7 @@ import initSqlJs from 'sql.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { exportJson, parseExport, restore } from '../src/core/backup';
 import { Db, SCHEMA_VERSION } from '../src/core/db';
-import { approveSnippet, seedSources } from '../src/content/model';
+import { approveSnippet, seedSources, sources } from '../src/content/model';
 import { importPack, templatePack, validatePack } from '../src/content/pack';
 import { selectLayers } from '../src/content/select';
 import { DECK, allTarotKeys, majorNumber, roman, CARD_BY_ID } from '../src/content/tarot';
@@ -22,6 +22,23 @@ const pack = (snippets: object[], extra: object = {}) => ({ format: 'metaphysics
 const trad = { id: 't1', key: 'tarot.major.tower.reversed', text: 'Read as a disruption that is resisted.', label: 'traditional', lens: 'general', source_id: 'waite1911', source_locator: 'Part II, XVI', authored_by: 'owner' };
 
 describe('content selection', () => {
+  it('seeding adds newly registered sources to an existing database without touching the old rows', () => {
+    const db = fresh();
+    db.run("UPDATE source SET notes = 'owner edit' WHERE id = 'waite1911'");
+    db.run("DELETE FROM source WHERE id IN ('lilly1647', 'leo-afa', 'heindel1918')");
+    seedSources(db);
+    const s = sources(db);
+    expect(s.map((x) => x.id)).toEqual(expect.arrayContaining(['lilly1647', 'leo-afa', 'heindel1918']));
+    expect(s.find((x) => x.id === 'waite1911')!.notes).toBe('owner edit');
+    expect(s.filter((x) => ['lilly1647', 'leo-afa', 'heindel1918'].includes(x.id)).every((x) => x.status === 'registered')).toBe(true);
+  });
+
+  it('a traditional natal paraphrase citing a registered astrology source is accepted', () => {
+    const db = fresh();
+    const r = importPack(db, pack([{ id: 'l1', key: 'natal.sun.sign.aries', text: 'Test paraphrase.', label: 'traditional', lens: 'general', source_id: 'lilly1647', source_locator: 'Book I, test', authored_by: 'owner' }]));
+    expect(r.snippets).toBe(1);
+  });
+
   it('with nothing stored, both layers are visible placeholders that still carry ids', () => {
     const l = selectLayers(fresh(), 'tarot.major.fool.upright', 'love');
     expect(l.traditional[0]!.placeholder).toBe(true);

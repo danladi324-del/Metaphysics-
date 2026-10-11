@@ -19,6 +19,9 @@ Every `snippet` and `correspondence` row cites a `source_id` from this registry.
 | `waite1911` | A. E. Waite, *The Pictorial Key to the Tarot* (1911) | public domain; not loaded | tarot paraphrase |
 | `balliett` | L. Dow Balliett, numerology works (1908–1917) | public domain (pre-1929 US); not loaded | Pythagorean letter table |
 | `cheiro` | Cheiro, *Cheiro's Book of Numbers* (1926) | US public domain since 2022 (published 1926; edition to confirm); not loaded | Chaldean letter table |
+| `lilly1647` | William Lilly, *Christian Astrology, Modestly Treated of in Three Books* (London, 1647) | public domain; not loaded. Cite the 1647 scans, not the SkyScript transcription (its terms forbid redistribution) | planets, signs (Book I); nativities (Book III) |
+| `leo-afa` | Alan Leo, *Astrology for All*, Part I (1899; enlarged 2nd ed. 1904; 1910) | public domain (author d. 1917; published before 1931); not loaded. Locators must name the edition | Sun and Moon sign characters |
+| `heindel1918` | Max Heindel and Augusta Foss Heindel, *The Message of the Stars* (Rosicrucian Fellowship, 1918) | public domain in the US (published 1918); not loaded. Cite the 1918 text, not modern reprints' added matter | natal and medical astrology |
 
 Paraphrases may be labeled Traditional only after the owner approves them (brief §8).
 | `geonames` | GeoNames cities15000 (2017 snapshot via npm cities15000-json) | CC-BY | offline city list, coordinates, zone names |

@@ -178,3 +178,16 @@ The owner supplied screenshots from Astrodienst (natal Placidus, sidereal Fagan/
 - Lunar node: **true** (Astrodienst shows True Node).
 - Lilith: **interpolated**, newly added (Astrodienst's "Lilith (i)"); mean and osculating stay available.
 - BaZi time: **true solar time on** (the owner's BaZi app is fed the true-solar time).
+
+## D-029 Astrology text sources: Lilly, Leo, Heindel (owner, 2026-10-11)
+The owner named three reference works. All three are registered (`lilly1647`, `leo-afa`, `heindel1918`; SOURCES.md) and seeded into existing databases on next launch. **No text is loaded**: this session's network policy blocks archive.org, gutenberg.org, hathitrust.org, wellcomecollection.org and skyscript.co.uk, so nothing has been read and no paraphrase has been written. Every natal slot stays a placeholder until text is loaded and the owner approves each paraphrase (rule 2, brief §8).
+- Public-domain basis: Lilly 1647. Leo died 1917; *Astrology for All* appeared 1899–1910. *The Message of the Stars* was published in the US in 1918 (Max Heindel d. 1919, Augusta Foss Heindel d. 1949).
+- Copies located, not opened: HathiTrust record 005776802 (Leo, 1910 ed., catalogued full view, public domain); Wellcome Collection and Franz Mayer library scans of the 1647 Lilly; archive.org copies of Heindel per the Penn Online Books index. The SkyScript Lilly transcription (Vols. I–II) forbids redistribution, so cite the 1647 page instead.
+- Locator format: `Book I, ch. N, p. N (1647)` for Lilly; `ch. N, p. N (1904 ed.)` (or whichever edition is loaded) for Leo; `ch. N, p. N (1918)` for Heindel.
+**Fit with the rest of the system:**
+- Zodiac: all three are tropical, matching the owner's default. Sign-based passages can reach the Traditional label as they stand.
+- Houses: none of the three used whole-sign houses (Lilly used Regiomontanus; Leo and Heindel worked with quadrant tables, to confirm from the loaded text). A house delineation written for a quadrant house, shown against a whole-sign house, is a transplant. When house passages are loaded, each must record the source's house system, and the reading must show it next to the owner's choice. Not built yet, because there is no content to apply it to.
+- Coverage: Lilly is pre-modern, with seven planets and no Uranus, Neptune, Pluto, Chiron or Lilith. He judges nativities mostly by house rulers, not "planet in house" entries. Many Lilly slots should stay empty; that is accurate, not a gap.
+- Independence: Leo and Heindel both came out of the Theosophical movement. When they agree, it should count as weaker evidence than agreement between Lilly and either of them. The composer counts sources by id today. A lineage field for convergence is a candidate (IDEA), not built.
+**Reverse if:** the owner prefers a different edition of Leo (locators change), or wants house passages shown without the house-system note.
+

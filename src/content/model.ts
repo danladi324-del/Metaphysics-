@@ -39,7 +39,11 @@ export const BUILTIN_SOURCES: Source[] = [
   { id: 'waite1911', title: 'The Pictorial Key to the Tarot', author: 'A. E. Waite', year: 1911, license: 'public domain', status: 'registered' },
   { id: 'legge1899', title: 'The Yi King (Sacred Books of the East, vol. 16)', author: 'James Legge', year: 1899, license: 'public domain', status: 'registered' },
   { id: 'balliett', title: 'The Philosophy of Numbers', author: 'L. Dow Balliett', year: 1908, license: 'public domain', status: 'registered' },
-  { id: 'cheiro', title: "Cheiro's Book of Numbers", author: 'Cheiro (William John Warner)', year: 1926, license: 'public domain (US)', status: 'registered', notes: 'Edition to confirm.' }
+  { id: 'cheiro', title: "Cheiro's Book of Numbers", author: 'Cheiro (William John Warner)', year: 1926, license: 'public domain (US)', status: 'registered', notes: 'Edition to confirm.' },
+  // Astrology sources named by the owner, 2026-10-11 (DECISIONS D-029). Their house delineations assume quadrant houses, not whole sign.
+  { id: 'lilly1647', title: 'Christian Astrology, Modestly Treated of in Three Books', author: 'William Lilly', year: 1647, license: 'public domain', status: 'registered', notes: 'Book I: planets and signs; Books I–II: horary; Book III: nativities. Pre-modern: seven planets, Regiomontanus houses.' },
+  { id: 'leo-afa', title: 'Astrology for All, Part I', author: 'Alan Leo', year: 1899, license: 'public domain', status: 'registered', notes: 'Characteristics by Sun and Moon sign. Editions differ in length (1899; enlarged 2nd ed. 1904; 1910): locators must name the edition.' },
+  { id: 'heindel1918', title: 'The Message of the Stars', author: 'Max Heindel and Augusta Foss Heindel', year: 1918, license: 'public domain (US, published 1918)', status: 'registered', notes: 'Natal and medical astrology, Rosicrucian Fellowship (esoteric Christian).' }
 ];
 
 export function seedSources(db: Db): void {

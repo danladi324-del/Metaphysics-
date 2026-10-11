@@ -68,13 +68,12 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 - All browser checks (p1, p3–p7, offline) pass on the CSP build with no console errors and no horizontal scroll at 390 px. 162 unit tests pass; CI green through P5 at time of writing.
 
 ### Not verified (honest list)
-- Live deploy: the repository is public but Pages is not enabled yet (deploy runs fail at configure-pages with "Not Found" until Settings → Pages → Source is set to GitHub Actions).
+- Live deploy: Pages deploy from `main` succeeded on 2026-10-11 (https://danladi324-del.github.io/Metaphysics-/); the page itself has not been loaded from this environment (github.io unreachable here).
 - Personal data: names were removed from the working tree on 2026-10-11; reference chart R1's birth instant and coordinates remain (the fixtures need them), and earlier git history still contains the names.
 - Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on the owner's iOS version, and install-to-Home-Screen.
-- GitHub Pages deploy: needs the branch merged to `main` and Pages source set to GitHub Actions (INSTALL.md).
 - External fixtures: 7 from the owner's apps (D-028). Still no awkward-case (midnight/DST) external fixture.
 - Flying Star fixture is from memory of a published chart.
-- No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information".
+- No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information". Astrology sources Lilly 1647, Leo *Astrology for All* and Heindel 1918 are registered (D-029) but blocked from download by this session's network policy.
 
 
 ## Decisions applied 2026-10-10
@@ -85,7 +84,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 
 ## Still owed by the owner (brief §8)
 - Optional: one awkward-case chart (a midnight or DST-change birth) from Astrodienst, to exercise the boundary code against an outside source.
-- Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional.
+- Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional. Astrology sources chosen 2026-10-11 (D-029); their text still has to reach the repo, either as files the owner supplies or by allowing archive.org / hathitrust.org in the environment's network settings.
 
 ## Design canvas: what it lacks
 The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet cover:
