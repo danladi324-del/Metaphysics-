@@ -59,7 +59,7 @@ Commercial reference: *Qi Men Dun Jia 1080Ju* (iOS, Chai Bu) and masterseanchan.
 Sources: npm registry search 2026-10-10; [masterseanchan Qi Men](https://www.masterseanchan.com/qi-men-dun-jia-calculator/), [1080Ju on App Store](https://apps.apple.com/app/id869889798), [mingyu-core on jsDelivr](https://www.jsdelivr.com/package/npm/mingyu-core?tab=files).
 
 ## D-006 Time zones: resolve once at entry, store the offset
-Historical offsets are the most common error source (brief §3). Example (reference chart R1): on 1974-03-24 the US was on year-round emergency DST (from 1974-01-06), so 11:15 in America/Chicago was **CDT, UTC−5**, not CST. A naive "March = standard time" rule would put the chart an hour off.
+Historical offsets are the most common error source (brief §3). Example: in early 1974 the US was on year-round emergency DST (from 1974-01-06), so a February morning in America/Chicago was **CDT, UTC−5**, not CST. A naive "winter = standard time" rule would put a chart an hour off.
 **Decision:** the profile stores local wall time, IANA zone, the UTC offset resolved at entry, and where the offset came from (`Intl` tzdb in the runtime that resolved it). Engines compute from the stored UTC instant, not from a fresh lookup, so the same record recomputes identically on any device (rule 9). On load the app re-resolves and flags a mismatch instead of silently changing the chart.
 **Ambiguous/nonexistent local times** (fall-back hour, spring-forward gap) are detected and the user must pick.
 
@@ -170,7 +170,7 @@ Reverse if: the owner loads a source whose author defines reversals by one gener
 ## D-028 Reference fixtures from the owner's apps, and the defaults they settle (2026-10-10)
 The owner supplied screenshots from Astrodienst (natal Placidus, sidereal Fagan/Bradley whole signs, a relocation chart, draconic), a BaZi app, a planetary-hours app and Qi Men Dun Jia Pro (kymon.net). They are transcribed in `tests/reference-fixtures.test.ts` and listed in `src/core/fixtures.ts` (shown in Lab). Results:
 - Astrodienst natal: 11 bodies within 2″ (most within 1″); interpolated Lilith exact; true node 11″ and osculating Lilith 77″ off (Moshier vs Swiss data files); Ascendant, MC and four cusps to the printed minute. Sidereal: Sun, Moon, Ascendant, MC within 1″, confirming the nutation-inclusive ayanamsa (D-016 era fix). Relocation: Ascendant and MC to the second. Draconic: consistent within 15″.
-- BaZi app: shows the birth time as 09:53, which is the app's true-solar-time result to the minute, with pillars 己巳 甲子 丁卯 甲寅.
+- BaZi app: shows the birth time already converted to true solar time; it equals the app's true-solar-time result to the minute, and the four pillars match.
 - Planetary hours: Saturn day; Mars/Sun/Venus hours to the minute; sunrise ~1 minute apart.
 - Kymon Qi Men: Yin dun Ju 9 with every palace's stems, door and deity identical, and annual stars identical. The competing elapsed-time yuan rule would give Ju 6, so Kymon follows the fu-head Chai Bu the app shows (supports D-027).
 **Bug found by a fixture:** in sidereal mode, whole-sign cusps were tropical cusps minus the ayanamsa, leaving them mid-sign. Whole-sign cusps now start at 0° of the sidereal rising sign. (House assignment was already correct; the wheel's cusp lines were not.)
@@ -209,4 +209,13 @@ The owner uploaded OCR texts of Heindel (3rd ed., text copyright 1918) and Lilly
   3. Step 1 "produce a backup export and verify it restores": the owner's data is on the phone. Export and restore are verified with sample data; the real export is the owner's (A1).
   4. Step 2 refers to an updated design board, which this environment cannot see. Readings will be built to the Part H section order directly.
 - **Superseded, to be rewritten when their step lands:** D-007 (GitHub Pages; Part A5 moves to Cloudflare Pages, Step 1), D-014 and D-018 (composer selects snippets and writes no free text; Parts B and H, Step 2), D-025 (tarot reversal "as the source reads it"; B4 lists blocked, opposite, internal, delayed and "as commonly read", Step 4).
+
+## D-032 Scrub prepared: sample chart in public tests, private fixtures, CI guard, hosting variable (2026-10-11)
+- **Personal data out of the tree.** Public tests and e2e scripts use the fictitious sample chart S1 (1983-12-15 02:20 MST = 09:20 UT, Denver 39.7392 N 104.9903 W) or Chicago. S1's time was picked by search so the shadow test keeps its edge case (a body, Mars, in the 12th under Placidus only). Numerology keeps every hand-worked number: 1983-12-15 reduces exactly as the old date did (12/15/1983: 3 + 6 + 3 = 12 → 3; all digits 30). Kua 1983 gives the same 8/7 as before.
+- **The owner's reference fixtures stay as evidence, out of the repo.** The owner's standing rule (no birth data in the repo, tests or fixtures) wins over Part A3's "fixtures stay in a private repo". `tests/private/` is gitignored; CI rebuilds it from the secret `PRIVATE_TESTS_B64` and warns when the secret is absent. The owner keeps the file. Until then the files are also recoverable from the old repo's history.
+- **Guard (A7).** `scripts/scrub.mjs` reads `label<TAB>regex` lines from the `SCRUB_PATTERNS` secret or a gitignored `.scrub-patterns`, scans the tree, `dist/` and (with `--history`) every commit's files and metadata, and prints labels and locations only. The GeoNames city list is the one allowlisted file. CI fails on any hit.
+- **Hosting (A5), prepared.** `BASE_PATH` sets Vite's base, the manifest scope and start_url; fonts are base-relative. Default stays `/Metaphysics-/` until the move. Cloudflare Pages chosen for its own origin. Free-plan builds from a private repo are UNVERIFIED here; the fallback is a `wrangler pages deploy` workflow.
+- **Commit identity.** The squashed commit uses a neutral author (`owner <owner@users.noreply.github.com>`), not the account's noreply address, because that address contains the account name, which contains the owner's middle name.
+- **Supersedes D-007** once the move is done.
+**Reverse if:** the owner prefers fixture inputs inside the private repo (Part A3 default): then move `tests/private/` back and drop the secret.
 

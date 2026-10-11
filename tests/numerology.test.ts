@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { CHALDEAN, DEFAULT_NUMEROLOGY, PYTHAGOREAN, computeNumerology, isVowel, normalizeName, numerology, numerologyDisagreements, personalCycles, reduce } from '../src/engines/numerology/compute';
 
 /*
- Hand-worked with a fictitious name: ELI KANE, 1974-03-24 (the reference date R1).
+ Hand-worked with a fictitious name: ELI KANE, 1983-12-15 (fictitious).
  Pythagorean: E5 L3 I9 = 17 -> 8; K2 A1 N5 E5 = 13 -> 4 (karmic 13 inside KANE). Expression by part 8 + 4 = 12 -> 3; all letters 30 -> 3.
    Vowels: E5 I9 = 14 -> 5 (karmic 14 inside ELI); A1 E5 = 6. By part 5 + 6 = 11 (master). All vowels 20 -> 2.
    Consonants: L3 = 3; K2 N5 = 7. By part 10 -> 1; all 10 -> 1.
  Chaldean: E5 L3 I1 = 9; K2 A1 N5 E5 = 13 -> 4. By part 13 -> 4 (karmic 13 in the total); all letters 22 (master).
    Vowels: E5 I1 = 6; A1 E5 = 6 -> 12 -> 3 both ways. Consonants: L3; K2 N5 = 7 -> 10 -> 1 both ways.
- Date: 3 + (24 -> 6) + (1974 -> 21 -> 3) = 12 -> 3. All digits 3+2+4+1+9+7+4 = 30 -> 3. Birthday 24 -> 6.
+ Date: (12 -> 3) + (15 -> 6) + (1983 -> 21 -> 3) = 12 -> 3. All digits 1+2+1+5+1+9+8+3 = 30 -> 3. Birthday 15 -> 6.
  Maturity (Pythagorean): 3 + 3 = 6.
  Pinnacles: 3+6=9, 6+3=9, 9+9=18->9, 3+3=6. Challenges |3-6|=3, |6-3|=3, |3-3|=0, |3-3|=0. First break 36-3 = 33.
  Personal year 2026: 3 + 6 + (2026 -> 10 -> 1) = 10 -> 1. October: 1 + 1 = 2. 10 Oct: 2 + 1 = 3.
 */
-describe('numerology: Eli Kane (fictitious), 1974-03-24', () => {
-  const r = numerology({ name: 'Eli Kane', year: 1974, month: 3, day: 24 });
+describe('numerology: Eli Kane (fictitious), 1983-12-15', () => {
+  const r = numerology({ name: 'Eli Kane', year: 1983, month: 12, day: 15 });
 
   it('date numbers', () => {
     expect(r.date.lifePathByComponent).toEqual({ compound: 12, value: 3, karmicDebt: null });
@@ -63,11 +63,11 @@ describe('numerology: Eli Kane (fictitious), 1974-03-24', () => {
   });
 
   it('personal cycles for 10 Oct 2026', () => {
-    expect(personalCycles(3, 24, 2026, 10, 10)).toEqual({ personalYear: 1, personalMonth: 2, personalDay: 3 });
+    expect(personalCycles(12, 15, 2026, 10, 10)).toEqual({ personalYear: 1, personalMonth: 2, personalDay: 3 });
   });
 
   it('logs disagreements: Soul Urge and Chaldean Expression method splits, letter-table splits', () => {
-    const rec = computeNumerology({ name: 'Eli Kane', year: 1974, month: 3, day: 24 }, DEFAULT_NUMEROLOGY, new Date('2026-10-10T00:00:00Z'));
+    const rec = computeNumerology({ name: 'Eli Kane', year: 1983, month: 12, day: 15 }, DEFAULT_NUMEROLOGY, new Date('2026-10-10T00:00:00Z'));
     const subjects = numerologyDisagreements(rec, null).map((d) => d.subject);
     expect(subjects).toContain('Soul Urge (pythagorean)');
     expect(subjects).toContain('Expression (chaldean)');
@@ -128,14 +128,14 @@ describe('numerology: boundaries', () => {
 });
 
 /*
- Hand-worked with a fictitious three-part example: ADA LOVELACE, 1974-03-24.
+ Hand-worked with a fictitious three-part example: ADA LOVELACE, 1983-12-15.
  Pythagorean: ADA A1 D4 A1 = 6; LOVELACE L3 O6 V4 E5 L3 A1 C3 E5 = 30 -> 3. Expression by part 9; all letters 36 -> 9.
    Vowels: ADA 2; LOVELACE O6 E5 A1 E5 = 17 -> 8. By part 10 -> 1; all vowels 19 -> 10 -> 1 (karmic 19 in that total).
    Consonants: ADA D4 = 4; LOVELACE L3 V4 L3 C3 = 13 -> 4 (karmic 13 inside the part). By part 8; all 17 -> 8.
  Chaldean: ADA 6; LOVELACE L3 O7 V6 E5 L3 A1 C3 E5 = 33 (master, kept). By part 39 -> 12 -> 3; all letters 39 -> 3.
 */
 describe('numerology: Ada Lovelace (fictitious use of a historical name)', () => {
-  const r = numerology({ name: 'Ada Lovelace', year: 1974, month: 3, day: 24 });
+  const r = numerology({ name: 'Ada Lovelace', year: 1983, month: 12, day: 15 });
   it('Pythagorean', () => {
     expect([r.pythagorean.expression.byNamePart.value, r.pythagorean.expression.allLetters.value]).toEqual([9, 9]);
     expect([r.pythagorean.soulUrge.byNamePart.value, r.pythagorean.soulUrge.allLetters.value]).toEqual([1, 1]);

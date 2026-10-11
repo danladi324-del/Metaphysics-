@@ -7,8 +7,8 @@ import type { Ephemeris } from '../src/engines/natal/ephemeris';
 import { formatLongitude, separation } from '../src/engines/natal/zodiac';
 import { nodeEphemeris } from './helpers/ephemeris';
 
-// Reference chart R1: 1974-03-24 11:15 CDT (UTC-5), 32.5160 N, 93.7321 W (America/Chicago).
-const ERIC = { utcMs: Date.UTC(1974, 2, 24, 16, 15), lat: 32.516, lon: -93.7321 };
+// Sample chart S1 (fictitious): 1983-12-15 02:20 MST (UTC-7), Denver 39.7392 N, 104.9903 W.
+const SAMPLE = { utcMs: Date.UTC(1983, 11, 15, 9, 20), lat: 39.7392, lon: -104.9903 };
 const FIXED_NOW = new Date('2026-10-10T00:00:00Z');
 
 let eph: Ephemeris;
@@ -43,29 +43,19 @@ function independentHouses(utcMs: number, lat: number, lon: number) {
   return { asc, mc, c11: placidus(1 / 3, true), c12: placidus(2 / 3, true), c2: placidus(2 / 3, false), c3: placidus(1 / 3, false) };
 }
 
-describe('natal chart: reference chart R1', () => {
+describe('natal chart: sample chart S1', () => {
   it('produces a valid, deterministic record', () => {
-    const a = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
-    const b = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const a = computeNatal(eph, SAMPLE, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const b = computeNatal(eph, SAMPLE, DEFAULT_ASTRO, undefined, FIXED_NOW);
     expect(validateRecord(a)).toEqual([]);
     expect(sameResult(a, b)).toBe(true);
     expect(a.raw_result.bodies.map((x) => x.id)).toEqual([...BODY_ORDER]);
     expect(a.limitations).toEqual([]);
   });
 
-  it('matches the values first seen in the prior-art probe', () => {
-    const { result } = natalPositions(eph, ERIC, DEFAULT_ASTRO);
-    const fmt = (id: string) => formatLongitude(result.bodies.find((b) => b.id === id)!.longitude);
-    expect(fmt('sun')).toBe('3°38′ Aries');
-    expect(fmt('moon')).toBe('13°02′ Aries');
-    expect(fmt('chiron')).toBe('19°21′ Aries');
-    expect(formatLongitude(result.angles.asc)).toBe('18°26′ Gemini');
-    expect(formatLongitude(result.angles.mc)).toBe('29°40′ Aquarius');
-  });
-
   it('Sun..Pluto agree with astronomy-engine (independent code) within 0.005°', () => {
-    const { result } = natalPositions(eph, ERIC, DEFAULT_ASTRO);
-    const date = new Date(ERIC.utcMs);
+    const { result } = natalPositions(eph, SAMPLE, DEFAULT_ASTRO);
+    const date = new Date(SAMPLE.utcMs);
     const bodies: [string, Astronomy.Body][] = [
       ['sun', Astronomy.Body.Sun], ['moon', Astronomy.Body.Moon], ['mercury', Astronomy.Body.Mercury], ['venus', Astronomy.Body.Venus],
       ['mars', Astronomy.Body.Mars], ['jupiter', Astronomy.Body.Jupiter], ['saturn', Astronomy.Body.Saturn], ['uranus', Astronomy.Body.Uranus],
@@ -79,8 +69,8 @@ describe('natal chart: reference chart R1', () => {
   });
 
   it('ascendant, MC and Placidus cusps agree with an independent textbook implementation within 0.01°', () => {
-    const { result } = natalPositions(eph, ERIC, DEFAULT_ASTRO);
-    const ref = independentHouses(ERIC.utcMs, ERIC.lat, ERIC.lon);
+    const { result } = natalPositions(eph, SAMPLE, DEFAULT_ASTRO);
+    const ref = independentHouses(SAMPLE.utcMs, SAMPLE.lat, SAMPLE.lon);
     const c = result.houses.placidus!.cusps;
     expect(separation(result.angles.asc, ref.asc)).toBeLessThan(0.01);
     expect(separation(result.angles.mc, ref.mc)).toBeLessThan(0.01);
@@ -93,12 +83,14 @@ describe('natal chart: reference chart R1', () => {
   });
 
   it('whole sign houses start at 0° of the rising sign', () => {
-    const { result } = natalPositions(eph, ERIC, DEFAULT_ASTRO);
-    expect(result.houses.wholeSign!.cusps).toEqual([60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]);
+    const { result } = natalPositions(eph, SAMPLE, DEFAULT_ASTRO);
+    // S1 rises in Libra (the Ascendant itself is checked against an independent implementation above).
+    expect(Math.floor(result.angles.asc / 30)).toBe(6);
+    expect(result.houses.wholeSign!.cusps).toEqual([180, 210, 240, 270, 300, 330, 0, 30, 60, 90, 120, 150]);
   });
 
   it('writes a disagreement row for every body whose house changes between systems', () => {
-    const rec = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const rec = computeNatal(eph, SAMPLE, DEFAULT_ASTRO, undefined, FIXED_NOW);
     const rows = natalDisagreements(rec, 'p1');
     const changed = rec.raw_result.bodies.filter((b) => b.houses.placidus !== b.houses.wholeSign);
     expect(rows.filter((r) => r.cause === 'convention: house system').length).toBe(changed.length);
@@ -116,7 +108,7 @@ describe('natal chart: boundaries', () => {
 
   it('without the asteroid file, Chiron is omitted and the limitation says so', async () => {
     const bare = await nodeEphemeris(false);
-    const rec = computeNatal(bare, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const rec = computeNatal(bare, SAMPLE, DEFAULT_ASTRO, undefined, FIXED_NOW);
     expect(rec.raw_result.bodies.some((b) => b.id === 'chiron')).toBe(false);
     expect(rec.limitations[0]).toMatch(/Chiron not computed/);
   });
@@ -126,7 +118,7 @@ describe('natal chart: boundaries', () => {
   });
 
   it('old dates compute (1850, LMT era) and the record keeps the UTC instant it ran on', () => {
-    const rec = computeNatal(eph, { utcMs: Date.UTC(1850, 0, 1, 17, 50, 36), lat: 32.516, lon: -93.7321 }, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const rec = computeNatal(eph, { utcMs: Date.UTC(1850, 0, 1, 17, 50, 36), lat: 41.8781, lon: -87.6298 }, DEFAULT_ASTRO, undefined, FIXED_NOW);
     expect(rec.raw_result.bodies.length).toBe(BODY_ORDER.length);
     expect(rec.inputs.utcMs).toBe(Date.UTC(1850, 0, 1, 17, 50, 36));
   });
@@ -136,14 +128,14 @@ import { computeReturn, computeTransits, findReturn } from '../src/engines/natal
 
 describe('transits and returns', () => {
   it('solar return lands where the Sun is back at its natal longitude, within a day of the birthday', () => {
-    const natal = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const natal = computeNatal(eph, SAMPLE, DEFAULT_ASTRO, undefined, FIXED_NOW);
     const ret = computeReturn(eph, natal, 'sun', Date.UTC(2026, 0, 1), FIXED_NOW);
-    const sunThen = natalPositions(eph, { ...ERIC, utcMs: ret.raw_result.utcMs }, DEFAULT_ASTRO).result.bodies[0]!.longitude;
+    const sunThen = natalPositions(eph, { ...SAMPLE, utcMs: ret.raw_result.utcMs }, DEFAULT_ASTRO).result.bodies[0]!.longitude;
     expect(separation(sunThen, ret.raw_result.targetLongitude)).toBeLessThan(1e-5);
     const d = new Date(ret.raw_result.utcMs);
     expect(d.getUTCFullYear()).toBe(2026);
-    expect(d.getUTCMonth()).toBe(2);
-    expect(Math.abs(d.getUTCDate() - 24)).toBeLessThanOrEqual(1);
+    expect(d.getUTCMonth()).toBe(11);
+    expect(Math.abs(d.getUTCDate() - 15)).toBeLessThanOrEqual(1);
   });
 
   it('lunar return falls within 27.4 days of the start', () => {
@@ -154,8 +146,8 @@ describe('transits and returns', () => {
   });
 
   it('a transit on the birth instant shows every body conjunct itself at orb 0', () => {
-    const natal = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
-    const tr = computeTransits(eph, natal, ERIC.utcMs, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const natal = computeNatal(eph, SAMPLE, DEFAULT_ASTRO, undefined, FIXED_NOW);
+    const tr = computeTransits(eph, natal, SAMPLE.utcMs, DEFAULT_ASTRO, undefined, FIXED_NOW);
     for (const id of ['sun', 'moon', 'saturn', 'chiron']) {
       expect(tr.raw_result.aspects.some((a) => a.transiting === id && a.natal === id && a.type === 'conjunction' && a.orb === 0)).toBe(true);
     }

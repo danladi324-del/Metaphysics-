@@ -33,7 +33,7 @@ describe('engines refuse malformed input', () => {
     expect(() => computeTzolkin({ year: 2000, month: 4, day: 31 })).toThrow(/no such date/);
   });
   it('feng shui bearing and building year', () => {
-    const base = { bearing: 10, north: 'true' as const, lat: 0, lon: 0, dateMs: Date.UTC(2026, 0, 1), builtYear: 2010, birthSolarYear: 1974, currentSolarYear: 2026 };
+    const base = { bearing: 10, north: 'true' as const, lat: 0, lon: 0, dateMs: Date.UTC(2026, 0, 1), builtYear: 2010, birthSolarYear: 1983, currentSolarYear: 2026 };
     expect(() => computeFengShui({ ...base, bearing: 360 })).toThrow(/bearing/);
     expect(() => computeFengShui({ ...base, bearing: NaN })).toThrow(/bearing/);
     expect(() => computeFengShui({ ...base, builtYear: 1700 })).toThrow(/building year/);
@@ -61,7 +61,7 @@ describe('fuzz: junk never produces NaN or an invalid record', () => {
         check(() => computeMoon(eph, a as number));
         check(() => computeHours(a as number, b as number, 0, () => 0));
         check(() => computeTzolkin({ year: a as number, month: b as number, day: 1 }));
-        check(() => computeFengShui({ bearing: a as number, north: 'magnetic', lat: b as number, lon: 0, dateMs: Date.UTC(2026, 0, 1), builtYear: 2010, birthSolarYear: 1974, currentSolarYear: 2026 }));
+        check(() => computeFengShui({ bearing: a as number, north: 'magnetic', lat: b as number, lon: 0, dateMs: Date.UTC(2026, 0, 1), builtYear: 2010, birthSolarYear: 1983, currentSolarYear: 2026 }));
       }
     }
   });

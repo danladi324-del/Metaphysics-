@@ -84,7 +84,7 @@ describe('composer status: never manufactures consensus', () => {
 describe('composer layers', () => {
   it('every item carries a trace id; facts are calculated, move is synthesis', () => {
     const db = fresh();
-    const rec = computeNatal(eph, { utcMs: Date.UTC(1974, 2, 24, 16, 15), lat: 32.516, lon: -93.7321 }, DEFAULT_ASTRO);
+    const rec = computeNatal(eph, { utcMs: Date.UTC(1983, 11, 15, 9, 20), lat: 39.7392, lon: -104.9903 }, DEFAULT_ASTRO);
     db.saveRecord(rec, null);
     for (const d of natalDisagreements(rec, null)) db.saveDisagreement(d);
     const r = compose(db, natalView(rec, true), 'general');
@@ -94,7 +94,7 @@ describe('composer layers', () => {
     expect(r.layers[4]!.items[0]!.label).toBe('synthesis');
     // House-system splits for this record appear in layer 4.
     expect(r.layers[3]!.items.some((i) => i.caption.startsWith('Mars house'))).toBe(true);
-    expect(r.layers[1]!.items.map((i) => i.caption.split(':')[0])).toEqual(['Sun in Aries', 'Moon in Aries']);
+    expect(r.layers[1]!.items.map((i) => i.caption.split(':')[0])).toEqual(['Sun in Sagittarius', 'Moon in Aries']);
   });
 
   it('with no splits, layer 4 says so plainly', () => {

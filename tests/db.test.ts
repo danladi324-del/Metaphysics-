@@ -17,14 +17,14 @@ beforeAll(async () => {
   eph = await nodeEphemeris();
 });
 
-function ericProfile(): Profile {
-  const r = resolveLocal({ year: 1974, month: 3, day: 24, hour: 11, minute: 15 }, 'America/Chicago');
+function sampleProfile(): Profile {
+  const r = resolveLocal({ year: 1983, month: 12, day: 15, hour: 2, minute: 20 }, 'America/Denver');
   if (r.kind !== 'exact') throw new Error('expected exact');
   return {
-    id: 'p-eric',
-    displayName: 'R1',
-    birth: { local: { year: 1974, month: 3, day: 24, hour: 11, minute: 15 }, zone: 'America/Chicago', offsetSeconds: r.result.offsetSeconds, utcMs: r.result.utcMs, offsetSource: 'Intl tzdb', timeKnown: true },
-    place: { name: 'Reference place', admin: 'LA', country: 'US', lat: 32.516, lon: -93.7321, source: 'geonames' },
+    id: 'p-sample',
+    displayName: 'S1',
+    birth: { local: { year: 1983, month: 12, day: 15, hour: 2, minute: 20 }, zone: 'America/Denver', offsetSeconds: r.result.offsetSeconds, utcMs: r.result.utcMs, offsetSource: 'Intl tzdb', timeKnown: true },
+    place: { name: 'Reference place', admin: 'CO', country: 'US', lat: 39.7392, lon: -104.9903, source: 'geonames' },
     numerologyNames: [{ name: 'Eli Kane', kind: 'as given' }],
     created_at: '2026-10-10T00:00:00.000Z',
     updated_at: '2026-10-10T00:00:00.000Z'
@@ -35,7 +35,7 @@ describe('P1 acceptance: profile -> chart -> export -> wipe -> restore -> identi
   it('round-trips', async () => {
     const images: Uint8Array[] = [];
     const db = Db.open(SQL, null, async (img) => void images.push(img));
-    const p = ericProfile();
+    const p = sampleProfile();
     db.saveProfile(p);
     const rec = computeNatal(eph, { utcMs: p.birth.utcMs, lat: p.place.lat, lon: p.place.lon }, DEFAULT_ASTRO, undefined, new Date('2026-10-10T01:00:00Z'));
     db.saveRecord(rec, p.id);
@@ -66,17 +66,17 @@ describe('P1 acceptance: profile -> chart -> export -> wipe -> restore -> identi
   it('a persisted image reopens with the same contents (simulated app restart)', async () => {
     let last: Uint8Array | null = null;
     const db = Db.open(SQL, null, async (img) => void (last = img));
-    db.saveProfile(ericProfile());
+    db.saveProfile(sampleProfile());
     await db.flush();
     const reopened = Db.open(SQL, last, null);
-    expect(reopened.profiles()[0]!.displayName).toBe('R1');
+    expect(reopened.profiles()[0]!.displayName).toBe('S1');
   });
 });
 
 describe('restore rejects malformed input and leaves data alone', () => {
   const db = () => {
     const d = Db.open(SQL, null, null);
-    d.saveProfile(ericProfile());
+    d.saveProfile(sampleProfile());
     return d;
   };
   it('not JSON', () => expect(() => parseExport('{oops')).toThrow(/Not valid JSON/));

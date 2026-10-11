@@ -4,7 +4,7 @@
 1. **Merge the work to `main`.** All phases were built on the branch `claude/intelligent-mendel-j3p880`. Open a pull request from it into `main` and merge it (or ask Claude Code to open the PR).
 2. **Turn on Pages** (once). The repository is public, so Pages is free. Repository → Settings → Pages → *Build and deployment* → Source: **GitHub Actions**.
 3. **Check Actions are allowed.** Repository → Settings → Actions → General → allow actions. The `Deploy to Pages` workflow runs on every push to `main`; `CI` runs on every push.
-4. When `Deploy to Pages` finishes, the app is at `https://danladi324-del.github.io/Metaphysics-/`.
+4. When `Deploy to Pages` finishes, the app is at the URL shown under Settings → Pages. (This hosting is being replaced: see `docs/SCRUB_PLAN.md`.)
 
 ## Install on the iPhone
 1. Open that URL in **Safari** (not another browser: only Safari can add a web app to the Home Screen with its own storage).

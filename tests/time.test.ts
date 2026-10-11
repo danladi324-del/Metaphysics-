@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { daysBetween, formatOffset, julianDayUT, resolveLocal, validateLocal, zoneOffsetSeconds } from '../src/core/time';
 
 describe('resolveLocal', () => {
-  it("R1: 1974 US emergency DST puts 11:15 in America/Chicago at UTC-5, not -6", () => {
-    const r = resolveLocal({ year: 1974, month: 3, day: 24, hour: 11, minute: 15 }, 'America/Chicago');
+  it("1974 US emergency DST puts a February 10:30 in America/Chicago at UTC-5, not -6", () => {
+    const r = resolveLocal({ year: 1974, month: 2, day: 10, hour: 10, minute: 30 }, 'America/Chicago');
     expect(r.kind).toBe('exact');
     if (r.kind !== 'exact') return;
     expect(r.result.offsetSeconds).toBe(-5 * 3600);
-    expect(new Date(r.result.utcMs).toISOString()).toBe('1974-03-24T16:15:00.000Z');
+    expect(new Date(r.result.utcMs).toISOString()).toBe('1974-02-10T15:30:00.000Z');
   });
 
   it('the same date one year later was standard time (emergency DST began 1975-02-23)', () => {
@@ -70,6 +70,6 @@ describe('julian day', () => {
     expect(julianDayUT(Date.UTC(2000, 0, 1, 12))).toBe(2451545);
   });
   it('days between dates across DST', () => {
-    expect(daysBetween({ year: 1974, month: 3, day: 24 }, { year: 2026, month: 10, day: 10 })).toBe(19193);
+    expect(daysBetween({ year: 1983, month: 12, day: 15 }, { year: 2026, month: 10, day: 10 })).toBe(15640);
   });
 });

@@ -68,9 +68,9 @@ const weekday = (ms: number) => {
   return new Date(Date.UTC(l.year, l.month - 1, l.day)).getUTCDay();
 };
 
-describe('planetary hours (R1 place)', () => {
-  const lat = 32.516;
-  const lon = -93.7321;
+describe('planetary hours (sample place: Chicago)', () => {
+  const lat = 41.8781;
+  const lon = -87.6298;
 
   it('sunrise agrees with an independent NOAA formula within 3 minutes', () => {
     const r = planetaryHours(Date.UTC(2026, 9, 10, 18), lat, lon, weekday);

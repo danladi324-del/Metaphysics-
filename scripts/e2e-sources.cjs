@@ -6,8 +6,8 @@ const { chromium, devices } = require(process.env.PW);
   page.on('dialog', (d) => d.accept());
   await page.goto('http://localhost:4173/Metaphysics-/');
   await page.waitForSelector('text=New profile');
-  await page.fill('input >> nth=0', 'R1'); await page.fill('input[type=date]', '1974-03-24'); await page.fill('input[type=time]', '11:15');
-  await page.fill('label:has-text("City") input', 'Shreveport'); await page.click('button:has-text("Shreveport")');
+  await page.fill('input >> nth=0', 'S1'); await page.fill('input[type=date]', '1983-12-15'); await page.fill('input[type=time]', '02:20');
+  await page.fill('label:has-text("City") input', 'Denver'); await page.click('button:has-text("Denver")');
   await page.click('button:has-text("Save profile")'); await page.waitForSelector('text=Placements');
   await page.click('nav a:has-text("Lab")'); await page.waitForSelector('text=Built-in packs');
   await page.click('button:has-text("Import") >> nth=0');
@@ -16,11 +16,11 @@ const { chromium, devices } = require(process.env.PW);
   await page.waitForSelector('text=Showing 24 of 24', { state: 'detached' }).catch(() => {});
   const cards = page.locator('.card:has-text("natal.sun.")');
   console.log('sun cards shown', await cards.count());
-  const aries = page.locator('.card:has-text("natal.sun.sign.aries")');
+  const aries = page.locator('.card:has-text("natal.sun.sign.sagittarius")');
   await aries.locator('summary').click();
   console.log('PASSAGE:', (await aries.locator('details p').innerText()).slice(0, 120));
   await aries.locator('button:has-text("Approve")').click();
-  // Approve every Sun house entry too, so whichever house R1's Sun falls in shows Traditional.
+  // Approve every Sun house entry too, so whichever house the sample chart's Sun falls in shows Traditional.
   for (let i = 0; i < 12; i++) {
     const c = page.locator('.card:has-text("natal.sun.house.")').first();
     if (!(await c.count())) break;

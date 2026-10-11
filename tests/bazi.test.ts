@@ -11,7 +11,8 @@ beforeAll(async () => {
 });
 
 const gz = (p: Pillar) => `${STEMS_ZH[p.stem]}${BRANCHES_ZH[p.branch]}`;
-const ERIC = { utcMs: Date.UTC(1974, 2, 24, 16, 15), zone: 'America/Chicago', lat: 32.516, lon: -93.7321 };
+// Sample chart S1 (fictitious).
+const SAMPLE = { utcMs: Date.UTC(1983, 11, 15, 9, 20), zone: 'America/Denver', lat: 39.7392, lon: -104.9903 };
 
 /** Wall-clock fields of a UTC instant shifted by an offset in hours. */
 const wall = (ms: number, offH: number) => {
@@ -34,22 +35,6 @@ describe('Li Chun instants agree with lunar-javascript within 2 minutes (1950-20
       const ref = Date.UTC(t.getYear(), t.getMonth() - 1, t.getDay(), t.getHour(), t.getMinute(), t.getSecond()) - 8 * 3_600_000;
       expect(Math.abs(ours - ref), String(y)).toBeLessThan(120_000);
     }
-  });
-});
-
-describe("reference chart R1: four pillars", () => {
-  it('clock time: 甲寅 丁卯 甲子 庚午 (matches lunar-javascript)', () => {
-    const r = computeBazi(eph, ERIC, { ziHour: 'early', trueSolarTime: false }).raw_result.chosen;
-    expect([r.year, r.month, r.day, r.hour].map(gz)).toEqual(['甲寅', '丁卯', '甲子', '庚午']);
-  });
-  it('true solar time moves the hour to 己巳 and writes a disagreement row', () => {
-    const rec = computeBazi(eph, ERIC, { ziHour: 'early', trueSolarTime: false });
-    const tst = rec.raw_result.variants.find((v) => v.conventions.trueSolarTime && v.conventions.ziHour === 'early')!.chart;
-    expect(gz(tst.hour)).toBe('己巳');
-    expect(tst.timeUsed.slice(11)).toMatch(/^09:5\d$/);
-    const rows = baziDisagreements(rec, null);
-    expect(rows.some((d) => d.subject === 'Hour pillar' && d.cause === 'convention: true solar time')).toBe(true);
-    expect(pillarName(tst.hour)).toBe('己巳 Ji-Si');
   });
 });
 
@@ -104,17 +89,8 @@ describe('random instants vs lunar-javascript (clock time)', () => {
 import { luckPillars } from '../src/engines/bazi/compute';
 
 describe('luck pillars', () => {
-  it("R1 (male, yang Jia year): forward from 丁卯, starting 戊辰 at about 3 years 10 months", () => {
-    const rec = computeBazi(eph, { ...ERIC, sex: 'male' });
-    const l = rec.raw_result.luck!;
-    expect(l.direction).toBe('forward');
-    expect(l.pillars.slice(0, 4).map((p) => gz(p.pillar))).toEqual(['戊辰', '己巳', '庚午', '辛未']);
-    expect(l.daysToTerm).toBeGreaterThan(11.4);
-    expect(l.daysToTerm).toBeLessThan(11.6);
-    expect(l.startAge).toEqual({ years: 3, months: 9 });
-  });
   it('no sex, no luck pillars, and the limitation says why', () => {
-    const rec = computeBazi(eph, ERIC);
+    const rec = computeBazi(eph, SAMPLE);
     expect(rec.raw_result.luck).toBeNull();
     expect(rec.limitations[0]).toMatch(/sex/);
   });

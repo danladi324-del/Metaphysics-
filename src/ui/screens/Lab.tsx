@@ -100,7 +100,7 @@ export function Lab() {
       <section>
         <h2>Reference fixtures</h2>
         <p class="note">
-          Screenshots from your own apps, transcribed into tests that run on every push (CI). A failing fixture fails the build. Independent-code checks (astronomy-engine, lunar-javascript, qimen-wasm) run alongside.
+          Screenshots from your own apps, transcribed into private tests (they hold your birth data, so they are kept out of the repository and run in CI only when the private-test secret is set). A failing fixture fails the build. Independent-code checks (astronomy-engine, lunar-javascript, qimen-wasm) run alongside.
         </p>
         {FIXTURES.map((f) => (
           <div class="card" style={{ padding: '10px', gap: '4px' }}>

@@ -2,8 +2,11 @@ import { defineConfig } from 'vitest/config';
 import preact from '@preact/preset-vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Served at /Metaphysics-/ on the old GitHub Pages site; the Cloudflare Pages build sets BASE_PATH=/ (docs/SCRUB_PLAN.md).
+const base = process.env.BASE_PATH ?? '/Metaphysics-/';
+
 export default defineConfig({
-  base: '/Metaphysics-/',
+  base,
   plugins: [
     preact(),
     VitePWA({
@@ -16,6 +19,8 @@ export default defineConfig({
         theme_color: '#131E27',
         background_color: '#131E27',
         display: 'standalone',
+        scope: base,
+        start_url: base,
         orientation: 'portrait',
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },

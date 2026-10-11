@@ -28,7 +28,7 @@ describe("Tzolk'in (GMT 584283)", () => {
     expect(c.haab).toEqual(a.haab);
   });
   it('the 584285 correlation shifts the day by two and is logged', () => {
-    const rec = computeTzolkin({ year: 1974, month: 3, day: 24 });
+    const rec = computeTzolkin({ year: 1983, month: 12, day: 15 });
     const alt = rec.raw_result.alternatives[0]!;
     expect((DAY_INDEX(alt.tzolkin.name) - DAY_INDEX(rec.raw_result.chosen.tzolkin.name) + 20) % 20).toBe(18);
     expect(tzolkinDisagreements(rec, null).length).toBe(1);
@@ -44,7 +44,7 @@ describe('Vedic', () => {
     expect(r.ayanamsa).toBeLessThan(23.87);
   });
   it('sidereal = tropical - ayanamsa for every graha (consistency with the natal engine)', () => {
-    const inp = { utcMs: Date.UTC(1974, 2, 24, 16, 15), lat: 32.516, lon: -93.7321 };
+    const inp = { utcMs: Date.UTC(1983, 11, 15, 9, 20), lat: 39.7392, lon: -104.9903 };
     const v = vedic(eph, inp);
     const t = natalPositions(eph, inp, DEFAULT_ASTRO).result;
     for (const [vid, tid] of [['Sun', 'sun'], ['Moon', 'moon'], ['Saturn', 'saturn'], ['Rahu', 'meanNode']]) {
@@ -61,7 +61,7 @@ describe('Vedic', () => {
   });
   it('Vimshottari: 120 years; nine dashas from birth cover 120 years minus the elapsed part of the first', () => {
     expect(DASHA.reduce((s, [, y]) => s + y, 0)).toBe(120);
-    const inp = { utcMs: Date.UTC(1974, 2, 24, 16, 15), lat: 32.516, lon: -93.7321 };
+    const inp = { utcMs: Date.UTC(1983, 11, 15, 9, 20), lat: 39.7392, lon: -104.9903 };
     const r = vedic(eph, inp);
     const yearMs = 365.25 * 86_400_000;
     expect(r.dashas[0]!.startMs).toBeLessThanOrEqual(inp.utcMs);
@@ -104,7 +104,7 @@ describe('Flying Star', () => {
     expect(periodOf(2026)).toBe(9);
     expect(periodOf(2023)).toBe(8);
     expect(periodOf(2004)).toBe(8);
-    expect(periodOf(1974)).toBe(6); // 1964-1983
+    expect(periodOf(1983)).toBe(6); // 1964-1983
     expect([2024, 2025, 2026, 2027].map(annualCentre)).toEqual([3, 2, 1, 9]);
   });
   it('flags facings near a mountain edge', () => {
@@ -114,9 +114,9 @@ describe('Flying Star', () => {
 });
 
 describe('Eight Mansions', () => {
-  it('Kua: 1974 male 8, female 7; 2000 male 9, female 6; 5 becomes 2 or 8', () => {
-    expect(kua(1974, 'male')).toBe(8);
-    expect(kua(1974, 'female')).toBe(7);
+  it('Kua: 1983 male 8, female 7; 2000 male 9, female 6; 5 becomes 2 or 8', () => {
+    expect(kua(1983, 'male')).toBe(8);
+    expect(kua(1983, 'female')).toBe(7);
     expect(kua(2000, 'male')).toBe(9);
     expect(kua(2000, 'female')).toBe(6);
     expect(kua(1977, 'male')).toBe(2); // 10 - 5 = 5 -> 2
@@ -152,13 +152,14 @@ describe('Eight Mansions', () => {
 
 describe('Feng Shui record', () => {
   it('true bearing = magnetic + declination, and both are stored', () => {
-    const r = computeFengShui({ bearing: 180, north: 'magnetic', lat: 32.516, lon: -93.7321, dateMs: Date.UTC(2026, 9, 10), builtYear: 2010, birthSolarYear: 1974, currentSolarYear: 2026 }).raw_result;
+    const r = computeFengShui({ bearing: 180, north: 'magnetic', lat: 39.7392, lon: -104.9903, dateMs: Date.UTC(2026, 9, 10), builtYear: 2010, birthSolarYear: 1983, currentSolarYear: 2026 }).raw_result;
     expect(r.magneticBearing).toBe(180);
     expect(r.trueBearing).toBeCloseTo(180 + r.declination.degrees, 1);
     expect(r.declination.model).toMatch(/WMM/);
-    expect(Math.abs(r.declination.degrees)).toBeLessThan(5);
+    expect(r.declination.degrees).toBeGreaterThan(5); // Denver: about 7.5° east
+    expect(r.declination.degrees).toBeLessThan(10);
     expect(r.flyingStar.period).toBe(8);
     expect(r.annual.C).toBe(1);
-    expect(r.kua).toEqual({ male: 8, female: 7, solarYear: 1974 });
+    expect(r.kua).toEqual({ male: 8, female: 7, solarYear: 1983 });
   });
 });

@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-CHANGE_BRIEF_2 work plan (docs/NEXT_STEPS.md), started 2026-10-11. Step 0 (housekeeping) done; Step 1 (scrub, prepare only) next.
+CHANGE_BRIEF_2 work plan (docs/NEXT_STEPS.md), started 2026-10-11. Steps 0 and 1 done (Step 1 prepared only: the account steps are the owner's). Waiting for the owner before Step 2.
 
 Earlier: P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). The owner's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
 
@@ -70,8 +70,8 @@ Earlier: P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `clau
 - All browser checks (p1, p3–p7, offline) pass on the CSP build with no console errors and no horizontal scroll at 390 px. 162 unit tests pass; CI green through P5 at time of writing.
 
 ### Not verified (honest list)
-- Live deploy: Pages deploy from `main` succeeded on 2026-10-11 (https://danladi324-del.github.io/Metaphysics-/); the page itself has not been loaded from this environment (github.io unreachable here).
-- Personal data: names were removed from the working tree on 2026-10-11; reference chart R1's birth instant and coordinates remain (the fixtures need them), and earlier git history still contains the names.
+- Live deploy: Pages deploy from `main` succeeded on 2026-10-11 (the github.io project URL); the page itself has not been loaded from this environment (github.io unreachable here). To be replaced by Cloudflare Pages (Step 1 plan).
+- Personal data: the working tree is clean as of Step 1 (scanner, 0 hits); the old repo's history, PR text and the deployed github.io bundle still carry it until the owner runs `docs/SCRUB_PLAN.md`.
 - Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on the owner's iOS version, and install-to-Home-Screen.
 - External fixtures: 7 from the owner's apps (D-028). Still no awkward-case (midnight/DST) external fixture.
 - Flying Star fixture is from memory of a published chart.
@@ -84,6 +84,15 @@ Earlier: P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `clau
 - One build brief: `docs/BUILD_BRIEF.md` (the owner's new copy, first name replaced by "the owner"); the root copy is deleted and `CLAUDE.md` points at the four controlling files.
 - Stale lines fixed here and in CONVENTIONS.md (Astrodienst and Qi Men fixtures done, node/Lilith/Zi/true-solar-time defaults, luck pillars, deploy).
 - Tests: 187 passing (biorhythm tests removed, scope test added).
+
+### Step 1 Scrub, prepared — done 2026-10-11 (D-032); account steps are the owner's
+- Inventory: `docs/SCRUB_REPORT.md` (locations only). All 28 commits of the old public repo, PR #1–#4 text, the github.io bundle and 8 commits' author metadata carry personal data.
+- Working tree cleaned: every public test and e2e script uses the fictitious sample chart S1 (1983-12-15 02:20 MST, Denver) or Chicago. The owner's reference-chart tests moved to `tests/private/` (gitignored; run in CI from the `PRIVATE_TESTS_B64` secret). The scanner finds 0 hits in the tree and in `dist/` (both base paths).
+- Guard: `scripts/scrub.mjs` (locations only, never values; tested) and a CI step that fails on any hit in tree, build or history when the `SCRUB_PATTERNS` secret is set.
+- Hosting prepared: `BASE_PATH` build variable; manifest scope/start_url and fonts follow it; a root build checked clean. Plan and exact commands: `docs/SCRUB_PLAN.md`.
+- Backup: export → wipe → reload → restore verified in headless Chromium with sample data (`scripts/e2e-p1.cjs`), plus the existing unit round-trip test. The owner's real export is UNVERIFIED (on the phone).
+- Tests: 177 public + 15 private, all passing. Browser checks p1, p3 and sources pass with the sample chart.
+- UNVERIFIED: Cloudflare Pages building from a private GitHub repo on the free plan (docs unreachable from here; fallback in the plan); the deployed site scan (needs the new URL).
 
 ## Decisions applied 2026-10-10
 - House system, zodiac, birth name and sex set by the owner (D-024); tarot reversals and Qi Men school delegated (D-025, D-027); BaZi luck pillars added (D-026).

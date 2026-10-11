@@ -7,11 +7,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      # The owner's reference-chart tests hold birth data, so they live outside the repo (D-032).
+      # Secret PRIVATE_TESTS_B64 = base64 of a .tar.gz of tests/private/.
+      - name: Private fixture tests (if the secret is set)
+        env:
+          PRIVATE_TESTS_B64: ${{ secrets.PRIVATE_TESTS_B64 }}
+        run: |
+          if [ -n "$PRIVATE_TESTS_B64" ]; then
+            mkdir -p tests/private && echo "$PRIVATE_TESTS_B64" | base64 -d | tar -xz -C tests/private
+            echo "Private fixture tests: $(ls tests/private | wc -l) files"
+          else
+            echo "::warning::PRIVATE_TESTS_B64 not set: the owner's reference fixtures were not run."
+          fi
       - run: npm test
       - run: npx vite build
+      # Personal-data guard (CHANGE_BRIEF_2 A7). Secret SCRUB_PATTERNS = one "label<TAB>regex" per line.
+      # Fails on any hit in the tree, the build output or any commit. Prints locations only.
+      - name: Personal-data scan
+        env:
+          SCRUB_PATTERNS: ${{ secrets.SCRUB_PATTERNS }}
+        run: |
+          if [ -n "$SCRUB_PATTERNS" ]; then node scripts/scrub.mjs --history; else echo "::warning::SCRUB_PATTERNS not set: personal-data scan skipped."; fi
