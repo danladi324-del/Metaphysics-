@@ -3,7 +3,8 @@ import preact from '@preact/preset-vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Served at /Metaphysics-/ on the old GitHub Pages site; the Cloudflare Pages build sets BASE_PATH=/ (docs/SCRUB_PLAN.md).
-const base = process.env.BASE_PATH ?? '/Metaphysics-/';
+const raw = process.env.BASE_PATH?.trim() || '/Metaphysics-/';
+const base = `/${raw.replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
 
 export default defineConfig({
   base,

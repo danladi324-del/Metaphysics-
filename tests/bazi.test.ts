@@ -115,3 +115,29 @@ describe('luck pillars', () => {
     expect(typeof luckPillars).toBe('function');
   });
 });
+
+describe('true solar time and luck pillars away from the zone meridian (sample charts, no personal data)', () => {
+  // Madrid, 2001-06-15 11:20 CEST (09:20 UT). Longitude 3.70° W sits 18.7° west of the CEST meridian (30° E for UTC+2),
+  // so local mean time is 09:20 UT − 14.8 min ≈ 09:05; the equation of time is under 1 minute in mid-June.
+  const MADRID = { utcMs: Date.UTC(2001, 5, 15, 9, 20), zone: 'Europe/Madrid', lat: 40.4168, lon: -3.7038 };
+  it('moves the hour pillar from Wu (11-13 clock) to Si (09-11 solar) and logs the split', () => {
+    const rec = computeBazi(eph, MADRID, { ziHour: 'early', trueSolarTime: false });
+    const clock = rec.raw_result.chosen;
+    const tst = rec.raw_result.variants.find((v) => v.conventions.trueSolarTime && v.conventions.ziHour === 'early')!.chart;
+    expect(clock.timeUsed.slice(11)).toBe('11:20');
+    const [h, m] = tst.timeUsed.slice(11).split(':').map(Number) as [number, number];
+    expect(Math.abs(h * 60 + m - (9 * 60 + 5))).toBeLessThanOrEqual(3);
+    expect(gz(clock.hour).slice(1)).toBe('午');
+    expect(gz(tst.hour).slice(1)).toBe('巳');
+    expect(baziDisagreements(rec, null).some((d) => d.subject === 'Hour pillar' && d.cause === 'convention: true solar time')).toBe(true);
+  });
+  it('luck-pillar start depends on the absolute instant only: the same instant read in another zone gives the same start', () => {
+    for (const ms of [Date.UTC(1991, 3, 2, 3, 0), Date.UTC(2005, 9, 20, 22, 30)]) {
+      const a = computeBazi(eph, { utcMs: ms, zone: 'America/New_York', lat: 40.7128, lon: -74.006, sex: 'female' }, { ziHour: 'early', trueSolarTime: false }).raw_result.luck!;
+      const b = computeBazi(eph, { utcMs: ms, zone: 'Asia/Shanghai', lat: 31.2, lon: 121.5, sex: 'female' }, { ziHour: 'early', trueSolarTime: false }).raw_result.luck!;
+      expect(Math.abs(a.daysToTerm - b.daysToTerm)).toBeLessThan(1e-6);
+      expect(a.startUtcMs).toBe(b.startUtcMs);
+    }
+  });
+});
+

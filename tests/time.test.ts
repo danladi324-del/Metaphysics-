@@ -10,7 +10,7 @@ describe('resolveLocal', () => {
     expect(new Date(r.result.utcMs).toISOString()).toBe('1974-02-10T15:30:00.000Z');
   });
 
-  it('the same date one year later was standard time (emergency DST began 1975-02-23)', () => {
+  it('the following winter was standard time until emergency DST resumed on 1975-02-23', () => {
     expect(zoneOffsetSeconds('America/Chicago', Date.UTC(1975, 1, 1, 12))).toBe(-6 * 3600);
     expect(zoneOffsetSeconds('America/Chicago', Date.UTC(1975, 2, 1, 12))).toBe(-5 * 3600);
   });

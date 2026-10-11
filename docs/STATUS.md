@@ -91,7 +91,7 @@ Earlier: P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `clau
 - Guard: `scripts/scrub.mjs` (locations only, never values; tested) and a CI step that fails on any hit in tree, build or history when the `SCRUB_PATTERNS` secret is set.
 - Hosting prepared: `BASE_PATH` build variable; manifest scope/start_url and fonts follow it; a root build checked clean. Plan and exact commands: `docs/SCRUB_PLAN.md`.
 - Backup: export → wipe → reload → restore verified in headless Chromium with sample data (`scripts/e2e-p1.cjs`), plus the existing unit round-trip test. The owner's real export is UNVERIFIED (on the phone).
-- Tests: 177 public + 15 private, all passing. Browser checks p1, p3 and sources pass with the sample chart.
+- Tests: 180 public + 15 private, all passing. An independent review pass (separate agent) checked the test changes and the scanner: it found a pattern-echo leak in the scanner's error path, one leftover owner-derived value in a test, and two calculation checks (true-solar hour shift, luck-pillar start outside China) that had become private-only. All fixed: the scanner reports a bad pattern by line and label only (tested), and public tests now cover true solar time on a Madrid sample and luck-pillar zone independence. Browser checks p1, p3 and sources pass with the sample chart.
 - UNVERIFIED: Cloudflare Pages building from a private GitHub repo on the free plan (docs unreachable from here; fallback in the plan); the deployed site scan (needs the new URL).
 
 ## Decisions applied 2026-10-10

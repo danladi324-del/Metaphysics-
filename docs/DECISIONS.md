@@ -154,7 +154,7 @@ Reverse if: the owner loads a source whose author defines reversals by one gener
 ## D-026 BaZi luck pillars
 - Direction: forward for yang year stem + male or yin year stem + female; otherwise backward.
 - Start: days from birth to the next (forward) or previous (backward) month-boundary solar term, 3 days = 1 calendar year, minute precision, added as continuous time.
-- Solar terms are absolute instants. lunar-javascript reads the birth clock as Beijing time, which is right for births in China and wrong elsewhere: for reference chart R1 (America/Chicago) that shifts the start by about two months. Tested against lunar-javascript on 120 Shanghai births: direction and pillars identical, start dates within 3 days (it adds calendar components, this adds continuous time).
+- Solar terms are absolute instants. lunar-javascript reads the birth clock as Beijing time, which is right for births in China and wrong elsewhere: for a birth in the Americas that shifts the start by weeks (about two months for the owner's chart). Tested against lunar-javascript on 120 Shanghai births: direction and pillars identical, start dates within 3 days (it adds calendar components, this adds continuous time).
 - A bug found while testing: the first version converted days with "1 day = 120 days", which silently assumes 360-day years and drifted ~5 weeks over 7 years. Fixed.
 
 ## D-027 Qi Men school: Chai Bu (delegated to Claude)

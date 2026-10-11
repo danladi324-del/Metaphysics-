@@ -36,7 +36,7 @@ describe('shadow prompts never assert', () => {
     }
   });
   it('filled prompts stay non-assertive', () => {
-    for (const q of [...promptsFor({ id: 'saturn', title: 'Saturn', fact: 'Saturn 28°21′ Gemini.', keys: [], split: null }), ...cardPrompts('The Tower', true)]) {
+    for (const q of [...promptsFor({ id: 'saturn', title: 'Saturn', fact: 'Saturn 12°23′ Scorpio.', keys: [], split: null }), ...cardPrompts('The Tower', true)]) {
       expect(ASSERTIVE.test(q.text)).toBe(false);
     }
   });

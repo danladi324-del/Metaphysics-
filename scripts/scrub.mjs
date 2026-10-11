@@ -4,21 +4,28 @@
 // environment variable (a CI secret): one "label<TAB>regex" per line, # for comments. Matching is case-insensitive.
 //
 //   node scripts/scrub.mjs            scan the working tree (git ls-files plus dist/ if present); exit 1 on any hit
-//   node scripts/scrub.mjs --history  also scan every commit reachable from any ref (including fetched PR refs)
+//   node scripts/scrub.mjs --history  also scan every commit reachable from any local ref (fetch refs/pull/* first to include them)
+// Not scanned: binary files (images, PDFs, wasm, fonts), file names, branch and tag names, tag messages; patterns match within one line.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 export function parsePatterns(text) {
-  return text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith('#'))
-    .map((l) => {
-      const i = l.indexOf('\t');
-      if (i < 0) throw new Error('pattern line without a TAB between label and regex');
-      return { label: l.slice(0, i), re: new RegExp(l.slice(i + 1), 'gi') };
-    });
+  const out = [];
+  text.split('\n').forEach((raw, n) => {
+    const l = raw.trim();
+    if (!l || l.startsWith('#')) return;
+    const i = l.indexOf('\t');
+    if (i < 0) throw new Error(`pattern line ${n + 1}: no TAB between label and regex`);
+    const label = l.slice(0, i);
+    try {
+      out.push({ label, re: new RegExp(l.slice(i + 1), 'gi') });
+    } catch {
+      // The engine's own message quotes the regex, which is the secret; report only where it is.
+      throw new Error(`pattern line ${n + 1} (${label}): not a valid regular expression`);
+    }
+  });
+  return out;
 }
 
 export function scanText(patterns, where, text) {
@@ -57,7 +64,8 @@ function main() {
   }
   const patterns = parsePatterns(src);
   const hits = [];
-  const files = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' }).split('\0').filter(Boolean);
+  // Tracked files plus untracked files that are not ignored (so a local run sees new docs before `git add`).
+  const files = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' }).split('\0').filter(Boolean);
   if (existsSync('dist')) files.push(...walk('dist'));
   for (const f of files) if (!BINARY.test(f) && !allowed(f) && existsSync(f)) hits.push(...scanText(patterns, f, readFileSync(f, 'utf8')));
   if (process.argv.includes('--history')) {

@@ -6,7 +6,7 @@ Nothing here has been run. The old public repository is not touched until step 8
 1. **Backup.** Open the installed app → Lab → **Export all records** → Save to Files. Open the file once in Files to see it is not empty. Do not continue until this is done (A1).
 2. **Keep the two private files** Claude sends with this report (they hold birth data and must never be committed):
    - `scrub-patterns.txt`: the strings the CI guard searches for.
-   - `private-tests.b64`: the owner's reference-chart tests (Astrodienst, BaZi app, planetary hours, Kymon), base64 of a .tar.gz.
+   - `private-tests.b64`: the owner's reference-chart tests (Astrodienst, BaZi app, planetary hours, Kymon), base64 of a .tar.gz. Built with `tar -czf - -C tests/private . | base64 -w0` (files must sit directly in `tests/private/`, because they import `../../src`).
 3. GitHub → Settings → Emails: tick **Keep my email addresses private** and **Block command line pushes that expose my email**. From then on, web uploads are authored with a noreply address.
 
 ## 1. New private repository (owner)

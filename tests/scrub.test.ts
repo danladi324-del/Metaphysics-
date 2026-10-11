@@ -29,6 +29,18 @@ describe('scrub scanner', () => {
     expect(allowed('tests/natal.test.ts')).toBe(false);
   });
 
+  it('a malformed pattern is refused by line number and label, never echoing the regex', () => {
+    let msg = '';
+    try {
+      parsePatterns('ok\tfine\nsecret label\tTopSecretValue(');
+    } catch (e) {
+      msg = (e as Error).message;
+    }
+    expect(msg).toMatch(/line 2/);
+    expect(msg).toMatch(/secret label/);
+    expect(msg).not.toMatch(/TopSecretValue/);
+  });
+
   it('a clean text has no hits', () => {
     expect(scanText(parsePatterns(PATTERNS), 'b.ts', 'sample chart, no personal data')).toEqual([]);
   });
