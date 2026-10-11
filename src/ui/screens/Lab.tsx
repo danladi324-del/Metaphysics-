@@ -249,7 +249,9 @@ function ContentSection() {
   const approved = Number(db.all("SELECT COUNT(*) AS n FROM snippet WHERE label = 'traditional' AND approved = 1")[0]?.n ?? 0);
   const synth = Number(db.all("SELECT COUNT(*) AS n FROM snippet WHERE label = 'synthesis'")[0]?.n ?? 0);
 
-  const shown = pending.slice(0, 30);
+  const [filter, setFilter] = useState('');
+  const matching = filter.trim() ? pending.filter((s) => s.key.includes(filter.trim().toLowerCase())) : pending;
+  const shown = matching.slice(0, 30);
   const shownIds = shown.map((s) => s.id).join('|');
   const [excerpts, setExcerpts] = useState<Map<string, string>>(new Map());
   useEffect(() => {
@@ -326,7 +328,13 @@ function ContentSection() {
       <p class="note small">Templates list every key an engine reads. Fill in text, source and locator, then import. Traditional entries arrive unapproved.</p>
       {msg && <p class="note" role="status">{msg}</p>}
       {pending.length > 0 && <h3>Awaiting your approval</h3>}
-      {pending.length > shown.length && <p class="note small">Showing {shown.length} of {pending.length}.</p>}
+      {pending.length > 0 && (
+        <label>
+          Filter by key (e.g. natal.sun)
+          <input value={filter} onInput={(e) => setFilter(e.currentTarget.value)} />
+        </label>
+      )}
+      {matching.length > shown.length && <p class="note small">Showing {shown.length} of {matching.length}.</p>}
       {shown.map((sn) => (
         <div class="card">
           <div class="small muted">

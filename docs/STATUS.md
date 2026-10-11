@@ -73,7 +73,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 - Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on the owner's iOS version, and install-to-Home-Screen.
 - External fixtures: 7 from the owner's apps (D-028). Still no awkward-case (midnight/DST) external fixture.
 - Flying Star fixture is from memory of a published chart.
-- No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information". Astrology sources Lilly 1647, Leo *Astrology for All* and Heindel 1918 are registered (D-029) but blocked from download by this session's network policy.
+- No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information". Exception: Heindel 1918 is loaded, with 216 natal paraphrases bundled and awaiting the owner's approval (D-030); Lilly is loaded but has no pack; Leo is registered only.
 
 
 ## Decisions applied 2026-10-10
@@ -84,7 +84,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 
 ## Still owed by the owner (brief §8)
 - Optional: one awkward-case chart (a midnight or DST-change birth) from Astrodienst, to exercise the boundary code against an outside source.
-- Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional. Astrology sources chosen 2026-10-11 (D-029); their text still has to reach the repo, either as files the owner supplies or by allowing archive.org / hathitrust.org in the environment's network settings.
+- Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional. Astrology sources chosen 2026-10-11 (D-029). Heindel and Lilly texts supplied; Heindel pack built (D-030). To do: approve or reject the 216 Heindel paraphrases in Lab; supply Leo's *Astrology for All* if wanted.
 
 ## Design canvas: what it lacks
 The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet cover:
@@ -103,7 +103,7 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Numerology | TEST | letter tables not yet checked against source scans |
 | Biorhythm, moon, planetary hours, I Ching | TEST | I Ching text not loaded |
 | Tarot | TEST | text placeholders until sources are loaded |
-| Content layer | TEST | approval gate, packs, templates |
+| Content layer | TEST | approval gate, packs, templates; built-in Heindel natal pack (216, unapproved) |
 | Composer, journal, outcomes | TEST | P5 |
 | BaZi, Tzolk'in, Vedic | TEST | own BaZi, lunar-javascript as test oracle (D-016) |
 | Feng Shui | TEST | Flying Star fixture from memory; needs reference screenshot |
