@@ -219,3 +219,9 @@ The owner uploaded OCR texts of Heindel (3rd ed., text copyright 1918) and Lilly
 - **Supersedes D-007** once the move is done.
 **Reverse if:** the owner prefers fixture inputs inside the private repo (Part A3 default): then move `tests/private/` back and drop the secret.
 
+
+## D-033 Owner's answers to the Step 1 report (2026-10-11)
+- **Reference-chart tests stay out of the repository** (confirms D-032): `tests/private/`, gitignored, run in CI from the `PRIVATE_TESTS_B64` secret.
+- **Heindel paraphrases are not the interpretation layer.** The 216 stay in the content pack and are not deleted (B11); the owner will add reference publications to the new repository as the grounding corpus. Rule that applies to every upload: only public-domain texts with edition and US status verified and recorded in SOURCES.md go in the repository. A copyrighted book the owner owns never goes in any repository, private or not (Part B3): it is imported on the device only.
+- **Interpreting model: undecided.** Step 2 is built against a provider interface (one adapter per vendor, mocked in tests). The model id, endpoint and the one extra CSP `connect-src` origin are settings chosen when the owner picks; nothing is sent until then.
+- **New repository:** `Sovereign-Lattice-Architecture`, private (checked 2026-10-11). It was created with a README commit authored with the owner's display name and personal email, so the one-commit import (plan step 3) must replace that commit; that is a force-push and waits for the owner's explicit yes.
