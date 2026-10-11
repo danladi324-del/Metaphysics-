@@ -3,7 +3,12 @@ import { LENSES, saveSnippet, sources, type Lens, type Snippet, type Source } fr
 
 export const PACK_FORMAT = 'metaphysics-content';
 
-export type PackSnippet = Omit<Snippet, 'approved' | 'placeholder' | 'version' | 'themes'> & { version?: number; themes?: string[] };
+export type PackSnippet = Omit<Snippet, 'approved' | 'placeholder' | 'version' | 'themes'> & {
+  version?: number;
+  themes?: string[];
+  /** The public-domain passage paraphrased, shown beside the paraphrase when the owner approves it. Not stored. */
+  excerpt?: string;
+};
 
 /** A content pack: sources, snippets and declared interpretation splits, loaded from a JSON file. */
 export interface ContentPack {
@@ -73,7 +78,7 @@ export function validatePack(raw: unknown, known: Set<string>): { pack: ContentP
   return { pack: { ...p, snippets: filled }, warnings };
 }
 
-/** Import a validated pack. Traditional snippets always arrive unapproved: approval happens in the app (brief §8). */
+/** Import a validated pack. New or changed snippets always arrive unapproved: approval happens in the app (brief §8). */
 export function importPack(db: Db, raw: unknown, now = new Date()): PackReport {
   const known = new Set(sources(db).map((s) => s.id));
   const { pack, warnings } = validatePack(raw, known);
@@ -85,6 +90,9 @@ export function importPack(db: Db, raw: unknown, now = new Date()): PackReport {
     }
   });
   for (const s of pack.snippets ?? []) {
+    // Re-importing an unchanged snippet keeps the owner's approval; any change to text, source or locator revokes it.
+    const prev = db.all('SELECT text, source_id, source_locator, approved FROM snippet WHERE id = ?', [s.id])[0];
+    const unchanged = !!prev && prev.text === s.text.trim() && (prev.source_id ?? null) === (s.source_id ?? null) && (prev.source_locator ?? null) === (s.source_locator ?? null);
     saveSnippet(db, {
       id: s.id,
       key: s.key,
@@ -98,7 +106,7 @@ export function importPack(db: Db, raw: unknown, now = new Date()): PackReport {
       version: s.version ?? 1,
       authored_by: s.authored_by,
       placeholder: false,
-      approved: false,
+      approved: unchanged && Number(prev!.approved) === 1,
       themes: (s.themes ?? []).map((t) => t.trim().toLowerCase()).filter(Boolean)
     });
   }

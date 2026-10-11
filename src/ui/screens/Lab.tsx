@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'preact/hooks';
 import { loadCities, searchCities, type City } from '../../core/cities';
 import { KEY_SETS } from '../../content/keys';
-import { approveSnippet, rowToSnippet, sources } from '../../content/model';
+import { approveSnippet, deleteSnippet, rowToSnippet, sources } from '../../content/model';
+import { BUNDLED_PACKS, excerptsFor } from '../../content/packs';
 import { importPack, templatePack } from '../../content/pack';
 import { FIT_LABEL, summarize } from '../../core/outcomes';
 import { backupStatus, exportJson, parseExport, restore } from '../../core/backup';
@@ -248,6 +249,25 @@ function ContentSection() {
   const approved = Number(db.all("SELECT COUNT(*) AS n FROM snippet WHERE label = 'traditional' AND approved = 1")[0]?.n ?? 0);
   const synth = Number(db.all("SELECT COUNT(*) AS n FROM snippet WHERE label = 'synthesis'")[0]?.n ?? 0);
 
+  const shown = pending.slice(0, 30);
+  const shownIds = shown.map((s) => s.id).join('|');
+  const [excerpts, setExcerpts] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    if (!shownIds) return;
+    void excerptsFor(shownIds.split('|')).then(setExcerpts);
+  }, [shownIds]);
+
+  async function onBundled(id: string) {
+    const p = BUNDLED_PACKS.find((x) => x.id === id)!;
+    try {
+      const r = importPack(db, await p.load());
+      setMsg(`Imported ${r.snippets} snippets from ${p.title}. Unchanged snippets keep their approval; new ones await it.${r.warnings.length ? ' Warnings: ' + r.warnings.join(' ') : ''}`);
+      bump();
+    } catch (e) {
+      setMsg(`Pack refused: ${(e as Error).message} Nothing was imported.`);
+    }
+  }
+
   async function onPack(file: File) {
     try {
       const r = importPack(db, JSON.parse(await file.text()));
@@ -275,6 +295,19 @@ function ContentSection() {
           </>
         ))}
       </div>
+      <h3>Built-in packs</h3>
+      {BUNDLED_PACKS.map((p) => {
+        const n = Number(db.all('SELECT COUNT(*) AS n FROM snippet WHERE source_id = ?', [p.sourceId])[0]?.n ?? 0);
+        return (
+          <div class="row" style={{ justifyContent: 'space-between', gap: '8px' }}>
+            <div class="small">
+              {p.title}
+              <span class="muted"> · {n ? `${n} snippets in the database` : 'not imported'}</span>
+            </div>
+            <button class="chip" onClick={() => void onBundled(p.id)}>{n ? 'Re-import' : 'Import'}</button>
+          </div>
+        );
+      })}
       <label class="btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         Import a content pack
         <input type="file" accept="application/json,.json" class="visually-hidden" onChange={(e) => {
@@ -293,16 +326,28 @@ function ContentSection() {
       <p class="note small">Templates list every key an engine reads. Fill in text, source and locator, then import. Traditional entries arrive unapproved.</p>
       {msg && <p class="note" role="status">{msg}</p>}
       {pending.length > 0 && <h3>Awaiting your approval</h3>}
-      {pending.slice(0, 30).map((sn) => (
+      {pending.length > shown.length && <p class="note small">Showing {shown.length} of {pending.length}.</p>}
+      {shown.map((sn) => (
         <div class="card">
           <div class="small muted">
             {sn.key} · {sn.lens}
             {sn.reversal_mode ? ` · ${sn.reversal_mode}` : ''} · {sn.source_id}, {sn.source_locator}
           </div>
           <p class="serif">{sn.text}</p>
-          <button class="btn" onClick={() => { approveSnippet(db, sn.id, true); bump(); }}>
-            Approve as a faithful paraphrase
-          </button>
+          {excerpts.has(sn.id) && (
+            <details>
+              <summary class="small">Source passage (OCR)</summary>
+              <p class="small muted">{excerpts.get(sn.id)}</p>
+            </details>
+          )}
+          <div class="row" style={{ gap: '8px' }}>
+            <button class="btn" onClick={() => { approveSnippet(db, sn.id, true); bump(); }}>
+              Approve as a faithful paraphrase
+            </button>
+            <button class="btn" onClick={() => { deleteSnippet(db, sn.id); bump(); }}>
+              Reject
+            </button>
+          </div>
         </div>
       ))}
     </section>

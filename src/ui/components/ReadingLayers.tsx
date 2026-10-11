@@ -1,13 +1,15 @@
-import type { Lens } from '../../content/model';
+import { HOUSE_SYSTEM_LABEL } from '../../core/conventions';
+import { SOURCE_HOUSE_BASIS, type Lens } from '../../content/model';
 import { selectLayers } from '../../content/select';
 import { useStore } from '../store';
 import { Label } from './Label';
 
 /** Traditional (one per source) and Synthesis layers for a snippet key. Every block shows its snippet id. */
 export function ReadingLayers({ snippetKey, lens, reversalMode = null }: { snippetKey: string; lens: Lens; reversalMode?: string | null }) {
-  const { db, version } = useStore();
+  const { db, version, settings } = useStore();
   void version;
   const l = selectLayers(db, snippetKey, lens, reversalMode);
+  const houseKey = /\.house\.\d+$/.test(snippetKey);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {l.traditional.map((t) => (
@@ -18,6 +20,11 @@ export function ReadingLayers({ snippetKey, lens, reversalMode = null }: { snipp
             snippet {t.snippetId}
             {t.lensUsed !== lens ? ` · no ${lens} reading stored, showing ${t.lensUsed}` : ''}
           </div>
+          {houseKey && t.sourceId && SOURCE_HOUSE_BASIS[t.sourceId] && (
+            <div class="small muted">
+              Written for {SOURCE_HOUSE_BASIS[t.sourceId]}; this chart uses {HOUSE_SYSTEM_LABEL[settings.astro.houseSystem]} houses.
+            </div>
+          )}
         </div>
       ))}
       <div>

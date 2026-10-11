@@ -2,7 +2,7 @@ import initSqlJs from 'sql.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { exportJson, parseExport, restore } from '../src/core/backup';
 import { Db, SCHEMA_VERSION } from '../src/core/db';
-import { approveSnippet, seedSources, sources } from '../src/content/model';
+import { approveSnippet, deleteSnippet, seedSources, sources } from '../src/content/model';
 import { importPack, templatePack, validatePack } from '../src/content/pack';
 import { selectLayers } from '../src/content/select';
 import { DECK, allTarotKeys, majorNumber, roman, CARD_BY_ID } from '../src/content/tarot';
@@ -30,7 +30,27 @@ describe('content selection', () => {
     const s = sources(db);
     expect(s.map((x) => x.id)).toEqual(expect.arrayContaining(['lilly1647', 'leo-afa', 'heindel1918']));
     expect(s.find((x) => x.id === 'waite1911')!.notes).toBe('owner edit');
-    expect(s.filter((x) => ['lilly1647', 'leo-afa', 'heindel1918'].includes(x.id)).every((x) => x.status === 'registered')).toBe(true);
+    expect(s.find((x) => x.id === 'leo-afa')!.status).toBe('registered');
+    expect(s.find((x) => x.id === 'heindel1918')!.status).toBe('loaded');
+  });
+
+  it('a source whose text arrives later is upgraded to loaded on the next seed', () => {
+    const db = fresh();
+    db.run("UPDATE source SET status = 'registered' WHERE id = 'heindel1918'");
+    seedSources(db);
+    expect(sources(db).find((x) => x.id === 'heindel1918')!.status).toBe('loaded');
+  });
+
+  it('re-importing an unchanged snippet keeps its approval; a changed one loses it; a rejected one is gone', () => {
+    const db = fresh();
+    importPack(db, pack([trad]));
+    approveSnippet(db, trad.id, true);
+    importPack(db, pack([trad]));
+    expect(selectLayers(db, trad.key, 'general').traditional[0]!.label).toBe('traditional');
+    importPack(db, pack([{ ...trad, source_locator: 'Part II, XVII' }]));
+    expect(selectLayers(db, trad.key, 'general').traditional[0]!.label).toBe('synthesis');
+    deleteSnippet(db, trad.id);
+    expect(selectLayers(db, trad.key, 'general').traditional[0]!.placeholder).toBe(true);
   });
 
   it('a traditional natal paraphrase citing a registered astrology source is accepted', () => {
