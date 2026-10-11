@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-CHANGE_BRIEF_2 work plan (docs/NEXT_STEPS.md), started 2026-10-11. Steps 0 and 1 done (Step 1 prepared only: the account steps are the owner's). Waiting for the owner before Step 2.
+CHANGE_BRIEF_2 work plan (docs/NEXT_STEPS.md), started 2026-10-11. Steps 0 and 1 done. The owner answered (D-033) and created the new private repo; the one-commit import waits on the owner's yes to replace its README commit.
 
 Earlier: P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). The owner's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
 
