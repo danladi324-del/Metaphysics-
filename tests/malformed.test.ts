@@ -3,7 +3,6 @@ import { canonicalJson } from '../src/core/canonical';
 import { DEFAULT_ASTRO } from '../src/core/conventions';
 import { validateRecord } from '../src/core/record';
 import { computeBazi } from '../src/engines/bazi/compute';
-import { computeBiorhythm } from '../src/engines/biorhythm/compute';
 import { computeFengShui } from '../src/engines/fengshui/compute';
 import { computeHours } from '../src/engines/hours/compute';
 import { computeMoon } from '../src/engines/moon/compute';
@@ -29,7 +28,7 @@ describe('engines refuse malformed input', () => {
     expect(() => computeNatal(eph, { utcMs: Date.UTC(5000, 0, 1), lat: 0, lon: 0 }, DEFAULT_ASTRO)).toThrow(/range/);
   });
   it('dates that do not exist', () => {
-    expect(() => computeBiorhythm({ year: 2001, month: 2, day: 29 }, { year: 2026, month: 1, day: 1 })).toThrow(/no such date/);
+    expect(() => computeTzolkin({ year: 2001, month: 2, day: 29 })).toThrow(/no such date/);
     expect(() => computeNumerology({ name: 'A', year: 2000, month: 13, day: 1 })).toThrow(/no such date/);
     expect(() => computeTzolkin({ year: 2000, month: 4, day: 31 })).toThrow(/no such date/);
   });
@@ -61,7 +60,7 @@ describe('fuzz: junk never produces NaN or an invalid record', () => {
         check(() => computeVedic(eph, { utcMs: a as number, lat: b as number, lon: 0 }));
         check(() => computeMoon(eph, a as number));
         check(() => computeHours(a as number, b as number, 0, () => 0));
-        check(() => computeBiorhythm({ year: a as number, month: 1, day: 1 }, { year: 2026, month: b as number, day: 1 }));
+        check(() => computeTzolkin({ year: a as number, month: b as number, day: 1 }));
         check(() => computeFengShui({ bearing: a as number, north: 'magnetic', lat: b as number, lon: 0, dateMs: Date.UTC(2026, 0, 1), builtYear: 2010, birthSolarYear: 1974, currentSolarYear: 2026 }));
       }
     }

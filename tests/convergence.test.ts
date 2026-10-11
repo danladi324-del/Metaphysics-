@@ -3,7 +3,7 @@ import { chanceWords, convergence, groupSources, simulateChance } from '../src/c
 
 const DAILY = [
   { engine: 'numerology', deps: ['birth.date', 'date'], themes: ['completion'] },
-  { engine: 'biorhythm', deps: ['birth.date', 'date'], themes: ['completion', 'rest'] },
+  { engine: 'tzolkin', deps: ['birth.date', 'date'], themes: ['completion', 'rest'] },
   { engine: 'moon', deps: ['date', 'ephemeris.swiss'], themes: [] },
   { engine: 'planetaryHours', deps: ['date', 'place', 'ephemeris.astronomy-engine'], themes: ['effort'] },
   { engine: 'iching', deps: ['random'], themes: ['completion', 'return'] },
@@ -13,7 +13,7 @@ const DAILY = [
 describe('independence grouping', () => {
   it('birth-based engines are one source, sky-based one source, each random draw its own', () => {
     const t = groupSources(DAILY);
-    expect(t.map((r) => r.engines)).toEqual([['numerology', 'biorhythm'], ['moon', 'planetaryHours'], ['iching'], ['tarot']]);
+    expect(t.map((r) => r.engines)).toEqual([['numerology', 'tzolkin'], ['moon', 'planetaryHours'], ['iching'], ['tarot']]);
     expect(t[0]!.sharedInputs).toEqual(['birth data']);
   });
   it('an engine with both birth and sky inputs merges those groups (transitively)', () => {
@@ -51,7 +51,7 @@ describe('convergence', () => {
     expect(c.table.length).toBe(4);
   });
   it('blocked when fewer than two independent sources carry approved themes', () => {
-    const c = convergence(DAILY.map((d) => (d.engine === 'numerology' || d.engine === 'biorhythm' ? d : { ...d, themes: [] })), 12);
+    const c = convergence(DAILY.map((d) => (d.engine === 'numerology' || d.engine === 'tzolkin' ? d : { ...d, themes: [] })), 12);
     expect(c.kind).toBe('blocked');
   });
   it('blocked with a vocabulary under two', () => {
@@ -81,7 +81,7 @@ describe('P6 acceptance: no convergence without its chance rate', () => {
     const rnd = seeded(99);
     const vocab = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     for (let d = 0; d < 200; d++) {
-      const items = ['numerology', 'moon', 'tarot', 'iching', 'biorhythm'].map((engine) => ({
+      const items = ['numerology', 'moon', 'tarot', 'iching', 'tzolkin'].map((engine) => ({
         engine,
         deps: engine === 'tarot' || engine === 'iching' ? ['random'] : engine === 'moon' ? ['ephemeris.swiss'] : ['birth.date'],
         themes: vocab.filter(() => rnd() < 0.25)

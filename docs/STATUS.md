@@ -3,13 +3,15 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). The owner's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
+CHANGE_BRIEF_2 work plan (docs/NEXT_STEPS.md), started 2026-10-11. Step 0 (housekeeping) done; Step 1 (scrub, prepare only) next.
+
+Earlier: P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). The owner's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
 
 ## Phase log
-### P0 Scaffold — BUILD done; deploy UNVERIFIED
+### P0 Scaffold — BUILD done
 - Works: Vite 8 + TypeScript 7 strict + Vitest 5 + vite-plugin-pwa; Preact UI shell with the canvas tab bar, tokens and self-hosted fonts; service worker precaches wasm, ephemeris file, city list and fonts; manifest + apple-touch-icon.
 - CI: `.github/workflows/ci.yml` (typecheck, tests, build on every push). `pages.yml` deploys `main` to GitHub Pages.
-- UNVERIFIED: no workflow run had registered when checked right after the first push (Actions may need enabling in repo settings). Pages deploy only runs from `main`, and this work is on `claude/intelligent-mendel-j3p880`, so the live deploy and home-screen install on an iPhone have **not** been confirmed. Pages must also be set to "GitHub Actions" as source in repo settings.
+- CI and the Pages deploy from `main` both run (first successful deploy 2026-10-11). Install on an iPhone is still UNVERIFIED.
 
 ### P1 Foundation + natal chart — TEST
 - Works: profile entry with offline city search (GeoNames), IANA zone, DST gap/overlap detection that forces a choice, "time unknown" mode; resolved UTC offset stored with the profile; record envelope with fingerprint; sql.js DB persisted to IndexedDB; JSON export via share sheet / download; validated restore (all-or-nothing); wipe; natal chart (Sun–Pluto, Chiron, mean/true node, mean/osculating Lilith, Placidus + whole sign always, any of 7 systems on demand, aspects with stored orbs); transits; next solar and lunar return; ledger rows wherever house system, node or Lilith convention changes a result; Markdown note for Obsidian.
@@ -17,7 +19,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 - Tested in headless Chromium at iPhone 13 size (`scripts/e2e-p1.cjs`): full create/export/wipe/reload/restore loop, no console errors, no horizontal scroll at 390 px.
 - Failed / fixed during the phase: wasm wrapper ignores the house-calc return code (polar fallback was silent) — now detected by latitude; wheel markers overlapped — spacing widened.
 - Assumed: Moshier ephemeris is accurate enough for natal work (agreement with astronomy-engine supports this); GeoNames 2017 snapshot is fine for coordinates and zone names.
-- UNVERIFIED: agreement with Astrodienst (no screenshots yet); iOS Safari behavior of IndexedDB persistence, share sheet and `navigator.storage.persist()`; sidereal mode (wired, untested against a reference).
+- Astrodienst agreement and sidereal mode: verified against the owner's Astrodienst screenshots (D-028). UNVERIFIED: iOS Safari behavior of IndexedDB persistence, share sheet and `navigator.storage.persist()`.
 
 ### P2 Fast engines — TEST
 - Works: numerology (Pythagorean and Chaldean side by side; Life Path, Expression, Soul Urge, Personality, Birthday, Maturity; both reduction methods with ledger rows; letter counts; missing numbers; karmic debt split into "in a total" vs "inside one part"; pinnacles, challenges; personal year/month/day); biorhythm with a 4-week chart and the not-validated warning; moon phase, sign, illumination and next four principal phases; planetary day and 24 unequal hours for the current location; I Ching casting (yarrow odds or three coins, replayable draws, primary and relating hexagram). Readings and Draw screens; "current location" setting.
@@ -56,7 +58,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 - Works: Shadow tab (pointers with house-system split, interpretive snippet slots, question prompts that write to the journal, pattern log of user tags); geomancy (shield chart from 16 random bits, replayable, composed reading for judge and witnesses).
 - Tested (153 unit tests total): reference chart R1 pointers (a body in the 12th under Placidus only); time-unknown pointers; prompts never assert; 16 unique figures; exactly 4 self-inverse figures and the named inversion pairs; addition identities; judge even and uniform over all 65,536 mother sets; replay.
 - Browser (`scripts/e2e-p7.cjs`): Shadow → prompt → journal → pattern log shows "#work · 1"; geomancy shield chart renders (hand-checked one cast end to end); no errors; no horizontal scroll.
-- BLOCKED: Qi Men (school choice). NOT STARTED: the rest of the long tail.
+- Qi Men: built later as an experimental module (D-027) and matched to the owner's Kymon screenshot (D-028). NOT STARTED: the rest of the long tail.
 
 ### P8 Validate and release — RELEASE (v0.1.0)
 - Restore test: unit round trip (profile → chart → export → wipe → restore → identical recompute) and browser round trip with reload, both passing.
@@ -76,6 +78,13 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 - No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information". Exception: Heindel 1918 is loaded, with 216 natal paraphrases bundled and awaiting the owner's approval (D-030); Lilly is loaded but has no pack; Leo is registered only.
 
 
+## CHANGE_BRIEF_2 steps (docs/NEXT_STEPS.md)
+### Step 0 Housekeeping — done 2026-10-11 (D-031)
+- Biorhythm removed: engine, its tests, the Readings tab, the Today card and its composer view. A scope test (`tests/scope.test.ts`) fails if it reappears in src, tests or scripts. Old biorhythm records already on the phone stay in the database untouched (not displayed). Phase logs above that mention it are history.
+- One build brief: `docs/BUILD_BRIEF.md` (the owner's new copy, first name replaced by "the owner"); the root copy is deleted and `CLAUDE.md` points at the four controlling files.
+- Stale lines fixed here and in CONVENTIONS.md (Astrodienst and Qi Men fixtures done, node/Lilith/Zi/true-solar-time defaults, luck pillars, deploy).
+- Tests: 187 passing (biorhythm tests removed, scope test added).
+
 ## Decisions applied 2026-10-10
 - House system, zodiac, birth name and sex set by the owner (D-024); tarot reversals and Qi Men school delegated (D-025, D-027); BaZi luck pillars added (D-026).
 - Delegated to Claude: tarot reversals read as each card's source gives them (D-025); Qi Men school Chai Bu (D-027).
@@ -91,7 +100,7 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 - Feng Shui compass, Shadow, Library (correspondences), Journal (tab currently links to an anchor on Today), Settings (conventions, profiles, backup), Lab as a hub (tab currently opens Ledger).
 - Profile creation / birth-data entry, including ambiguous-time handling.
 - Transits and Returns content (tabs exist, only Natal drawn).
-- Readings "Daily" mode, and detail views for biorhythm, moon, planetary hours, I Ching.
+- Readings "Daily" mode, and detail views for moon, planetary hours, I Ching.
 - Export / restore flow and backup-status detail; fixtures-status page; Qi Men.
 - All numbers on the canvas are sample values (it says so).
 
@@ -101,13 +110,13 @@ The canvas (Today, Natal chart, Draw, Ledger, Readings/numerology) does not yet 
 | Foundation | TEST | P1 |
 | Natal chart, transits, returns | VALIDATE | matches Astrodienst natal, sidereal, relocation, draconic (D-028) |
 | Numerology | TEST | letter tables not yet checked against source scans |
-| Biorhythm, moon, planetary hours, I Ching | TEST | I Ching text not loaded |
+| Moon, planetary hours, I Ching | TEST | I Ching text not loaded; biorhythm removed (D-031) |
 | Tarot | TEST | text placeholders until sources are loaded |
 | Content layer | TEST | approval gate, packs, templates; built-in Heindel natal pack (216, unapproved) |
 | Composer, journal, outcomes | TEST | P5 |
 | BaZi, Tzolk'in, Vedic | TEST | own BaZi, lunar-javascript as test oracle (D-016) |
 | Feng Shui | TEST | Flying Star fixture from memory; needs reference screenshot |
-| Qi Men | TEST (experimental) | Chai Bu, checked vs qimen-wasm and qimen-dunjia; old-app fixture owed; Zhi Run not built (D-027) |
+| Qi Men | VALIDATE (experimental) | Chai Bu, checked vs qimen-wasm and qimen-dunjia and the owner's Kymon screenshot (D-028); Zhi Run not built (D-027) |
 | Shadow | TEST | D-021 |
 | Geomancy | TEST | D-022 |
 | Rest of long tail | IDEA | one at a time |

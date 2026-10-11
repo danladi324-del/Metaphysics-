@@ -1,7 +1,6 @@
 import * as Astronomy from 'astronomy-engine';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { localDateIn } from '../src/core/time';
-import { biorhythm, computeBiorhythm } from '../src/engines/biorhythm/compute';
 import { CHALDEAN_ORDER, DAY_RULER, planetaryHours } from '../src/engines/hours/compute';
 import { moon, phaseName } from '../src/engines/moon/compute';
 import type { Ephemeris } from '../src/engines/natal/ephemeris';
@@ -107,21 +106,3 @@ describe('planetary hours (R1 place)', () => {
   });
 });
 
-describe('biorhythm', () => {
-  it('day 0 is zero on all cycles; quarter-cycle peaks', () => {
-    const b = { year: 2000, month: 1, day: 1 };
-    expect(biorhythm(b, b).values).toEqual({ physical: 0, emotional: 0, intellectual: 0 });
-    expect(biorhythm(b, { year: 2000, month: 1, day: 8 }).values.emotional).toBe(1); // 7/28 = quarter
-  });
-  it("R1 on 2026-10-10: 19193 days lived", () => {
-    const r = biorhythm({ year: 1974, month: 3, day: 24 }, { year: 2026, month: 10, day: 10 });
-    expect(r.daysLived).toBe(19193);
-    // 19193 mod 23 = 11, mod 28 = 13, mod 33 = 20
-    expect(r.values.physical).toBeCloseTo(Math.sin((2 * Math.PI * 11) / 23), 6);
-    expect(r.values.emotional).toBeCloseTo(Math.sin((2 * Math.PI * 13) / 28), 6);
-    expect(r.values.intellectual).toBeCloseTo(Math.sin((2 * Math.PI * 20) / 33), 6);
-  });
-  it('carries the not-validated limitation', () => {
-    expect(computeBiorhythm({ year: 2000, month: 1, day: 1 }, { year: 2000, month: 1, day: 2 }).limitations[0]).toMatch(/not validated/);
-  });
-});

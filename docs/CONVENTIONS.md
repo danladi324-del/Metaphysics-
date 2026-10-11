@@ -9,18 +9,18 @@ Status column: **P** = provisional default awaiting the owner (DECISIONS D-008),
 | `houseSystem` | placidus, wholeSign, koch, equal, campanus, regiomontanus, porphyry | wholeSign | D (owner, D-024) | natal, transits, returns |
 | `zodiac` | tropical, sidereal | tropical | D (owner, D-024) | natal, Vedic |
 | `ayanamsa` | lahiri, raman, krishnamurti, faganBradley | lahiri | – | sidereal only |
-| `nodeType` | mean, true | mean | P | natal |
-| `lilithType` | mean, osculating | mean | P | natal |
+| `nodeType` | mean, true | true | D (matches the owner's Astrodienst charts, D-028) | natal |
+| `lilithType` | mean, osculating, interpolated | interpolated | D (Astrodienst "Lilith (i)", D-028) | natal |
 | `aspectOrbs` | table of degrees per aspect | see `src/engines/natal/aspects.ts` | D (documented, adjustable) | natal |
 | `numerologySystem` | pythagorean, chaldean | both computed | D | numerology |
 | `masterNumbers` | keep (11, 22, 33), reduce | keep | P | numerology |
 | `nameUsed` | stored string + kind (birth, current, as given) | the full birth name (birth) | D (owner, D-024) | numerology |
 | `sex` | male, female, unset | set in the profile | D (owner, D-024) | BaZi luck pillars, Kua |
-| `ziHour` | early (day changes 23:00), late (day changes 00:00) | – | – | BaZi |
-| `trueSolarTime` | on, off | – | – | BaZi |
-| `tzolkinCorrelation` | 584283 (GMT), 584285, … | – | – | Tzolk'in |
+| `ziHour` | early (day changes 23:00), late (day changes 00:00) | early | D (Claude, D-016; both computed) | BaZi |
+| `trueSolarTime` | on, off | on | D (matches the owner's BaZi app, D-028) | BaZi |
+| `tzolkinCorrelation` | 584283 (GMT), 584285, … | 584283 | D (both computed) | Tzolk'in |
 | `qiMenSchool` | chaiBu, zhiRun | chaiBu | D (delegated, D-027) | Qi Men |
-| `northReference` | magnetic, true | – | – | Feng Shui |
+| `northReference` | magnetic, true | true (charts); both stored | D | Feng Shui |
 | `reversalMode` | source, blocked, opposite, internal, delayed (or reversals off) | source | D (delegated, D-025) | tarot |
 
 ## Time
@@ -41,9 +41,6 @@ Latitude north positive, longitude east positive (so places in the western hemis
 - Pinnacles: first ends at 36 − single-digit Life Path; then 9-year spans.
 - Personal year = month + day + calendar year (each to one digit), reduced; month = year + calendar month; day = month + calendar day.
 
-## Biorhythm (P2)
-Periods 23 / 28 / 33 days; value = sin(2π·days/period); days are whole calendar days between local birth date and local target date. Labeled "conventional, not validated".
-
 ## Moon (P2)
 Elongation = Moon − Sun ecliptic longitude. Illumination = (1 − cos elongation)/2 (ignores lunar latitude; error under ~1%). Phase names: eight 45° bins centred on the exact phases. Daily record taken at local noon of the current location.
 
@@ -59,10 +56,10 @@ Methods: three coins (6, 7, 8, 9 at 2/6/6/2 of 16) and yarrow odds (1/5/7/3 of 1
 ## BaZi (P4)
 - Year changes at Li Chun (apparent solar longitude 315°, found with Swiss Ephemeris, as an absolute instant). Month changes every 30° from 315°. Five Tigers rule for month stems, Five Rats rule for hour stems.
 - Day pillar: sexagenary index (JDN + 49) mod 60 of the civil date used.
-- `trueSolarTime`: off = clock time in the birth zone; on = local apparent solar time from the Sun's hour angle at the birth place (astronomy-engine). Default off (provisional).
-- `ziHour`: `early` = day changes at 23:00; `midnight` = day changes at 00:00 and 23:00–24:00 takes the next day's stem for the hour. Default early (provisional). Both match lunar-javascript's `sect` 1 and 2.
+- `trueSolarTime`: off = clock time in the birth zone; on = local apparent solar time from the Sun's hour angle at the birth place (astronomy-engine). Default **on** (D-028).
+- `ziHour`: `early` = day changes at 23:00; `midnight` = day changes at 00:00 and 23:00–24:00 takes the next day's stem for the hour. Default early. Both match lunar-javascript's `sect` 1 and 2.
 - All four combinations are computed; day or hour pillars that differ are written to the ledger.
-- Luck pillars not computed: direction needs sex.
+- Luck pillars: computed from the profile's sex (D-026).
 
 ## Tzolk'in (P4)
 Correlation 584283 (GMT) by default; 584285 computed alongside and logged. Civil birth date.

@@ -1,7 +1,6 @@
 import { useState } from 'preact/hooks';
 import type { Profile } from '../../core/profile';
 import { localDateIn, resolveLocal } from '../../core/time';
-import { computeBiorhythm, CYCLES, type Cycle } from '../../engines/biorhythm/compute';
 import { computeHours } from '../../engines/hours/compute';
 import { computeMoon } from '../../engines/moon/compute';
 import { baziDisagreements, BRANCHES_ZH, computeBazi, DEFAULT_BAZI, pillarName, STEMS, STEMS_ZH } from '../../engines/bazi/compute';
@@ -22,13 +21,13 @@ import { Label } from '../components/Label';
 import { ComposedReading } from '../components/ComposedReading';
 import { Shadow } from './Shadow';
 import { Qimen } from './Qimen';
-import { baziView, biorhythmView, hoursView, moonView, numerologyDailyView, numerologyMasterView, tzolkinView, vedicView } from '../../composer/views';
+import { baziView, hoursView, moonView, numerologyDailyView, numerologyMasterView, tzolkinView, vedicView } from '../../composer/views';
 import { useStore } from '../store';
 import { useEphemeris } from '../useNatal';
 import { useStoredRecord } from '../useRecord';
 import { NoProfile } from './Charts';
 
-type Engine = 'numerology' | 'biorhythm' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'qimen' | 'shadow';
+type Engine = 'numerology' | 'sky' | 'bazi' | 'tzolkin' | 'vedic' | 'qimen' | 'shadow';
 
 export function Readings() {
   const { profile } = useStore();
@@ -44,7 +43,6 @@ export function Readings() {
         {(
           [
             ['numerology', 'Numerology'],
-            ['biorhythm', 'Biorhythm'],
             ['sky', 'Moon and hours'],
             ['bazi', 'BaZi'],
             ['tzolkin', "Tzolk'in"],
@@ -59,7 +57,6 @@ export function Readings() {
         ))}
       </div>
       {engine === 'numerology' && <Numerology profile={profile} />}
-      {engine === 'biorhythm' && <Biorhythm profile={profile} />}
       {engine === 'sky' && <Sky profile={profile} />}
       {engine === 'bazi' && <WithEph render={(eph) => <BaziView profile={profile} eph={eph} />} />}
       {engine === 'tzolkin' && <TzolkinView profile={profile} />}
@@ -215,60 +212,6 @@ function Numerology({ profile }: { profile: Profile }) {
       <ComposedReading view={numerologyMasterView(rec)} kind="master" rec={rec} />
       <ComposedReading view={numerologyDailyView(rec.id, cyc.personalDay, cyc.personalYear)} kind="daily" day={`${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}`} rec={{ id: rec.id, fingerprint: `${rec.fingerprint}:${t.year}-${t.month}-${t.day}` }} />
       <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={rec.limitations} />
-    </>
-  );
-}
-
-function Biorhythm({ profile }: { profile: Profile }) {
-  const b = profile.birth.local;
-  const t = today(useHere().zone);
-  const { rec } = useStoredRecord([b.year, b.month, b.day, t.year, t.month, t.day], () =>
-    computeBiorhythm({ year: b.year, month: b.month, day: b.day }, { year: t.year, month: t.month, day: t.day })
-  );
-  if (!rec) return null;
-  const r = rec.raw_result;
-  const W = 350;
-  const H = 140;
-  const days = 29;
-  const color: Record<Cycle, string> = { physical: '#7CC3D6', emotional: '#E0847F', intellectual: '#D6B066' };
-  return (
-    <>
-      <section>
-        <div class="card warn">
-          <Label label="disagreement">Conventional, not validated</Label>
-          <p class="note">{rec.limitations[0]}</p>
-        </div>
-        <div class="table" style={{ gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr)' }}>
-          <div class="h">Cycle</div>
-          <div class="h">Today</div>
-          <div class="h">Period</div>
-          {(Object.keys(CYCLES) as Cycle[]).map((k) => (
-            <>
-              <div style={{ color: color[k] }}>{k[0]!.toUpperCase() + k.slice(1)}</div>
-              <div>{Math.round(r.values[k] * 100)}%{r.critical.includes(k) ? ' (zero crossing)' : ''}</div>
-              <div>{CYCLES[k]} days</div>
-            </>
-          ))}
-        </div>
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Biorhythm curves for the next four weeks">
-          <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke="#2C4050" />
-          <line x1="0" y1="0" x2="0" y2={H} stroke="#9AA8B3" />
-          {(Object.keys(CYCLES) as Cycle[]).map((k) => (
-            <polyline
-              fill="none"
-              stroke={color[k]}
-              stroke-width="1.5"
-              points={Array.from({ length: days * 4 + 1 }, (_, i) => {
-                const d = r.daysLived + i / 4;
-                return `${(i / (days * 4)) * W},${H / 2 - Math.sin((2 * Math.PI * d) / CYCLES[k]) * (H / 2 - 6)}`;
-              }).join(' ')}
-            />
-          ))}
-        </svg>
-        <p class="note">Today on the left, four weeks ahead. Day {r.daysLived.toLocaleString()} of life, counted in calendar days.</p>
-      </section>
-      <ComposedReading view={biorhythmView(rec)} kind="daily" day={`${t.year}-${t.month}-${t.day}`} rec={rec} />
-      <Provenance engine={`${rec.engine} ${rec.engine_version}`} at={rec.computed_at} fp={rec.fingerprint} limitations={[]} />
     </>
   );
 }

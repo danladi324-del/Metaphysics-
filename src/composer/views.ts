@@ -4,7 +4,6 @@ import type { CalcRecord } from '../core/record';
 import { snippetKey, CARD_BY_ID } from '../content/tarot';
 import type { BaziResult } from '../engines/bazi/compute';
 import { pillarName } from '../engines/bazi/compute';
-import type { BiorhythmResult } from '../engines/biorhythm/compute';
 import type { HoursResult } from '../engines/hours/compute';
 import type { CastResult } from '../engines/iching/compute';
 import type { MoonResult } from '../engines/moon/compute';
@@ -66,22 +65,6 @@ export function numerologyDailyView(recId: string, personalDay: number, personal
     recordIds: [recId],
     facts: [{ id: 'fact:numerology.personalDay', text: `Personal day ${personalDay}, in personal year ${personalYear}.` }],
     keys: [{ key: `numerology.personalDay.${personalDay}`, title: `Personal day ${personalDay}` }]
-  };
-}
-
-export function biorhythmView(rec: CalcRecord<BiorhythmResult>): EngineView {
-  const v = rec.raw_result.values;
-  const pct = (x: number) => `${Math.round(x * 100)}%`;
-  const state = (x: number) => (Math.abs(x) < 0.1 ? 'crossing' : x > 0 ? 'high' : 'low');
-  return {
-    engine: 'biorhythm',
-    title: 'Biorhythm',
-    recordIds: [rec.id],
-    facts: [
-      { id: 'fact:biorhythm.values', text: `Physical ${pct(v.physical)}, emotional ${pct(v.emotional)}, intellectual ${pct(v.intellectual)}.` },
-      { id: 'fact:biorhythm.validity', text: 'Conventional cycles; not validated by controlled studies.' }
-    ],
-    keys: [{ key: `biorhythm.physical.${state(v.physical)}`, title: 'Physical cycle' }]
   };
 }
 

@@ -1,1 +1,1 @@
-See [BUILD_BRIEF.md](BUILD_BRIEF.md) for the full build brief. Progress lives in [docs/STATUS.md](docs/STATUS.md).
+Read, in this order: [docs/CHANGE_BRIEF_2.md](docs/CHANGE_BRIEF_2.md) (wins over the build brief; its Part H wins on narrative structure), [docs/BUILD_BRIEF.md](docs/BUILD_BRIEF.md), [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) (the work plan) and [docs/APP_PARITY.md](docs/APP_PARITY.md). Progress lives in [docs/STATUS.md](docs/STATUS.md); decisions in [docs/DECISIONS.md](docs/DECISIONS.md).

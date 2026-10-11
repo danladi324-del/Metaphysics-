@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks';
 import { compose, type EngineView, type Reading } from '../../composer/compose';
 import { chanceWords, convergence, themeVocabulary, type Convergence, type EngineThemes } from '../../composer/convergence';
-import { biorhythmView, hoursView, ichingView, moonView, numerologyDailyView, tarotView } from '../../composer/views';
+import { hoursView, ichingView, moonView, numerologyDailyView, tarotView } from '../../composer/views';
 import { backupStatus } from '../../core/backup';
 import { entries } from '../../core/journal';
 import { outcomes } from '../../core/outcomes';
@@ -9,7 +9,6 @@ import type { Profile } from '../../core/profile';
 import type { CalcRecord } from '../../core/record';
 import { localDateIn, resolveLocal } from '../../core/time';
 import { LENSES } from '../../content/model';
-import { BIORHYTHM, computeBiorhythm } from '../../engines/biorhythm/compute';
 import { BRANCHES_ZH, dayIndex, STEMS, BRANCHES, STEMS_ZH } from '../../engines/bazi/compute';
 import { computeHours, HOURS } from '../../engines/hours/compute';
 import { ICHING, type CastResult } from '../../engines/iching/compute';
@@ -55,7 +54,6 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
   const name = profile.numerologyNames[0]?.name ?? profile.displayName;
 
   const num = useStoredRecord([name, b.year, b.month, b.day], () => computeNumerology({ name, year: b.year, month: b.month, day: b.day }, DEFAULT_NUMEROLOGY)).rec;
-  const bio = useStoredRecord([dayKey, profile.id], () => computeBiorhythm({ year: b.year, month: b.month, day: b.day }, t)).rec;
   const moon = useStoredRecord([noonMs], () => computeMoon(eph, noonMs)).rec;
   const todays = useStoredRecord([noonMs, here.lat, here.lon], () => computeHours(noonMs, here.lat, here.lon, weekday));
   const beforeSunrise = todays.rec ? nowMs < todays.rec.raw_result.sunrise : false;
@@ -80,7 +78,6 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
     if (view) daily.push({ engine: view.engine, deps, view, reading: compose(db, view, 'general') });
   };
   if (num) add(NUMEROLOGY.input_dependencies, numerologyDailyView(num.id, cyc.personalDay, cyc.personalYear));
-  if (bio) add(BIORHYTHM.input_dependencies, biorhythmView(bio));
   if (moon) add(MOON.input_dependencies, moonView(moon));
   if (hours) add(HOURS.input_dependencies, hoursView(hours, nowMs));
   if (tarot) add(TAROT.input_dependencies, tarotView(tarot, snippetMode(settings.tarot.mode)));
@@ -144,7 +141,6 @@ function TodayInner({ profile, eph }: { profile: Profile; eph: Ephemeris }) {
         <h2>Engines today</h2>
         <div class="scroll-x">
           <EngineCard title="Numerology" value={`Day ${cyc.personalDay}`} label="calculated" note="Calculated" inputs={['birth date']} />
-          {bio && <EngineCard title="Biorhythm" value={`Physical ${Math.round(bio.raw_result.values.physical * 100)}%`} label="calculated" note="Calculated, not validated" inputs={['birth date']} />}
           <EngineCard title="BaZi" value={`${STEMS_ZH[di % 10]}${BRANCHES_ZH[di % 12]} ${STEMS[di % 10]}-${BRANCHES[di % 12]} day`} label="calculated" note="Calculated" inputs={['date', 'calendar']} />
           {moon && <EngineCard title="Moon" value={`${Math.round(moon.raw_result.illumination * 100)}% lit`} label="calculated" note="Calculated" inputs={['ephemeris']} />}
           {cast && <EngineCard title="I Ching" value={`Hexagram ${cast.raw_result.primary.number}`} label="calculated" note="Today's cast" inputs={['random cast']} />}

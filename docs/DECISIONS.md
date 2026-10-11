@@ -7,7 +7,7 @@ Prior-art findings use the four verdicts from rule 7: **exists / partially exist
 ---
 
 ## D-001 Brief location
-`Claude.md` held the brief. Renamed to `BUILD_BRIEF.md`; `CLAUDE.md` now points at it and at `docs/STATUS.md`.
+`Claude.md` held the brief. Renamed to `BUILD_BRIEF.md`; `CLAUDE.md` now points at it and at `docs/STATUS.md`. Superseded by D-031: the brief now lives in `docs/`.
 
 ## D-002 In-browser database: sql.js with IndexedDB snapshot
 **Prior art: exists.** Searched npm metadata and PowerSync's survey posts.
@@ -66,7 +66,7 @@ Historical offsets are the most common error source (brief §3). Example (refere
 ## D-007 Hosting and CI
 GitHub Pages deployed by GitHub Actions; tests run on every push. Vite base path `/Metaphysics-/`.
 
-## D-008 Provisional conventions pending OWNER choices
+## D-008 Provisional conventions pending OWNER choices (superseded by D-024, D-025, D-027, D-028)
 Until the owner decides (brief §8), these defaults are used **and labeled provisional in the UI**. Competing conventions are computed anyway (rule 5), so the choice only sets which one is shown first.
 - House system: **Placidus** (provisional); Whole Sign always computed alongside.
 - Zodiac: **Tropical** (provisional); sidereal Lahiri computed alongside once Vedic lands.
@@ -136,7 +136,7 @@ Three parts only (brief §4.9). (a) Pointers: Saturn, Pluto, Chiron, Lilith, the
 ## D-022 Long tail: geomancy first
 **Prior art: partially exists** (npm `geomancy` 1.2.0, MIT, last published 2020: figure utilities without records or tests). Adjacent: `@catidegla/fadu` (Ifá/Fa 16 du). Geomancy chosen first because it is fully algorithmic and has a checkable invariant: over all 65,536 sets of Mothers the Judge is always one of the 8 even figures, each exactly 8,192 times (tested). Figure names are the conventional Latin ones; interpretation waits for a loaded source. Not built: the 12-house chart and perfection. Remaining long tail (runes, ogham, Ifá, Human Design, Gene Keys, Tree of Life, kameas, crystals, candles, herbs, chakras, dream symbols, angel numbers, sigil and ritual builders) stays IDEA, one at a time, each with sources.
 
-## D-023 Qi Men blocked
+## D-023 Qi Men blocked (superseded by D-027)
 Not started. The brief requires the school choice (Chai Bu vs Zhi Run) first, and the old app's output as a fixture. Candidate libraries are listed in D-005.
 
 ## D-024 Owner's choices, 2026-10-10
@@ -199,4 +199,14 @@ The owner uploaded OCR texts of Heindel (3rd ed., text copyright 1918) and Lilly
 - **Fit:** Heindel is tropical, which matches the owner's setup. For house passages the app shows "Written for quadrant houses … this chart uses Whole sign houses" (D-029). Heindel's text is sometimes medical ("prone to fevers") or religious; the paraphrases keep that, because it is his reading.
 - **Re-import:** re-importing an unchanged snippet keeps its approval; a change to text, source or locator revokes it.
 - **Lilly not packed:** *Christian Astrology* has no planet-in-sign or planet-in-house natal entries. Book I gives planet and house significations (and, for horary, how a planet in a sign describes a person); Book III judges nativities through house rulers. Forcing these into the app's `natal.<planet>.sign/house` slots would misrepresent him. Fitting Lilly needs new keys, for planet nature and house signification (IDEA). His OCR also keeps the long s and garbles every planet and sign glyph, so passages need checking against a scan.
+
+## D-031 CHANGE_BRIEF_2 adopted; Step 0 housekeeping (2026-10-11)
+- **Controlling files:** `docs/CHANGE_BRIEF_2.md` wins over `docs/BUILD_BRIEF.md` wherever they conflict, and its Part H wins on narrative structure. `docs/NEXT_STEPS.md` is the work plan. The owner's new `docs/BUILD_BRIEF.md` replaces the root copy (deleted). It arrived containing the owner's first name three times; that was replaced with "the owner" (rule 5). The upload commit c652583 keeps the name in history; it is listed for the Step 1 scrub.
+- **Biorhythm removed** (Part F): engine, tests, UI and composer view. `tests/scope.test.ts` guards against its return. Records already stored on the device are left alone.
+- **Conflicts found on reading the new files, and how each is handled:**
+  1. Fixture birth data: Part A3 keeps fixture inputs in a private repo; the owner's standing rule says no birth data in tests or fixtures at all. The stricter rule wins: Step 1 plans moving reference-chart inputs to a gitignored local file plus a CI secret, with sample data in the repo. Needs the owner's confirmation.
+  2. "No snippets or paraphrases shown" (CHANGE_BRIEF_2, top) vs B11 "remove the approval queue as a requirement to display": read as keep the 216 Heindel paraphrases, display none, and use the raw public-domain passages as grounding. To confirm with the owner before Step 3.
+  3. Step 1 "produce a backup export and verify it restores": the owner's data is on the phone. Export and restore are verified with sample data; the real export is the owner's (A1).
+  4. Step 2 refers to an updated design board, which this environment cannot see. Readings will be built to the Part H section order directly.
+- **Superseded, to be rewritten when their step lands:** D-007 (GitHub Pages; Part A5 moves to Cloudflare Pages, Step 1), D-014 and D-018 (composer selects snippets and writes no free text; Parts B and H, Step 2), D-025 (tarot reversal "as the source reads it"; B4 lists blocked, opposite, internal, delayed and "as commonly read", Step 4).
 
