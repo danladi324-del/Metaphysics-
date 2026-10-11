@@ -1,4 +1,4 @@
-/** Every convention is a parameter (rule 4). House system and zodiac decided by Eric 2026-10-10 (DECISIONS D-024); the rest marked provisional. */
+/** Every convention is a parameter (rule 4). House system and zodiac decided by the owner 2026-10-10 (DECISIONS D-024); the rest marked provisional. */
 
 export type HouseSystem = 'placidus' | 'wholeSign' | 'koch' | 'equal' | 'campanus' | 'regiomontanus' | 'porphyry';
 export type Zodiac = 'tropical' | 'sidereal';

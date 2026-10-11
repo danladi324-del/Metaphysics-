@@ -7,7 +7,7 @@ import type { Ephemeris } from '../src/engines/natal/ephemeris';
 import { formatLongitude, separation } from '../src/engines/natal/zodiac';
 import { nodeEphemeris } from './helpers/ephemeris';
 
-// Eric: 1974-03-24 11:15 CDT (UTC-5), Bossier City LA (GeoNames 32.5160 N, 93.7321 W).
+// Reference chart R1: 1974-03-24 11:15 CDT (UTC-5), 32.5160 N, 93.7321 W (America/Chicago).
 const ERIC = { utcMs: Date.UTC(1974, 2, 24, 16, 15), lat: 32.516, lon: -93.7321 };
 const FIXED_NOW = new Date('2026-10-10T00:00:00Z');
 
@@ -43,7 +43,7 @@ function independentHouses(utcMs: number, lat: number, lon: number) {
   return { asc, mc, c11: placidus(1 / 3, true), c12: placidus(2 / 3, true), c2: placidus(2 / 3, false), c3: placidus(1 / 3, false) };
 }
 
-describe('natal chart: Eric', () => {
+describe('natal chart: reference chart R1', () => {
   it('produces a valid, deterministic record', () => {
     const a = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);
     const b = computeNatal(eph, ERIC, DEFAULT_ASTRO, undefined, FIXED_NOW);

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { daysBetween, formatOffset, julianDayUT, resolveLocal, validateLocal, zoneOffsetSeconds } from '../src/core/time';
 
 describe('resolveLocal', () => {
-  it("Eric's birth: 1974 US emergency DST puts 11:15 Bossier City at UTC-5, not -6", () => {
+  it("R1: 1974 US emergency DST puts 11:15 in America/Chicago at UTC-5, not -6", () => {
     const r = resolveLocal({ year: 1974, month: 3, day: 24, hour: 11, minute: 15 }, 'America/Chicago');
     expect(r.kind).toBe('exact');
     if (r.kind !== 'exact') return;

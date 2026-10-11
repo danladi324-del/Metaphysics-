@@ -9,7 +9,7 @@ Save this file in the repo root as `CLAUDE.md` (or `BUILD_BRIEF.md` and point CL
 
 One personal app that replaces a folder of astrology, numerology, BaZi, Qi Men, I Ching, biorhythm and symbol apps. It calculates, interprets with sourced text, compares engines, logs outcomes, and reports daily.
 
-- User: Eric. One user. Personal use, not a product. Peer-level communication, no hype.
+- User: the owner. One user. Personal use, not a product. Peer-level communication, no hype.
 - Platform: **iOS only. No Mac, no Xcode, no local server.** Everything must be buildable and testable from Claude Code on web or mobile plus GitHub.
 - Stack: **TypeScript, Vite, installable PWA, all calculation on-device.** Host on GitHub Pages or Cloudflare Pages. Tests run in GitHub Actions.
 - Data: SQLite in the browser (evaluate sql.js or wa-sqlite with IndexedDB persistence; verify iOS Safari behavior). Call `navigator.storage.persist()`. Safari can evict storage, so the **JSON export to Files/iCloud is the real backup**.
@@ -41,7 +41,7 @@ One personal app that replaces a folder of astrology, numerology, BaZi, Qi Men, 
 - `docs`/`xlsx` skills are not needed.
 - Tools: Bash, WebSearch (research and prior-art checks), GitHub for CI.
 
-Do not use vault-specific constants from the Quarter Quest Revelations vault in this app unless Eric asks.
+Do not use vault-specific constants from the Quarter Quest Revelations vault in this app unless the owner asks.
 
 ## 3. Architecture
 
@@ -74,7 +74,7 @@ Repo layout:
 2. **Astronomy and natal chart**: positions, houses (Placidus and whole sign at minimum), aspects, nodes, Chiron, Lilith, wheel, transits, returns. Evaluate astronomy-engine (MIT) and a Swiss Ephemeris WASM build (AGPL is acceptable for personal use; note it in DECISIONS.md and revisit if the app is ever shared). astronomy-engine may not cover houses or Chiron; verify.
 3. **Numerology**: Pythagorean and Chaldean side by side. Life Path, Expression, Soul Urge, Personality, Birthday, Maturity, karmic debt (13, 14, 16, 19), missing numbers, letter counts, pinnacles and challenges (first age break = 36 minus Life Path), personal year/month/day. Source letter tables from Balliett (Pythagorean) and Cheiro (Chaldean), cite them, and test against hand-worked examples. Name used is a stored choice.
 4. **Biorhythm** (sine cycles from days lived; label "conventional, not validated"), **moon phase, planetary days and hours**, **I Ching** (casting mechanics; interpretation from Legge 1899, public domain).
-5. **Tarot** (78 cards, upright and reversed, per-lens snippets, spreads). Waite's Pictorial Key (1911) is a public-domain source for paraphrase. Use original line art for card faces, not Rider-Waite-Smith images unless Eric supplies public-domain scans.
+5. **Tarot** (78 cards, upright and reversed, per-lens snippets, spreads). Waite's Pictorial Key (1911) is a public-domain source for paraphrase. Use original line art for card faces, not Rider-Waite-Smith images unless the owner supplies public-domain scans.
 6. **Chinese and calendar systems**: BaZi (four pillars from solar terms; parameters: true solar time, early or late Zi hour, month boundary), Tzolk'in (correlation constant as a setting), Vedic (ayanamsa, nakshatras, dashas). Evaluate lunar-javascript before writing BaZi. Verify solar-term tables against ephemeris longitudes (Li Chun = 315 degrees).
 7. **Feng Shui**: live luopan from `webkitCompassHeading` (permission on a tap; manual-degrees fallback), 24 mountains of 15 degrees, Flying Star (Period 9 now), Eight Mansions (Kua from the year with the Li Chun boundary). Store magnetic and true bearings; declination needs a magnetic model (evaluate offline options and verify). Flying Star, Eight Mansions and BaZi share the solar-term input.
 8. **Qi Men Dun Jia**: pick a school first (Chai Bu vs Zhi Run), document it, ship as an experimental module, and keep the old app's output as a manual fixture.

@@ -11,7 +11,7 @@ beforeAll(async () => {
 });
 
 describe('shadow pointers', () => {
-  it("Eric: Saturn, Pluto, Chiron, Lilith, nodes, and Mars in the 12th under Placidus only", () => {
+  it("R1: Saturn, Pluto, Chiron, Lilith, nodes, and Mars in the 12th under Placidus only", () => {
     const rec = computeNatal(eph, { utcMs: Date.UTC(1974, 2, 24, 16, 15), lat: 32.516, lon: -93.7321 }, DEFAULT_ASTRO);
     const p = shadowPointers(rec, DEFAULT_ASTRO, true);
     expect(p.map((x) => x.id)).toEqual(['saturn', 'pluto', 'chiron', 'lilith', 'node', 'southnode', 'house12.mars']);

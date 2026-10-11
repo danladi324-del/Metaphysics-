@@ -27,7 +27,7 @@ export interface BaziConventions {
   trueSolarTime: boolean;
 }
 
-/** True solar time on by default: Eric's own BaZi app is fed the true-solar birth time (09:53 for 11:15 clock), D-028. */
+/** True solar time on by default: the owner's own BaZi app is fed the true-solar birth time, D-028. */
 export const DEFAULT_BAZI: BaziConventions = { ziHour: 'early', trueSolarTime: true };
 
 export interface Pillar {

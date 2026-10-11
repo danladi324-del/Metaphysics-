@@ -37,7 +37,7 @@ describe('Li Chun instants agree with lunar-javascript within 2 minutes (1950-20
   });
 });
 
-describe("Eric's four pillars", () => {
+describe("reference chart R1: four pillars", () => {
   it('clock time: 甲寅 丁卯 甲子 庚午 (matches lunar-javascript)', () => {
     const r = computeBazi(eph, ERIC, { ziHour: 'early', trueSolarTime: false }).raw_result.chosen;
     expect([r.year, r.month, r.day, r.hour].map(gz)).toEqual(['甲寅', '丁卯', '甲子', '庚午']);
@@ -104,7 +104,7 @@ describe('random instants vs lunar-javascript (clock time)', () => {
 import { luckPillars } from '../src/engines/bazi/compute';
 
 describe('luck pillars', () => {
-  it("Eric (male, yang Jia year): forward from 丁卯, starting 戊辰 at about 3 years 10 months", () => {
+  it("R1 (male, yang Jia year): forward from 丁卯, starting 戊辰 at about 3 years 10 months", () => {
     const rec = computeBazi(eph, { ...ERIC, sex: 'male' });
     const l = rec.raw_result.luck!;
     expect(l.direction).toBe('forward');

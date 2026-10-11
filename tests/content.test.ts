@@ -19,7 +19,7 @@ const fresh = () => {
 };
 
 const pack = (snippets: object[], extra: object = {}) => ({ format: 'metaphysics-content', version: 1, snippets, ...extra });
-const trad = { id: 't1', key: 'tarot.major.tower.reversed', text: 'Read as a disruption that is resisted.', label: 'traditional', lens: 'general', source_id: 'waite1911', source_locator: 'Part II, XVI', authored_by: 'Eric' };
+const trad = { id: 't1', key: 'tarot.major.tower.reversed', text: 'Read as a disruption that is resisted.', label: 'traditional', lens: 'general', source_id: 'waite1911', source_locator: 'Part II, XVI', authored_by: 'owner' };
 
 describe('content selection', () => {
   it('with nothing stored, both layers are visible placeholders that still carry ids', () => {

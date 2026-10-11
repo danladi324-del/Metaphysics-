@@ -22,7 +22,7 @@ export interface Here {
 export interface TarotSettings {
   reversals: boolean;
   /**
-   * Eric delegated the choice (2026-10-10, DECISIONS D-025): 'source' = each card's reversed meaning as its cited source gives it.
+   * The owner delegated the choice (2026-10-10, DECISIONS D-025): 'source' = each card's reversed meaning as its cited source gives it.
    * The four generic modes stay available as comparison lenses; without a cited passage for the mode they display as synthesis.
    */
   mode: 'source' | 'blocked' | 'opposite' | 'internal' | 'delayed';

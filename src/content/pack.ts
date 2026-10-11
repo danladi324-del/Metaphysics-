@@ -136,7 +136,7 @@ export function templatePack(keys: string[]): ContentPack {
       label: 'synthesis' as const,
       lens: 'general' as Lens,
       reversal_mode: null,
-      authored_by: 'Eric'
+      authored_by: 'owner'
     })),
     splits: []
   };

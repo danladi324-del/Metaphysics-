@@ -3,7 +3,7 @@
 Work-item states: IDEA, EXPLORATION, RESEARCH, DESIGN, BUILD, TEST, VALIDATE, RELEASE, MAINTAIN.
 
 ## Current phase
-P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). Eric's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
+P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intelligent-mendel-j3p880` (the session could not push a git tag; create tag `v0.1.0` on that commit when merging). The owner's decisions of 2026-10-10 applied on top of v0.1.0 (D-024 to D-027); Qi Men built as an experimental module.
 
 ## Phase log
 ### P0 Scaffold — BUILD done; deploy UNVERIFIED
@@ -21,12 +21,10 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 
 ### P2 Fast engines — TEST
 - Works: numerology (Pythagorean and Chaldean side by side; Life Path, Expression, Soul Urge, Personality, Birthday, Maturity; both reduction methods with ledger rows; letter counts; missing numbers; karmic debt split into "in a total" vs "inside one part"; pinnacles, challenges; personal year/month/day); biorhythm with a 4-week chart and the not-validated warning; moon phase, sign, illumination and next four principal phases; planetary day and 24 unequal hours for the current location; I Ching casting (yarrow odds or three coins, replayable draws, primary and relating hexagram). Readings and Draw screens; "current location" setting.
-- Tested (74 unit tests total, all passing): numerology against hand-worked arithmetic for Eric Garner 1974-03-24 and boundary cases (master dates, reduce-masters convention, karmic 13 birthday, 19→10→1, leap day, accents, Y rule, empty name); King Wen table is a permutation of 1–64 and every pair is an inversion or (for 1/2, 27/28, 29/30, 61/62) a complement — an independent structural check; casting weights; moon principal phases vs astronomy-engine SearchMoonPhase over a year (< 1 min) and two known 2024 lunations (< 2 min); sunrise vs an independent NOAA formula (< 3 min); Chaldean-order week property; pre-sunrise day-ruler convention; polar-night error; biorhythm values for 19,193 days lived.
+- Tested (74 unit tests total, all passing): numerology against hand-worked arithmetic for fictitious names and boundary cases (master dates, reduce-masters convention, karmic 13 birthday, 19→10→1, leap day, accents, Y rule, empty name); King Wen table is a permutation of 1–64 and every pair is an inversion or (for 1/2, 27/28, 29/30, 61/62) a complement — an independent structural check; casting weights; moon principal phases vs astronomy-engine SearchMoonPhase over a year (< 1 min) and two known 2024 lunations (< 2 min); sunrise vs an independent NOAA formula (< 3 min); Chaldean-order week property; pre-sunrise day-ruler convention; polar-night error; biorhythm values for 19,193 days lived.
 - Browser check: numerology, biorhythm, moon/hours and I Ching screens render at 390 px with no console errors and no horizontal scroll.
 - Failed / fixed: one test expectation of mine was wrong (300° elongation is Waning crescent under 45° bins, not Last quarter). "Today" used the birth time zone instead of the user's; fixed with the current-location setting.
-- Eric (calculated): Life Path 3 (both methods); Expression 8 Pythagorean / 2 Chaldean (Chaldean all-letters 29/11); Soul Urge 11 by name part vs 2 all vowels (Pythagorean), 3 Chaldean; Personality 6 / 8; Birthday 6; Maturity 11; karmic debt none in totals, 14 inside ERIC's vowels only; pinnacles 9-9-9-6, challenges 3-3-0-0, first break at 33; personal year 2026 = 1.
 - Assumed: letter tables as commonly reproduced match Balliett and Cheiro; not yet checked against scans (needs the texts). Interpretation is entirely placeholder.
-- UNVERIFIED: whether Eric's preferred name for numerology is "Eric Garner" or a fuller birth name.
 
 ### P3 Content layer + tarot — TEST
 - Works: source registry; snippet store with approval gate; content-pack import with validation; key templates per engine; one Traditional layer per source plus a Synthesis layer for natal (sign and house per body), numerology Life Path, I Ching (hexagram, changing lines, relating), and tarot (per card, lens, reversal mode); 78-card deck, three spreads, replayable shuffle, Waite/Marseille numbering; original card faces; draws save to the journal.
@@ -37,10 +35,9 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 
 ### P4 Calendar and Chinese systems + Feng Shui — TEST
 - Works: BaZi (four pillars, element counts, day master; clock vs true solar time and both Zi-hour rules all computed with ledger rows); Tzolk'in and Haab with Long Count, two correlations; Vedic (sidereal grahas, nakshatra and pada, ascendant, Vimshottari mahadashas); Feng Shui screen with live iOS compass on a tap or manual degrees, WMM-2025 declination, 24-mountain luopan, Flying Star chart (south up) with annual stars, Eight Mansions for both Kua formulas.
-- Tested (116 unit tests total): BaZi year and month pillars vs lunar-javascript on 300 random instants 1930–2060; day and hour pillars under both Zi rules on 300 random instants plus 40 forced 23:30 cases; Li Chun vs lunar-javascript's table 1950–2050 (< 2 min); day-pillar anchors 1949-10-01 Jia-Zi, 2000-01-01 Wu-Wu; Eric's pillars. Tzolk'in 2012-12-21 = 13.0.0.0.0 4 Ahau 3 Kankin, 260/365-day cycles. Vedic: Lahiri at J2000 ≈ 23.85°, sidereal = tropical − ayanamsa within 0.001°, nakshatra edges, dasha totals. Feng Shui: mountain edges, polarity pattern, Lo Shu flight, Period 8 Zi/Wu "double 8 at facing", periods and annual stars, Kua for 1974/1977/2000, Eight Mansions rule reproduces a typed reference table for all eight Kua, East/West group property, true = magnetic + declination.
+- Tested (116 unit tests total): BaZi year and month pillars vs lunar-javascript on 300 random instants 1930–2060; day and hour pillars under both Zi rules on 300 random instants plus 40 forced 23:30 cases; Li Chun vs lunar-javascript's table 1950–2050 (< 2 min); day-pillar anchors 1949-10-01 Jia-Zi, 2000-01-01 Wu-Wu; reference chart R1 pillars. Tzolk'in 2012-12-21 = 13.0.0.0.0 4 Ahau 3 Kankin, 260/365-day cycles. Vedic: Lahiri at J2000 ≈ 23.85°, sidereal = tropical − ayanamsa within 0.001°, nakshatra edges, dasha totals. Feng Shui: mountain edges, polarity pattern, Lo Shu flight, Period 8 Zi/Wu "double 8 at facing", periods and annual stars, Kua for 1974/1977/2000, Eight Mansions rule reproduces a typed reference table for all eight Kua, East/West group property, true = magnetic + declination.
 - Failed / fixed: Swiss Ephemeris's plain ayanamsa omits nutation (17″ off from sidereal positions); switched to the nutation-inclusive value, which also fixes sidereal house cusps in the natal engine. One test expectation of mine (1977 female Kua) was wrong.
-- Eric (calculated): BaZi 甲寅 丁卯 甲子 庚午 by clock time; hour becomes 己巳 under true solar time (local apparent time ≈ 09:54) — logged. Tzolk'in 9 Lamat (GMT), Haab 6 Kumku, Long Count 12.18.0.12.8. Vedic (Lahiri): ascendant 24°55′ Taurus, Moon in Revati, first dasha Mercury. Kua 8 (male formula) / 7 (female formula).
-- UNVERIFIED: no E-Bazi or reference-app screenshots yet; the Flying Star fixture is a recalled published chart; webkitCompassHeading behavior on Eric's phone; WMM declination not checked against NOAA's online calculator.
+- UNVERIFIED: no E-Bazi or reference-app screenshots yet; the Flying Star fixture is a recalled published chart; webkitCompassHeading behavior on the owner's phone; WMM declination not checked against NOAA's online calculator.
 - Not done: BaZi luck pillars and Eight Mansions single Kua (need sex); Ti Gua replacement charts; Vedic divisional charts and antardashas.
 
 ### P5 Composer, ledger, journal, outcomes — TEST
@@ -57,7 +54,7 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 
 ### P7 Long tail and Qi Men — partial
 - Works: Shadow tab (pointers with house-system split, interpretive snippet slots, question prompts that write to the journal, pattern log of user tags); geomancy (shield chart from 16 random bits, replayable, composed reading for judge and witnesses).
-- Tested (153 unit tests total): Eric's pointers (Mars in the 12th under Placidus only); time-unknown pointers; prompts never assert; 16 unique figures; exactly 4 self-inverse figures and the named inversion pairs; addition identities; judge even and uniform over all 65,536 mother sets; replay.
+- Tested (153 unit tests total): reference chart R1 pointers (a body in the 12th under Placidus only); time-unknown pointers; prompts never assert; 16 unique figures; exactly 4 self-inverse figures and the named inversion pairs; addition identities; judge even and uniform over all 65,536 mother sets; replay.
 - Browser (`scripts/e2e-p7.cjs`): Shadow → prompt → journal → pattern log shows "#work · 1"; geomancy shield chart renders (hand-checked one cast end to end); no errors; no horizontal scroll.
 - BLOCKED: Qi Men (school choice). NOT STARTED: the rest of the long tail.
 
@@ -71,29 +68,22 @@ P8 done 2026-10-10. Stable release **v0.1.0 = commit 05bc69b** on `claude/intell
 - All browser checks (p1, p3–p7, offline) pass on the CSP build with no console errors and no horizontal scroll at 390 px. 162 unit tests pass; CI green through P5 at time of writing.
 
 ### Not verified (honest list)
-- Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on Eric's iOS version, and install-to-Home-Screen.
+- Live deploy: the repository is public but Pages is not enabled yet (deploy runs fail at configure-pages with "Not Found" until Settings → Pages → Source is set to GitHub Actions).
+- Personal data: names were removed from the working tree on 2026-10-11; reference chart R1's birth instant and coordinates remain (the fixtures need them), and earlier git history still contains the names.
+- Nothing has run on an actual iPhone: Safari's IndexedDB persistence for Home Screen apps, the share sheet, `navigator.storage.persist()`, `webkitCompassHeading`, CSP with WebAssembly on the owner's iOS version, and install-to-Home-Screen.
 - GitHub Pages deploy: needs the branch merged to `main` and Pages source set to GitHub Actions (INSTALL.md).
-- External fixtures: 7 from Eric's apps (D-028). Still no awkward-case (midnight/DST) external fixture.
+- External fixtures: 7 from the owner's apps (D-028). Still no awkward-case (midnight/DST) external fixture.
 - Flying Star fixture is from memory of a published chart.
 - No source text loaded; every interpretive slot is a visible placeholder and every reading reports "Insufficient information".
 
-### Eric's chart (calculated, Placidus/tropical, mean node)
-Sun 3°38′ Aries (H11), Moon 13°02′ Aries (H11), Asc 18°26′ Gemini, MC 29°40′ Aquarius. House-system splits: Mars Placidus 12 / whole sign 1; Neptune 6 / 7.
 
 ## Decisions applied 2026-10-10
-- Birth name Eric Danladi Garner; sex male; whole sign houses; tropical zodiac (D-024).
+- House system, zodiac, birth name and sex set by the owner (D-024); tarot reversals and Qi Men school delegated (D-025, D-027); BaZi luck pillars added (D-026).
 - Delegated to Claude: tarot reversals read as each card's source gives them (D-025); Qi Men school Chai Bu (D-027).
-- New: BaZi luck pillars (D-026): Eric forward from 丁卯, first pillar 戊辰 from age 3 years 9 months (11.49 days to Qing Ming; lunar-javascript-based apps will show 4 years because they read the birth clock as Beijing time). Single Kua 8 (West group).
-- Numerology with the full birth name (hand-checked): Life Path 3; Expression 8 (both methods); Soul Urge 22 by name part vs 4 all vowels (DANLADI's vowels make 11); Personality 4 with karmic debt 13 in the total, plus 16 inside DANLADI; Chaldean Expression 3; Maturity 11.
-- Qi Men (experimental): Eric's birth hour is Yang dun Ju 3, Spring Equinox upper yuan, leader 天冲 / 伤门.
-- Reference screenshots received and turned into fixtures (D-028): 7 fixtures, all passing; one bug found and fixed (sidereal whole-sign cusps). Defaults now match Eric's own software: true node, interpolated Lilith, BaZi true solar time.
-- **On the phone:** the existing profile still has the old name and no sex. Edit it once (Lab → Profiles → Edit): name "Eric Danladi Garner" (kind Birth), sex Male.
+- Reference screenshots received and turned into fixtures (D-028): 7 fixtures, all passing; one bug found and fixed (sidereal whole-sign cusps). Defaults now match the owner's own software: true node, interpolated Lilith, BaZi true solar time.
 
-## Inputs received from Eric
-- Birth: 1974-03-24, 11:15, Bossier City, Louisiana (32.516 N, 93.732 W; America/Chicago; UTC−5 because of 1974 emergency DST — see DECISIONS D-006).
-- Name for numerology: "Eric Garner" (as given; full birth name not confirmed).
 
-## Still owed by Eric (brief §8)
+## Still owed by the owner (brief §8)
 - Optional: one awkward-case chart (a midnight or DST-change birth) from Astrodienst, to exercise the boundary code against an outside source.
 - Any public-domain scans/texts; approval of paraphrases before they are labeled Traditional.
 
