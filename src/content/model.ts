@@ -39,7 +39,11 @@ export const BUILTIN_SOURCES: Source[] = [
   { id: 'waite1911', title: 'The Pictorial Key to the Tarot', author: 'A. E. Waite', year: 1911, license: 'public domain', status: 'registered' },
   { id: 'legge1899', title: 'The Yi King (Sacred Books of the East, vol. 16)', author: 'James Legge', year: 1899, license: 'public domain', status: 'registered' },
   { id: 'balliett', title: 'The Philosophy of Numbers', author: 'L. Dow Balliett', year: 1908, license: 'public domain', status: 'registered' },
-  { id: 'cheiro', title: "Cheiro's Book of Numbers", author: 'Cheiro (William John Warner)', year: 1926, license: 'public domain (US)', status: 'registered', notes: 'Edition to confirm.' }
+  { id: 'cheiro', title: "Cheiro's Book of Numbers", author: 'Cheiro (William John Warner)', year: 1926, license: 'public domain (US)', status: 'registered', notes: 'Edition to confirm.' },
+  // Astrology sources named by the owner, 2026-10-11 (DECISIONS D-029). Their house delineations assume quadrant houses, not whole sign.
+  { id: 'lilly1647', title: 'Christian Astrology, Modestly Treated of in Three Books', author: 'William Lilly', year: 1647, license: 'public domain', status: 'loaded', notes: 'Book I: planets and signs; Books I–II: horary; Book III: nativities. Pre-modern: seven planets, Regiomontanus houses. Text: OCR of the Wellcome copy (archive.org b30338724), sources/ in the repo.' },
+  { id: 'leo-afa', title: 'Astrology for All, Part I', author: 'Alan Leo', year: 1899, license: 'public domain', status: 'registered', notes: 'Characteristics by Sun and Moon sign. Editions differ in length (1899; enlarged 2nd ed. 1904; 1910): locators must name the edition.' },
+  { id: 'heindel1918', title: 'The Message of the Stars', author: 'Max Heindel and Augusta Foss Heindel', year: 1918, license: 'public domain (US, text copyright 1918)', status: 'loaded', notes: 'Natal and medical astrology, Rosicrucian Fellowship (esoteric Christian). Text: 3rd ed., OCR of archive.org messageofstarses00heiniala, sources/ in the repo.' }
 ];
 
 export function seedSources(db: Db): void {
@@ -47,8 +51,19 @@ export function seedSources(db: Db): void {
     db.run('INSERT OR IGNORE INTO source (id, title, author, year, license, url, status, notes) VALUES (?,?,?,?,?,?,?,?)', [
       s.id, s.title, s.author ?? null, s.year ?? null, s.license, s.url ?? null, s.status, s.notes ?? null
     ]);
+    // A source whose text has since been loaded is upgraded; nothing is ever downgraded.
+    if (s.status === 'loaded') db.run("UPDATE source SET status = 'loaded', notes = ? WHERE id = ? AND status = 'registered'", [s.notes ?? null, s.id]);
   }
 }
+
+/**
+ * The house system a source's house delineations were written for (D-029). A house passage shown against a chart
+ * cast in another system is a transplant, and the reading says so.
+ */
+export const SOURCE_HOUSE_BASIS: Record<string, string> = {
+  lilly1647: 'Regiomontanus houses',
+  heindel1918: 'quadrant houses from printed tables of houses (the book does not name the system)'
+};
 
 export function sources(db: Db): Source[] {
   return db.all('SELECT * FROM source ORDER BY id') as unknown as Source[];
@@ -87,4 +102,9 @@ export function snippetsFor(db: Db, key: string): Snippet[] {
 
 export function approveSnippet(db: Db, id: string, approved: boolean): void {
   db.run('UPDATE snippet SET approved = ? WHERE id = ?', [approved ? 1 : 0, id]);
+}
+
+/** The owner rejects a paraphrase: it is removed, and its slot falls back to the placeholder. */
+export function deleteSnippet(db: Db, id: string): void {
+  db.run('DELETE FROM snippet WHERE id = ?', [id]);
 }
